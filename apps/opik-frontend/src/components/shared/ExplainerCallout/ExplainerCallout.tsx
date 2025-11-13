@@ -1,5 +1,6 @@
 import React from "react";
 import { Info, SquareArrowOutUpRight, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -17,18 +18,22 @@ const ExplainerCallout: React.FC<ExplainerCalloutProps> = ({
   id,
   title,
   description,
+  translationKey,
   docLink,
   docHash,
   className,
   Icon = Info,
   isDismissable = true,
 }) => {
+  const { t } = useTranslation();
   const [isShown, setIsShown] = useLocalStorageState<boolean>(
     `explainer-callout-${id}`,
     {
       defaultValue: true,
     },
   );
+
+  const translatedDescription = translationKey ? t(translationKey) : description;
 
   if (!isShown) return null;
 
@@ -41,7 +46,7 @@ const ExplainerCallout: React.FC<ExplainerCalloutProps> = ({
       <Icon />
       {title && <AlertTitle size="sm">{title}</AlertTitle>}
       <AlertDescription size="sm">
-        {description}
+        {translatedDescription}
         {docLink && (
           <Button variant="link" size="3xs" asChild>
             <a
@@ -49,7 +54,7 @@ const ExplainerCallout: React.FC<ExplainerCalloutProps> = ({
               target="_blank"
               rel="noreferrer"
             >
-              Read more
+              {t("common.readMore")}
               <SquareArrowOutUpRight className="ml-0.5 size-3 shrink-0" />
             </a>
           </Button>

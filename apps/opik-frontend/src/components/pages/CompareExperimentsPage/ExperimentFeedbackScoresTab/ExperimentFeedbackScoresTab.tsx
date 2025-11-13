@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import useLocalStorageState from "use-local-storage-state";
 import { ColumnPinningState } from "@tanstack/react-table";
 import find from "lodash/find";
@@ -91,10 +92,10 @@ export const DEFAULT_COLUMN_PINNING: ColumnPinningState = {
   right: [],
 };
 
-export const DEFAULT_COLUMNS: ColumnData<FeedbackScoreData>[] = [
+const getDefaultColumns = (t: (key: string) => string): ColumnData<FeedbackScoreData>[] => [
   {
     id: "name",
-    label: "Feedback score",
+    label: t("compareExperimentsPage.feedbackScores.feedbackScore"),
     type: COLUMN_TYPE.numberDictionary,
     cell: FeedbackScoreNameCell as never,
     size: 248,
@@ -109,6 +110,7 @@ export type ExperimentFeedbackScoresTabProps = {
 const ExperimentFeedbackScoresTab: React.FunctionComponent<
   ExperimentFeedbackScoresTabProps
 > = ({ experimentsIds, experiments, isPending }) => {
+  const { t } = useTranslation();
   const isCompare = experimentsIds.length > 1;
 
   const [columnsWidth, setColumnsWidth] = useLocalStorageState<
@@ -121,7 +123,7 @@ const ExperimentFeedbackScoresTab: React.FunctionComponent<
     const retVal = convertColumnDataToColumn<
       FeedbackScoreData,
       FeedbackScoreData
-    >(DEFAULT_COLUMNS, {});
+    >(getDefaultColumns(t), {});
 
     experimentsIds.forEach((id: string) => {
       retVal.push({
@@ -140,7 +142,7 @@ const ExperimentFeedbackScoresTab: React.FunctionComponent<
     });
 
     return retVal;
-  }, [experimentsIds, experiments]);
+  }, [experimentsIds, experiments, t]);
 
   const feedbackScoresMap = useMemo(() => {
     return getFeedbackScoreMap({
@@ -156,8 +158,8 @@ const ExperimentFeedbackScoresTab: React.FunctionComponent<
   }, [feedbackScoresMap, experimentsIds]);
 
   const noDataText = isCompare
-    ? "These experiments have no feedback scores"
-    : "This experiment has no feedback scores";
+    ? t("compareExperimentsPage.feedbackScores.noScoresMultiple")
+    : t("compareExperimentsPage.feedbackScores.noScoresSingle");
 
   const resizeConfig = useMemo(
     () => ({

@@ -16,6 +16,8 @@ import { RotateCw } from "lucide-react";
 import findIndex from "lodash/findIndex";
 import isNumber from "lodash/isNumber";
 import get from "lodash/get";
+import { useTranslation } from "react-i18next";
+import { TFunction } from "i18next";
 
 import {
   COLUMN_COMMENTS_ID,
@@ -79,10 +81,10 @@ const getRowId = (d: Thread) => d.id;
 
 const REFETCH_INTERVAL = 30000;
 
-const SHARED_COLUMNS: ColumnData<Thread>[] = [
+const getSharedColumns = (t: TFunction): ColumnData<Thread>[] => [
   {
     id: "first_message",
-    label: "First message",
+    label: t("threads.columns.firstMessage"),
     size: 400,
     type: COLUMN_TYPE.string,
     cell: PrettyCell as never,
@@ -92,7 +94,7 @@ const SHARED_COLUMNS: ColumnData<Thread>[] = [
   },
   {
     id: "last_message",
-    label: "Last message",
+    label: t("threads.columns.lastMessage"),
     size: 400,
     type: COLUMN_TYPE.string,
     cell: PrettyCell as never,
@@ -102,61 +104,61 @@ const SHARED_COLUMNS: ColumnData<Thread>[] = [
   },
   {
     id: "number_of_messages",
-    label: "Message count",
+    label: t("threads.columns.messageCount"),
     type: COLUMN_TYPE.number,
     accessorFn: (row) =>
       isNumber(row.number_of_messages) ? `${row.number_of_messages}` : "-",
   },
   {
     id: "status",
-    label: "Status",
+    label: t("threads.columns.status"),
     type: COLUMN_TYPE.category,
     cell: ThreadStatusCell as never,
   },
   {
     id: "created_at",
-    label: "Created at",
+    label: t("threads.columns.createdAt"),
     type: COLUMN_TYPE.time,
     accessorFn: (row) => formatDate(row.created_at),
   },
   {
     id: "last_updated_at",
-    label: "Last updated",
+    label: t("threads.columns.lastUpdated"),
     type: COLUMN_TYPE.time,
     accessorFn: (row) => formatDate(row.last_updated_at),
     sortable: true,
   },
   {
     id: "duration",
-    label: "Duration",
+    label: t("threads.columns.duration"),
     type: COLUMN_TYPE.duration,
     cell: DurationCell as never,
   },
   {
     id: "tags",
-    label: "Tags",
+    label: t("threads.columns.tags"),
     type: COLUMN_TYPE.list,
     cell: ListCell as never,
   },
   {
     id: "start_time",
-    label: "Start time",
+    label: t("threads.columns.startTime"),
     type: COLUMN_TYPE.time,
     accessorFn: (row) => formatDate(row.start_time),
   },
   {
     id: "end_time",
-    label: "End time",
+    label: t("threads.columns.endTime"),
     type: COLUMN_TYPE.time,
     accessorFn: (row) => formatDate(row.end_time),
   },
 ];
 
-const DEFAULT_COLUMNS: ColumnData<Thread>[] = [
-  ...SHARED_COLUMNS,
+const getDefaultColumns = (t: TFunction): ColumnData<Thread>[] => [
+  ...getSharedColumns(t),
   {
     id: `${COLUMN_USAGE_ID}.total_tokens`,
-    label: "Total tokens",
+    label: t("traces.columns.totalTokens"),
     type: COLUMN_TYPE.number,
     accessorFn: (row) =>
       row.usage && isNumber(row.usage.total_tokens)
@@ -165,7 +167,7 @@ const DEFAULT_COLUMNS: ColumnData<Thread>[] = [
   },
   {
     id: "total_estimated_cost",
-    label: "Estimated cost",
+    label: t("traces.columns.estimatedCost"),
     type: COLUMN_TYPE.cost,
     cell: CostCell as never,
     explainer: EXPLAINERS_MAP[EXPLAINER_ID.hows_the_thread_cost_estimated],
@@ -173,27 +175,27 @@ const DEFAULT_COLUMNS: ColumnData<Thread>[] = [
   },
   {
     id: "created_by",
-    label: "Created by",
+    label: t("traces.columns.createdBy"),
     type: COLUMN_TYPE.string,
   },
   {
     id: COLUMN_COMMENTS_ID,
-    label: "Comments",
+    label: t("traces.columns.comments"),
     type: COLUMN_TYPE.string,
     cell: CommentsCell as never,
   },
 ];
 
-const FILTER_COLUMNS: ColumnData<Thread>[] = [
+const getFilterColumns = (t: TFunction): ColumnData<Thread>[] => [
   {
     id: COLUMN_ID_ID,
-    label: "ID",
+    label: t("threads.columns.id"),
     type: COLUMN_TYPE.string,
   },
-  ...SHARED_COLUMNS,
+  ...getSharedColumns(t),
   {
     id: COLUMN_FEEDBACK_SCORES_ID,
-    label: "Feedback scores",
+    label: t("threads.columns.feedbackScores"),
     type: COLUMN_TYPE.numberDictionary,
   },
 ];
@@ -231,6 +233,7 @@ export const ThreadsTab: React.FC<ThreadsTabProps> = ({
   projectId,
   projectName,
 }) => {
+  const { t } = useTranslation();
   const truncationEnabled = useTruncationEnabled();
   const [search = "", setSearch] = useQueryParam(
     "threads_search",
@@ -239,6 +242,9 @@ export const ThreadsTab: React.FC<ThreadsTabProps> = ({
       updateType: "replaceIn",
     },
   );
+  
+  const DEFAULT_COLUMNS = useMemo(() => getDefaultColumns(t), [t]);
+  const FILTER_COLUMNS = useMemo(() => getFilterColumns(t), [t]);
 
   const { data: feedbackScoresNames, isPending: isFeedbackScoresNamesPending } =
     useThreadsFeedbackScoresNames({
@@ -378,7 +384,7 @@ export const ThreadsTab: React.FC<ThreadsTabProps> = ({
     // Always include "User feedback" column, even if it has no data
     const userFeedbackColumn: DynamicColumn = {
       id: USER_FEEDBACK_COLUMN_ID,
-      label: USER_FEEDBACK_NAME,
+      label: t("traces.columns.userFeedback"),
       columnType: COLUMN_TYPE.number,
     };
 
@@ -400,7 +406,7 @@ export const ThreadsTab: React.FC<ThreadsTabProps> = ({
           statisticKey: `${COLUMN_FEEDBACK_SCORES_ID}.${label}`,
         }) as ColumnData<Thread>,
     );
-  }, [dynamicScoresColumns]);
+  }, [dynamicScoresColumns, t]);
 
   const rows: Thread[] = useMemo(() => data?.content ?? [], [data]);
 
@@ -550,13 +556,13 @@ export const ThreadsTab: React.FC<ThreadsTabProps> = ({
   const columnSections = useMemo(() => {
     return [
       {
-        title: "Feedback scores",
+        title: t("threads.columns.feedbackScores"),
         columns: scoresColumnsData,
         order: scoresColumnsOrder,
         onOrderChange: setScoresColumnsOrder,
       },
     ];
-  }, [scoresColumnsData, scoresColumnsOrder, setScoresColumnsOrder]);
+  }, [scoresColumnsData, scoresColumnsOrder, setScoresColumnsOrder, t]);
 
   if (isPending || isFeedbackScoresNamesPending) {
     return <Loader />;

@@ -1,4 +1,6 @@
 import React, { useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import { TFunction } from "i18next";
 import { JsonParam, useQueryParam } from "use-query-params";
 
 import {
@@ -28,75 +30,75 @@ import FiltersButton from "@/components/shared/FiltersButton/FiltersButton";
 import TracesOrSpansPathsAutocomplete from "@/components/pages-shared/traces/TracesOrSpansPathsAutocomplete/TracesOrSpansPathsAutocomplete";
 import TracesOrSpansFeedbackScoresSelect from "@/components/pages-shared/traces/TracesOrSpansFeedbackScoresSelect/TracesOrSpansFeedbackScoresSelect";
 import MetricContainerChart from "./MetricChart/MetricChartContainer";
-import { INTERVAL_DESCRIPTIONS } from "./utils";
+import { getIntervalDescriptions } from "./utils";
 
 const renderCostTooltipValue = ({ value }: ChartTooltipRenderValueArguments) =>
   formatCost(value as number);
 
-const PROJECT_METRICS_FILTER_COLUMNS: ColumnData<BaseTraceData>[] = [
+const getProjectMetricsFilterColumns = (t: TFunction): ColumnData<BaseTraceData>[] => [
   {
     id: COLUMN_ID_ID,
-    label: "ID",
+    label: t("traces.columns.id"),
     type: COLUMN_TYPE.string,
   },
   {
     id: "name",
-    label: "Name",
+    label: t("traces.columns.name"),
     type: COLUMN_TYPE.string,
   },
   {
     id: "start_time",
-    label: "Start time",
+    label: t("traces.columns.startTime"),
     type: COLUMN_TYPE.time,
   },
   {
     id: "end_time",
-    label: "End time",
+    label: t("traces.columns.endTime"),
     type: COLUMN_TYPE.time,
   },
   {
     id: "input",
-    label: "Input",
+    label: t("traces.columns.input"),
     type: COLUMN_TYPE.string,
   },
   {
     id: "output",
-    label: "Output",
+    label: t("traces.columns.output"),
     type: COLUMN_TYPE.string,
   },
   {
     id: "duration",
-    label: "Duration",
+    label: t("traces.columns.duration"),
     type: COLUMN_TYPE.duration,
   },
   {
     id: COLUMN_METADATA_ID,
-    label: "Metadata",
+    label: t("traces.columns.metadata"),
     type: COLUMN_TYPE.dictionary,
   },
   {
     id: "tags",
-    label: "Tags",
+    label: t("traces.columns.tags"),
     type: COLUMN_TYPE.list,
   },
   {
     id: "thread_id",
-    label: "Thread ID",
+    label: t("traces.columns.threadId"),
     type: COLUMN_TYPE.string,
   },
   {
     id: "error_info",
-    label: "Errors",
+    label: t("traces.columns.errors"),
     type: COLUMN_TYPE.errors,
   },
   {
     id: COLUMN_FEEDBACK_SCORES_ID,
-    label: "Feedback scores",
+    label: t("traces.columns.feedbackScores"),
     type: COLUMN_TYPE.numberDictionary,
   },
   {
     id: COLUMN_CUSTOM_ID,
-    label: "Custom filter",
+    label: t("traces.columns.customFilter"),
     type: COLUMN_TYPE.dictionary,
   },
 ];
@@ -116,6 +118,9 @@ const ProjectMetricsSection: React.FC<ProjectMetricsSectionProps> = ({
   intervalEnd,
   hasTraces,
 }) => {
+  const { t } = useTranslation();
+  const intervalDescriptions = useMemo(() => getIntervalDescriptions(t), [t]);
+  const PROJECT_METRICS_FILTER_COLUMNS = useMemo(() => getProjectMetricsFilterColumns(t), [t]);
   const isGuardrailsEnabled = useIsFeatureEnabled(
     FeatureToggleKeys.GUARDRAILS_ENABLED,
   );
@@ -220,7 +225,7 @@ const ProjectMetricsSection: React.FC<ProjectMetricsSectionProps> = ({
   return (
     <div className="pt-6">
       <div className="sticky top-0 z-10 flex items-center justify-between bg-soft-background pb-3 pt-2">
-        <h2 className="comet-title-s truncate break-words">Project metrics</h2>
+        <h2 className="comet-title-s truncate break-words">{t("metrics.projectMetrics")}</h2>
         <FiltersButton
           columns={projectMetricsFilterColumns}
           filters={projectMetricsFilters}
@@ -236,8 +241,8 @@ const ProjectMetricsSection: React.FC<ProjectMetricsSectionProps> = ({
           <MetricContainerChart
             chartId="token_usage_chart"
             key="token_usage_chart"
-            name="Token usage"
-            description={INTERVAL_DESCRIPTIONS.TOTALS[interval]}
+            name={t("metrics.tokenUsage")}
+            description={intervalDescriptions.TOTALS[interval]}
             metricName={METRIC_NAME_TYPE.TOKEN_USAGE}
             interval={interval}
             intervalStart={intervalStart}
@@ -251,8 +256,8 @@ const ProjectMetricsSection: React.FC<ProjectMetricsSectionProps> = ({
           <MetricContainerChart
             chartId="estimated_cost_chart"
             key="estimated_cost_chart"
-            name="Estimated cost"
-            description={INTERVAL_DESCRIPTIONS.COST[interval]}
+            name={t("metrics.estimatedCost")}
+            description={intervalDescriptions.COST[interval]}
             metricName={METRIC_NAME_TYPE.COST}
             interval={interval}
             intervalStart={intervalStart}

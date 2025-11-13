@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 import SliderInputControl from "@/components/shared/SliderInputControl/SliderInputControl";
 import PromptModelSettingsTooltipContent from "@/components/pages-shared/llm/PromptModelSettings/providerConfigs/PromptModelConfigsTooltipContent";
@@ -31,6 +32,7 @@ const OpenAIModelConfigs = ({
   model,
   onChange,
 }: OpenAIModelSettingsProps) => {
+  const { t } = useTranslation();
   // Reasoning models (GPT-5, O1, O3, O4-mini) require temperature = 1.0
   const isReasoning = isReasoningModel(model);
 
@@ -45,13 +47,13 @@ const OpenAIModelConfigs = ({
           max={1}
           step={0.01}
           defaultValue={isReasoning ? 1 : DEFAULT_OPEN_AI_CONFIGS.TEMPERATURE}
-          label="Temperature"
+          label={t("modelConfig.temperature")}
           tooltip={
             <PromptModelSettingsTooltipContent
               text={
                 isReasoning
-                  ? "Reasoning models require temperature = 1.0. This setting controls randomness in completions."
-                  : "Controls randomness: Lowering results in less random completions. As the temperature approaches zero, the model will become deterministic and repetitive."
+                  ? t("modelConfig.temperatureReasoningTooltip")
+                  : t("modelConfig.temperatureTooltip")
               }
             />
           }
@@ -67,9 +69,9 @@ const OpenAIModelConfigs = ({
           max={128000}
           step={1}
           defaultValue={DEFAULT_OPEN_AI_CONFIGS.MAX_COMPLETION_TOKENS}
-          label="Max output tokens"
+          label={t("modelConfig.maxOutputTokens")}
           tooltip={
-            <PromptModelSettingsTooltipContent text="The maximum number of tokens to generate shared between the prompt and completion. The exact limit varies by model. (One token is roughly 4 characters for standard English text)." />
+            <PromptModelSettingsTooltipContent text={t("modelConfig.maxOutputTokensTooltip")} />
           }
         />
       )}
@@ -83,9 +85,9 @@ const OpenAIModelConfigs = ({
           max={1}
           step={0.01}
           defaultValue={DEFAULT_OPEN_AI_CONFIGS.TOP_P}
-          label="Top P"
+          label={t("modelConfig.topP")}
           tooltip={
-            <PromptModelSettingsTooltipContent text="Controls diversity via nucleus sampling: 0.5 means half of all likelihood-weighted options are considered" />
+            <PromptModelSettingsTooltipContent text={t("modelConfig.topPTooltip")} />
           }
         />
       )}
@@ -99,9 +101,9 @@ const OpenAIModelConfigs = ({
           max={1}
           step={0.01}
           defaultValue={DEFAULT_OPEN_AI_CONFIGS.FREQUENCY_PENALTY}
-          label="Frequency penalty"
+          label={t("modelConfig.frequencyPenalty")}
           tooltip={
-            <PromptModelSettingsTooltipContent text="How much to penalize new tokens based on their existing frequency in the text so far. Decreases the model's likelihood to repeat the same line verbatim" />
+            <PromptModelSettingsTooltipContent text={t("modelConfig.frequencyPenaltyTooltip")} />
           }
         />
       )}
@@ -115,9 +117,9 @@ const OpenAIModelConfigs = ({
           max={1}
           step={0.01}
           defaultValue={DEFAULT_OPEN_AI_CONFIGS.PRESENCE_PENALTY}
-          label="Presence penalty"
+          label={t("modelConfig.presencePenalty")}
           tooltip={
-            <PromptModelSettingsTooltipContent text="How much to penalize new tokens based on whether they appear in the text so far. Increases the model's likelihood to talk about new topics" />
+            <PromptModelSettingsTooltipContent text={t("modelConfig.presencePenaltyTooltip")} />
           }
         />
       )}
@@ -126,9 +128,9 @@ const OpenAIModelConfigs = ({
         <div className="space-y-2">
           <div className="flex items-center space-x-2">
             <Label htmlFor="reasoningEffort" className="text-sm font-medium">
-              Reasoning effort
+              {t("modelConfig.reasoningEffort")}
             </Label>
-            <ExplainerIcon description="Controls how much effort the model puts into reasoning before responding. Higher effort may result in more thoughtful but slower responses." />
+            <ExplainerIcon description={t("modelConfig.reasoningEffortTooltip")} />
           </div>
           <Select
             value={configs.reasoningEffort || "medium"}
@@ -137,13 +139,13 @@ const OpenAIModelConfigs = ({
             }
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select reasoning effort" />
+              <SelectValue placeholder={t("modelConfig.selectReasoningEffort")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="minimal">Minimal</SelectItem>
-              <SelectItem value="low">Low</SelectItem>
-              <SelectItem value="medium">Medium</SelectItem>
-              <SelectItem value="high">High</SelectItem>
+              <SelectItem value="minimal">{t("modelConfig.minimal")}</SelectItem>
+              <SelectItem value="low">{t("modelConfig.low")}</SelectItem>
+              <SelectItem value="medium">{t("modelConfig.medium")}</SelectItem>
+              <SelectItem value="high">{t("modelConfig.high")}</SelectItem>
             </SelectContent>
           </Select>
         </div>

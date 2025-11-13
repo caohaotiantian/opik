@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import isUndefined from "lodash/isUndefined";
 import findIndex from "lodash/findIndex";
 import find from "lodash/find";
@@ -114,30 +115,30 @@ const PAGINATION_SIZE_KEY = "compare-experiments-pagination-size";
 const ROW_HEIGHT_KEY = "compare-experiments-row-height";
 const SORTING_KEY = "compare-experiments-sorting";
 
-export const FILTER_COLUMNS: ColumnData<ExperimentsCompare>[] = [
+const getFilterColumns = (t: (key: string) => string): ColumnData<ExperimentsCompare>[] => [
   {
     id: COLUMN_ID_ID,
-    label: "ID (Dataset item)",
+    label: t("compareExperimentsPage.experimentItems.idDatasetItem"),
     type: COLUMN_TYPE.string,
   },
   {
     id: COLUMN_DURATION_ID,
-    label: "Duration",
+    label: t("compareExperimentsPage.experimentItems.duration"),
     type: COLUMN_TYPE.duration,
   },
   {
     id: COLUMN_COMMENTS_ID,
-    label: "Comments",
+    label: t("compareExperimentsPage.experimentItems.comments"),
     type: COLUMN_TYPE.string,
   },
   {
     id: "output",
-    label: "Evaluation task",
+    label: t("compareExperimentsPage.experimentItems.evaluationTask"),
     type: COLUMN_TYPE.string,
   },
   {
     id: COLUMN_FEEDBACK_SCORES_ID,
-    label: "Feedback scores",
+    label: t("compareExperimentsPage.experimentItems.feedbackScores"),
     type: COLUMN_TYPE.numberDictionary,
   },
 ];
@@ -162,6 +163,7 @@ const ExperimentItemsTab: React.FunctionComponent<ExperimentItemsTabProps> = ({
   experimentsIds = [],
   experiments,
 }) => {
+  const { t } = useTranslation();
   const datasetId = useDatasetIdFromCompareExperimentsURL();
   const workspaceName = useAppStore((state) => state.activeWorkspaceName);
 
@@ -224,12 +226,12 @@ const ExperimentItemsTab: React.FunctionComponent<ExperimentItemsTabProps> = ({
           keyComponent: ExperimentsFeedbackScoresSelect,
           keyComponentProps: {
             experimentsIds,
-            placeholder: "Select score",
+            placeholder: t("compareExperimentsPage.experimentItems.selectScore"),
           },
         },
       },
     }),
-    [experimentsIds],
+    [experimentsIds, t],
   );
 
   const [columnsWidth, setColumnsWidth] = useLocalStorageState<
@@ -358,7 +360,7 @@ const ExperimentItemsTab: React.FunctionComponent<ExperimentItemsTabProps> = ({
     () => statisticData?.stats ?? [],
     [statisticData],
   );
-  const noDataText = "There is no data for the selected experiments";
+  const noDataText = t("compareExperimentsPage.experimentItems.noData");
 
   const dynamicDatasetColumns = useMemo(() => {
     return (data?.columns ?? [])
@@ -446,7 +448,7 @@ const ExperimentItemsTab: React.FunctionComponent<ExperimentItemsTabProps> = ({
       ),
       {
         id: COLUMN_DURATION_ID,
-        label: "Duration",
+        label: t("compareExperimentsPage.experimentItems.duration"),
         type: COLUMN_TYPE.duration,
         cell: DurationCell.Compare as never,
         statisticKey: "duration",
@@ -457,7 +459,7 @@ const ExperimentItemsTab: React.FunctionComponent<ExperimentItemsTabProps> = ({
       },
       {
         id: COLUMN_COMMENTS_ID,
-        label: "Comments",
+        label: t("compareExperimentsPage.experimentItems.comments"),
         type: COLUMN_TYPE.string,
         cell: CommentsCell.Compare as never,
         sortable: isColumnSortable(COLUMN_COMMENTS_ID, sortableColumns),
@@ -472,6 +474,7 @@ const ExperimentItemsTab: React.FunctionComponent<ExperimentItemsTabProps> = ({
     experimentsIds,
     setTraceId,
     sortableColumns,
+    t,
   ]);
 
   const scoresColumnsData = useMemo(() => {
@@ -541,7 +544,7 @@ const ExperimentItemsTab: React.FunctionComponent<ExperimentItemsTabProps> = ({
       }),
       mapColumnDataFields<ExperimentsCompare, ExperimentsCompare>({
         id: COLUMN_ID_ID,
-        label: "ID (Dataset item)",
+        label: t("compareExperimentsPage.experimentItems.idDatasetItem"),
         type: COLUMN_TYPE.string,
         cell: LinkCell as never,
         verticalAlignment: calculateVerticalAlignment(experimentsCount),
@@ -560,7 +563,7 @@ const ExperimentItemsTab: React.FunctionComponent<ExperimentItemsTabProps> = ({
         columnHelper.group({
           id: "dataset",
           meta: {
-            header: "Dataset",
+            header: t("compareExperimentsPage.experimentItems.dataset"),
           },
           header: SectionHeader,
           columns: convertColumnDataToColumn<
@@ -580,7 +583,7 @@ const ExperimentItemsTab: React.FunctionComponent<ExperimentItemsTabProps> = ({
         columnHelper.group({
           id: "experiments",
           meta: {
-            header: "Experiments",
+            header: t("compareExperimentsPage.experimentItems.experiments"),
           },
           header: SectionHeader,
           columns: convertColumnDataToColumn<
@@ -590,7 +593,7 @@ const ExperimentItemsTab: React.FunctionComponent<ExperimentItemsTabProps> = ({
             [
               {
                 id: COLUMN_EXPERIMENT_NAME_ID,
-                label: "Name",
+                label: t("compareExperimentsPage.experimentItems.name"),
                 header: CompareExperimentsNameHeader as never,
                 cell: CompareExperimentsNameCell as never,
                 customMeta: {
@@ -610,7 +613,7 @@ const ExperimentItemsTab: React.FunctionComponent<ExperimentItemsTabProps> = ({
         columnHelper.group({
           id: "evaluation",
           meta: {
-            header: "Evaluation task",
+            header: t("compareExperimentsPage.experimentItems.evaluationTask"),
           },
           header: SectionHeader,
           columns: convertColumnDataToColumn<
@@ -630,7 +633,7 @@ const ExperimentItemsTab: React.FunctionComponent<ExperimentItemsTabProps> = ({
         columnHelper.group({
           id: "scores",
           meta: {
-            header: "Feedback scores",
+            header: t("compareExperimentsPage.experimentItems.feedbackScores"),
           },
           header: SectionHeader,
           columns: convertColumnDataToColumn<
@@ -659,6 +662,7 @@ const ExperimentItemsTab: React.FunctionComponent<ExperimentItemsTabProps> = ({
     outputColumnsOrder,
     scoresColumnsOrder,
     sortableColumns,
+    t,
   ]);
 
   const columnsToExport = useMemo(() => {
@@ -681,18 +685,18 @@ const ExperimentItemsTab: React.FunctionComponent<ExperimentItemsTabProps> = ({
       ...sortBy(dynamicDatasetColumns, "label").map(
         ({ id, label, columnType }) => ({
           id,
-          label: `${label} (Dataset)`,
+          label: `${label} ${t("compareExperimentsPage.experimentItems.labelDataset")}`,
           type: columnType,
         }),
       ),
       ...sortBy(dynamicOutputColumns, "label").map(({ id, label }) => ({
         id,
-        label: `${label} (Output)`,
+        label: `${label} ${t("compareExperimentsPage.experimentItems.labelOutput")}`,
         type: COLUMN_TYPE.string,
       })),
-      ...FILTER_COLUMNS,
+      ...getFilterColumns(t),
     ];
-  }, [dynamicDatasetColumns, dynamicOutputColumns]);
+  }, [dynamicDatasetColumns, dynamicOutputColumns, t]);
 
   const rowIndex = findIndex(rows, (row) => activeRowId === row.id);
 
@@ -741,13 +745,13 @@ const ExperimentItemsTab: React.FunctionComponent<ExperimentItemsTabProps> = ({
   const columnSections = useMemo(() => {
     return [
       {
-        title: "Evaluation task",
+        title: t("compareExperimentsPage.experimentItems.evaluationTask"),
         columns: outputColumnsData,
         order: outputColumnsOrder,
         onOrderChange: setOutputColumnsOrder,
       },
       {
-        title: "Feedback scores",
+        title: t("compareExperimentsPage.experimentItems.feedbackScores"),
         columns: scoresColumnsData,
         order: scoresColumnsOrder,
         onOrderChange: setScoresColumnsOrder,
@@ -760,6 +764,7 @@ const ExperimentItemsTab: React.FunctionComponent<ExperimentItemsTabProps> = ({
     scoresColumnsData,
     scoresColumnsOrder,
     setScoresColumnsOrder,
+    t,
   ]);
 
   const meta = useMemo(
@@ -798,7 +803,7 @@ const ExperimentItemsTab: React.FunctionComponent<ExperimentItemsTabProps> = ({
           <SearchInput
             searchText={search!}
             setSearchText={setSearch}
-            placeholder="Search dataset items"
+            placeholder={t("compareExperimentsPage.experimentItems.searchDatasetItems")}
             className="w-[320px]"
             dimension="sm"
           />

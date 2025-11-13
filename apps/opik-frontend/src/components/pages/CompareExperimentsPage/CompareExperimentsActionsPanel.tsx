@@ -1,4 +1,5 @@
 import React, { useCallback, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Split } from "lucide-react";
 import get from "lodash/get";
 import slugify from "slugify";
@@ -91,6 +92,7 @@ type CompareExperimentsActionsPanelProps = {
 const CompareExperimentsActionsPanel: React.FC<
   CompareExperimentsActionsPanelProps
 > = ({ getDataForExport, selectedRows = [], columnsToExport, experiments }) => {
+  const { t } = useTranslation();
   const resetKeyRef = useRef(0);
   const [open, setOpen] = useState<boolean>(false);
   const disabled = !selectedRows?.length;
@@ -184,7 +186,7 @@ const CompareExperimentsActionsPanel: React.FC<
         setOpen={setOpen}
       />
       <div className="inline-flex items-center gap-2">
-        <TooltipWrapper content="Compare experiments">
+        <TooltipWrapper content={t("compareExperimentsPage.actionsPanel.compareExperiments")}>
           <Button
             size="sm"
             onClick={() => {
@@ -193,7 +195,7 @@ const CompareExperimentsActionsPanel: React.FC<
             }}
           >
             <Split className="mr-1.5 size-3.5" />
-            Compare
+            {t("compareExperimentsPage.actionsPanel.compare")}
           </Button>
         </TooltipWrapper>
         <ExplainerIcon

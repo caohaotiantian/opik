@@ -1,4 +1,6 @@
 import React, { useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import { TFunction } from "i18next";
 import { JsonParam, useQueryParam } from "use-query-params";
 
 import {
@@ -18,71 +20,71 @@ import ThreadsFeedbackScoresSelect from "@/components/pages-shared/traces/Traces
 
 import MetricContainerChart from "./MetricChart/MetricChartContainer";
 import {
-  DURATION_LABELS_MAP,
-  INTERVAL_DESCRIPTIONS,
+  getDurationLabels,
+  getIntervalDescriptions,
   renderDurationTooltipValue,
   durationYTickFormatter,
 } from "./utils";
 
-const THREAD_FILTER_COLUMNS: ColumnData<Thread>[] = [
+const getThreadFilterColumns = (t: TFunction): ColumnData<Thread>[] => [
   {
     id: COLUMN_ID_ID,
-    label: "ID",
+    label: t("threads.columns.id"),
     type: COLUMN_TYPE.string,
   },
   {
     id: "first_message",
-    label: "First message",
+    label: t("threads.columns.firstMessage"),
     type: COLUMN_TYPE.string,
   },
   {
     id: "last_message",
-    label: "Last message",
+    label: t("threads.columns.lastMessage"),
     type: COLUMN_TYPE.string,
   },
   {
     id: "number_of_messages",
-    label: "Message count",
+    label: t("threads.columns.messageCount"),
     type: COLUMN_TYPE.number,
   },
   {
     id: "status",
-    label: "Status",
+    label: t("threads.columns.status"),
     type: COLUMN_TYPE.category,
   },
   {
     id: "created_at",
-    label: "Created at",
+    label: t("threads.columns.createdAt"),
     type: COLUMN_TYPE.time,
   },
   {
     id: "last_updated_at",
-    label: "Last updated",
+    label: t("threads.columns.lastUpdated"),
     type: COLUMN_TYPE.time,
   },
   {
     id: "duration",
-    label: "Duration",
+    label: t("threads.columns.duration"),
     type: COLUMN_TYPE.duration,
   },
   {
     id: "tags",
-    label: "Tags",
+    label: t("threads.columns.tags"),
     type: COLUMN_TYPE.list,
   },
   {
     id: "start_time",
-    label: "Start time",
+    label: t("threads.columns.startTime"),
     type: COLUMN_TYPE.time,
   },
   {
     id: "end_time",
-    label: "End time",
+    label: t("threads.columns.endTime"),
     type: COLUMN_TYPE.time,
   },
   {
     id: COLUMN_FEEDBACK_SCORES_ID,
-    label: "Feedback scores",
+    label: t("threads.columns.feedbackScores"),
     type: COLUMN_TYPE.numberDictionary,
   },
 ];
@@ -102,6 +104,10 @@ const ThreadMetricsSection: React.FC<ThreadMetricsSectionProps> = ({
   intervalEnd,
   hasThreads,
 }) => {
+  const { t } = useTranslation();
+  const intervalDescriptions = useMemo(() => getIntervalDescriptions(t), [t]);
+  const durationLabels = useMemo(() => getDurationLabels(t), [t]);
+  const THREAD_FILTER_COLUMNS = useMemo(() => getThreadFilterColumns(t), [t]);
   const [threadFilters = [], setThreadFilters] = useQueryParam(
     "threads_metrics_filters",
     JsonParam,
@@ -145,7 +151,7 @@ const ThreadMetricsSection: React.FC<ThreadMetricsSectionProps> = ({
   return (
     <div className="pt-6">
       <div className="sticky top-0 z-10 flex items-center justify-between bg-soft-background pb-3 pt-2">
-        <h2 className="comet-title-s truncate break-words">Thread metrics</h2>
+        <h2 className="comet-title-s truncate break-words">{t("metrics.threadMetrics")}</h2>
         <FiltersButton
           columns={THREAD_FILTER_COLUMNS}
           filters={threadFilters}
@@ -161,8 +167,8 @@ const ThreadMetricsSection: React.FC<ThreadMetricsSectionProps> = ({
           <MetricContainerChart
             chartId="threads_feedback_scores_chart"
             key="threads_feedback_scores_chart"
-            name="Threads feedback scores"
-            description={INTERVAL_DESCRIPTIONS.AVERAGES[interval]}
+            name={t("metrics.threadsFeedbackScores")}
+            description={intervalDescriptions.AVERAGES[interval]}
             metricName={METRIC_NAME_TYPE.THREAD_FEEDBACK_SCORES}
             interval={interval}
             intervalStart={intervalStart}
@@ -176,8 +182,8 @@ const ThreadMetricsSection: React.FC<ThreadMetricsSectionProps> = ({
           <MetricContainerChart
             chartId="number_of_thread_chart"
             key="number_of_thread_chart"
-            name="Number of threads"
-            description={INTERVAL_DESCRIPTIONS.TOTALS[interval]}
+            name={t("metrics.numberOfThreads")}
+            description={intervalDescriptions.TOTALS[interval]}
             metricName={METRIC_NAME_TYPE.THREAD_COUNT}
             interval={interval}
             intervalStart={intervalStart}
@@ -191,15 +197,15 @@ const ThreadMetricsSection: React.FC<ThreadMetricsSectionProps> = ({
           <MetricContainerChart
             chartId="thread_duration_chart"
             key="thread_duration_chart"
-            name="Thread duration"
-            description={INTERVAL_DESCRIPTIONS.QUANTILES[interval]}
+            name={t("metrics.threadDuration")}
+            description={intervalDescriptions.QUANTILES[interval]}
             metricName={METRIC_NAME_TYPE.THREAD_DURATION}
             interval={interval}
             intervalStart={intervalStart}
             intervalEnd={intervalEnd}
             projectId={projectId}
             renderValue={renderDurationTooltipValue}
-            labelsMap={DURATION_LABELS_MAP}
+            labelsMap={durationLabels}
             customYTickFormatter={durationYTickFormatter}
             chartType="line"
             threadFilters={threadFilters}

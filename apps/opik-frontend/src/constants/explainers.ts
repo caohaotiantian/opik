@@ -95,6 +95,7 @@ export const EXPLAINERS_MAP: Record<EXPLAINER_ID, Explainer> = {
     id: EXPLAINER_ID.what_are_feedback_scores,
     description:
       "Feedback scores are evaluations of your LLM outputs, obtained via human review, online evaluation rules, or the SDK",
+    translationKey: "explainers.whatAreFeedbackScores",
   },
   [EXPLAINER_ID.i_created_a_project_now_what]: {
     id: EXPLAINER_ID.i_created_a_project_now_what,
@@ -107,17 +108,20 @@ export const EXPLAINERS_MAP: Record<EXPLAINER_ID, Explainer> = {
     id: EXPLAINER_ID.what_are_traces,
     description:
       "A trace is a step-by-step record of how your LLM application processes a single input, including LLM calls and other operations.",
+    translationKey: "traces.explainers.whatAreTraces",
     docLink: "/tracing/log_traces",
   },
   [EXPLAINER_ID.what_are_spans]: {
     id: EXPLAINER_ID.what_are_spans,
     description:
       "A span represents a single step in the execution of a trace. Use spans to debug, monitor, and evaluate model behavior.",
+    translationKey: "traces.explainers.whatAreSpans",
   },
   [EXPLAINER_ID.what_are_threads]: {
     id: EXPLAINER_ID.what_are_threads,
     description:
       "A thread represents a full conversation session, grouping together multiple related traces. Use threads to review and evaluate entire interactions in chat-based applications.",
+    translationKey: "traces.explainers.whatAreThreads",
     docLink: "/tracing/log_chat_conversations",
     type: "help",
   },
@@ -213,6 +217,7 @@ export const EXPLAINERS_MAP: Record<EXPLAINER_ID, Explainer> = {
     id: EXPLAINER_ID.what_are_experiment_items,
     description:
       "Experiment items are individual evaluations that connect a dataset sample with its LLM output, feedback scores, and trace.",
+    translationKey: "explainers.whatAreExperimentItems",
     docLink: "/evaluation/overview",
     docHash: "#analyzing-evaluation-results",
   },
@@ -220,6 +225,7 @@ export const EXPLAINERS_MAP: Record<EXPLAINER_ID, Explainer> = {
     id: EXPLAINER_ID.whats_the_experiment_configuration,
     description:
       "The experiment configuration captures key settings, like the prompt, model, and temperature, to keep experiments reproducible and easy to analyze.",
+    translationKey: "explainers.whatsTheExperimentConfiguration",
     docLink: "/evaluation/concepts",
     docHash: "#experiment-configuration",
   },
@@ -227,6 +233,7 @@ export const EXPLAINERS_MAP: Record<EXPLAINER_ID, Explainer> = {
     id: EXPLAINER_ID.what_does_it_mean_to_compare_my_experiments,
     description:
       "Compare experiments to understand how changes to prompts, models, or rules impact performance. Select at least two experiments from the same dataset to get started.",
+    translationKey: "explainers.whatDoesItMeanToCompareMyExperiments",
     docLink: "/evaluation/overview",
     docHash: "#analyzing-evaluation-results",
     type: "help",
@@ -299,6 +306,7 @@ export const EXPLAINERS_MAP: Record<EXPLAINER_ID, Explainer> = {
     id: EXPLAINER_ID.whats_the_playground,
     description:
       "Test before saving a prompt to the library or running a full experiment. Or use it to explore different prompt variations and see how your LLM responds in real time.",
+    translationKey: "explainers.whatsThePlayground",
     docLink: "/prompt_engineering/playground",
   },
   [EXPLAINER_ID.whats_these_configuration_things]: {
@@ -306,6 +314,7 @@ export const EXPLAINERS_MAP: Record<EXPLAINER_ID, Explainer> = {
     title: "Model parameters",
     description:
       "The model configuration parameters allow you to control output behavior. Tuning these lets you balance between deterministic answers and more diverse, exploratory outputs.",
+    translationKey: "explainers.whatsTheseConfigurationThings",
   },
   [EXPLAINER_ID.why_do_i_need_an_ai_provider]: {
     id: EXPLAINER_ID.why_do_i_need_an_ai_provider,
@@ -316,6 +325,7 @@ export const EXPLAINERS_MAP: Record<EXPLAINER_ID, Explainer> = {
     id: EXPLAINER_ID.what_does_the_dataset_do_here,
     description:
       "Run a prompt on a dataset in the Playground to preview its performance across multiple inputs. Select one or more metrics to automatically evaluate each dataset item.",
+    translationKey: "explainers.whatDoesTheDatasetDoHere",
   },
   [EXPLAINER_ID.how_do_i_use_the_dataset_in_the_playground]: {
     id: EXPLAINER_ID.how_do_i_use_the_dataset_in_the_playground,
@@ -357,6 +367,7 @@ export const EXPLAINERS_MAP: Record<EXPLAINER_ID, Explainer> = {
     id: EXPLAINER_ID.whats_the_best_score,
     description:
       "Highest evaluation result achieved during the optimization run, based on your selected metric.",
+    translationKey: "explainers.whatsTheBestScore",
   },
   [EXPLAINER_ID.what_happens_if_i_edit_an_ai_provider]: {
     id: EXPLAINER_ID.what_happens_if_i_edit_an_ai_provider,
@@ -404,6 +415,7 @@ export const EXPLAINERS_MAP: Record<EXPLAINER_ID, Explainer> = {
     id: EXPLAINER_ID.whats_the_optimizer,
     description:
       "An optimizer is a built-in algorithm from the Opik Agent Optimizer SDK that improves prompt effectiveness. Each one uses its own strategy and configurable settings to target specific optimization goals.",
+    translationKey: "explainers.whatsTheOptimizer",
     docLink: "/agent_optimization/opik_optimizer/concepts",
     type: "help",
   },
@@ -535,6 +547,7 @@ export const EXPLAINERS_MAP: Record<EXPLAINER_ID, Explainer> = {
     id: EXPLAINER_ID.prompt_generation_learn_more,
     description:
       "Not sure where to start? Tell us your goal in plain language, and we'll generate a ready-to-use prompt.",
+    translationKey: "explainers.promptGenerationLearnMore",
     docLink: "/prompt_engineering/improve",
     docHash: "#generate",
   },
@@ -542,6 +555,7 @@ export const EXPLAINERS_MAP: Record<EXPLAINER_ID, Explainer> = {
     id: EXPLAINER_ID.prompt_improvement_learn_more,
     description:
       "Give your prompt a boost! Add optional guidance, or let AI apply best-practice improvements for you.",
+    translationKey: "explainers.promptImprovementLearnMore",
     docLink: "/prompt_engineering/improve",
     docHash: "#improve",
   },
@@ -549,6 +563,7 @@ export const EXPLAINERS_MAP: Record<EXPLAINER_ID, Explainer> = {
     id: EXPLAINER_ID.prompt_improvement_optimizer,
     description:
       "Looking for advanced optimization algorithms? Check out the Opik optimizer!",
+    translationKey: "explainers.promptImprovementOptimizer",
     docLink: "/agent_optimization/opik_optimizer/overview",
   },
 };

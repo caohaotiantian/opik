@@ -16,6 +16,8 @@ import findIndex from "lodash/findIndex";
 import isObject from "lodash/isObject";
 import isNumber from "lodash/isNumber";
 import get from "lodash/get";
+import { useTranslation } from "react-i18next";
+import { TFunction } from "i18next";
 
 import useTracesOrSpansList, {
   TRACE_DATA_TYPE,
@@ -105,27 +107,27 @@ const getRowId = (d: Trace | Span) => d.id;
 
 const REFETCH_INTERVAL = 30000;
 
-const SHARED_COLUMNS: ColumnData<BaseTraceData>[] = [
+const getSharedColumns = (t: TFunction): ColumnData<BaseTraceData>[] => [
   {
     id: "name",
-    label: "Name",
+    label: t("traces.columns.name"),
     type: COLUMN_TYPE.string,
   },
   {
     id: "start_time",
-    label: "Start time",
+    label: t("traces.columns.startTime"),
     type: COLUMN_TYPE.time,
     accessorFn: (row) => formatDate(row.start_time),
   },
   {
     id: "end_time",
-    label: "End time",
+    label: t("traces.columns.endTime"),
     type: COLUMN_TYPE.time,
     accessorFn: (row) => formatDate(row.end_time),
   },
   {
     id: "input",
-    label: "Input",
+    label: t("traces.columns.input"),
     size: 400,
     type: COLUMN_TYPE.string,
     cell: PrettyCell as never,
@@ -135,7 +137,7 @@ const SHARED_COLUMNS: ColumnData<BaseTraceData>[] = [
   },
   {
     id: "output",
-    label: "Output",
+    label: t("traces.columns.output"),
     size: 400,
     type: COLUMN_TYPE.string,
     cell: PrettyCell as never,
@@ -145,14 +147,14 @@ const SHARED_COLUMNS: ColumnData<BaseTraceData>[] = [
   },
   {
     id: "duration",
-    label: "Duration",
+    label: t("traces.columns.duration"),
     type: COLUMN_TYPE.duration,
     cell: DurationCell as never,
     statisticDataFormater: formatDuration,
   },
   {
     id: COLUMN_METADATA_ID,
-    label: "Metadata",
+    label: t("traces.columns.metadata"),
     type: COLUMN_TYPE.dictionary,
     accessorFn: (row) =>
       isObject(row.metadata)
@@ -162,13 +164,13 @@ const SHARED_COLUMNS: ColumnData<BaseTraceData>[] = [
   },
   {
     id: "tags",
-    label: "Tags",
+    label: t("traces.columns.tags"),
     type: COLUMN_TYPE.list,
     cell: ListCell as never,
   },
   {
     id: "usage.total_tokens",
-    label: "Total tokens",
+    label: t("traces.columns.totalTokens"),
     type: COLUMN_TYPE.number,
     accessorFn: (row) =>
       row.usage && isNumber(row.usage.total_tokens)
@@ -177,7 +179,7 @@ const SHARED_COLUMNS: ColumnData<BaseTraceData>[] = [
   },
   {
     id: "usage.prompt_tokens",
-    label: "Total input tokens",
+    label: t("traces.columns.totalInputTokens"),
     type: COLUMN_TYPE.number,
     accessorFn: (row) =>
       row.usage && isNumber(row.usage.prompt_tokens)
@@ -186,7 +188,7 @@ const SHARED_COLUMNS: ColumnData<BaseTraceData>[] = [
   },
   {
     id: "usage.completion_tokens",
-    label: "Total output tokens",
+    label: t("traces.columns.totalOutputTokens"),
     type: COLUMN_TYPE.number,
     accessorFn: (row) =>
       row.usage && isNumber(row.usage.completion_tokens)
@@ -195,7 +197,7 @@ const SHARED_COLUMNS: ColumnData<BaseTraceData>[] = [
   },
   {
     id: "total_estimated_cost",
-    label: "Estimated cost",
+    label: t("traces.columns.estimatedCost"),
     type: COLUMN_TYPE.cost,
     cell: CostCell as never,
     explainer: EXPLAINERS_MAP[EXPLAINER_ID.hows_the_cost_estimated],
@@ -237,6 +239,7 @@ export const TracesSpansTab: React.FC<TracesSpansTabProps> = ({
   projectId,
   projectName,
 }) => {
+  const { t } = useTranslation();
   const truncationEnabled = useTruncationEnabled();
   const [search = "", setSearch] = useQueryParam("search", StringParam, {
     updateType: "replaceIn",
@@ -297,6 +300,9 @@ export const TracesSpansTab: React.FC<TracesSpansTabProps> = ({
   const isGuardrailsEnabled = useIsFeatureEnabled(
     FeatureToggleKeys.GUARDRAILS_ENABLED,
   );
+  
+  const SHARED_COLUMNS = useMemo(() => getSharedColumns(t), [t]);
+  
   const [sortedColumns, setSortedColumns] = useQueryParamAndLocalStorageState<
     ColumnSort[]
   >({
@@ -535,7 +541,7 @@ export const TracesSpansTab: React.FC<TracesSpansTabProps> = ({
     // Always include "User feedback" column, even if it has no data
     const userFeedbackColumn: DynamicColumn = {
       id: USER_FEEDBACK_COLUMN_ID,
-      label: USER_FEEDBACK_NAME,
+      label: t("traces.columns.userFeedback"),
       columnType: COLUMN_TYPE.number,
     };
 
@@ -557,7 +563,7 @@ export const TracesSpansTab: React.FC<TracesSpansTabProps> = ({
           statisticKey: `${COLUMN_FEEDBACK_SCORES_ID}.${label}`,
         }) as ColumnData<BaseTraceData>,
     );
-  }, [dynamicScoresColumns]);
+  }, [dynamicScoresColumns, t]);
 
   const selectedRows: Array<Trace | Span> = useMemo(() => {
     return rows.filter((row) => rowSelection[row.id]);
@@ -639,7 +645,7 @@ export const TracesSpansTab: React.FC<TracesSpansTabProps> = ({
             },
             {
               id: "thread_id",
-              label: "Thread ID",
+              label: t("traces.columns.threadId"),
               type: COLUMN_TYPE.string,
               cell: LinkCell as never,
               customMeta: {
@@ -654,7 +660,7 @@ export const TracesSpansTab: React.FC<TracesSpansTabProps> = ({
         ? [
             {
               id: "type",
-              label: "Type",
+              label: t("traces.columns.type"),
               type: COLUMN_TYPE.category,
               cell: SpanTypeCell as never,
             },
@@ -662,19 +668,19 @@ export const TracesSpansTab: React.FC<TracesSpansTabProps> = ({
         : []),
       {
         id: "error_info",
-        label: "Errors",
+        label: t("traces.columns.errors"),
         statisticKey: "error_count",
         type: COLUMN_TYPE.errors,
         cell: ErrorCell as never,
       },
       {
         id: "created_by",
-        label: "Created by",
+        label: t("traces.columns.createdBy"),
         type: COLUMN_TYPE.string,
       },
       {
         id: COLUMN_COMMENTS_ID,
-        label: "Comments",
+        label: t("traces.columns.comments"),
         type: COLUMN_TYPE.string,
         cell: CommentsCell as never,
       },
@@ -694,13 +700,13 @@ export const TracesSpansTab: React.FC<TracesSpansTabProps> = ({
           ]
         : []),
     ];
-  }, [type, handleThreadIdClick, isGuardrailsEnabled]);
+  }, [type, handleThreadIdClick, isGuardrailsEnabled, SHARED_COLUMNS]);
 
   const filtersColumnData = useMemo(() => {
     return [
       {
         id: COLUMN_ID_ID,
-        label: "ID",
+        label: t("traces.columns.id"),
         type: COLUMN_TYPE.string,
       },
       ...SHARED_COLUMNS,
@@ -708,7 +714,7 @@ export const TracesSpansTab: React.FC<TracesSpansTabProps> = ({
         ? [
             {
               id: "thread_id",
-              label: "Thread ID",
+              label: t("traces.columns.threadId"),
               type: COLUMN_TYPE.string,
             },
             {
@@ -722,24 +728,24 @@ export const TracesSpansTab: React.FC<TracesSpansTabProps> = ({
         ? [
             {
               id: "type",
-              label: "Type",
+              label: t("traces.columns.type"),
               type: COLUMN_TYPE.category,
             },
           ]
         : []),
       {
         id: "error_info",
-        label: "Errors",
+        label: t("traces.columns.errors"),
         type: COLUMN_TYPE.errors,
       },
       {
         id: COLUMN_FEEDBACK_SCORES_ID,
-        label: "Feedback scores",
+        label: t("traces.columns.feedbackScores"),
         type: COLUMN_TYPE.numberDictionary,
       },
       {
         id: COLUMN_CUSTOM_ID,
-        label: "Custom filter",
+        label: t("traces.columns.customFilter"),
         type: COLUMN_TYPE.dictionary,
       },
       ...(isGuardrailsEnabled
@@ -752,7 +758,7 @@ export const TracesSpansTab: React.FC<TracesSpansTabProps> = ({
           ]
         : []),
     ];
-  }, [type, isGuardrailsEnabled]);
+  }, [type, isGuardrailsEnabled, SHARED_COLUMNS, t]);
 
   const columns = useMemo(() => {
     return [
@@ -841,13 +847,13 @@ export const TracesSpansTab: React.FC<TracesSpansTabProps> = ({
   const columnSections = useMemo(() => {
     return [
       {
-        title: "Feedback scores",
+        title: t("traces.columns.feedbackScores"),
         columns: scoresColumnsData,
         order: scoresColumnsOrder,
         onOrderChange: setScoresColumnsOrder,
       },
     ];
-  }, [scoresColumnsData, scoresColumnsOrder, setScoresColumnsOrder]);
+  }, [scoresColumnsData, scoresColumnsOrder, setScoresColumnsOrder, t]);
 
   if (isPending || isFeedbackScoresPending) {
     return <Loader />;

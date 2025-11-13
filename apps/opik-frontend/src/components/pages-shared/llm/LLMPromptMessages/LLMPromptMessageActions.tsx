@@ -5,6 +5,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { useTranslation } from "react-i18next";
 import useLocalStorageState from "use-local-storage-state";
 import { RotateCcw, Save, Wand2 } from "lucide-react";
 import isUndefined from "lodash/isUndefined";
@@ -52,6 +53,7 @@ const LLMPromptMessageActions: React.FC<LLMPromptLibraryActionsProps> = ({
   setIsHoldActionsVisible,
   improvePromptConfig,
 }) => {
+  const { t } = useTranslation();
   const resetKeyRef = useRef(0);
   const [open, setOpen] = useState<boolean | ConfirmType>(false);
   const selectedPromptIdRef = useRef<string | undefined>();
@@ -81,10 +83,10 @@ const LLMPromptMessageActions: React.FC<LLMPromptLibraryActionsProps> = ({
   const hasModel = Boolean(improvePromptConfig?.model?.trim());
   const isPromptButtonDisabled = !hasModel;
   const promptButtonTooltip = !hasModel
-    ? "Configure model first"
+    ? t("promptActions.configureModelFirst")
     : hasContent
-      ? "Improve prompt with AI"
-      : "Generate prompt with AI";
+      ? t("promptActions.improvePromptWithAI")
+      : t("promptActions.generatePromptWithAI");
 
   const handleOpenWizard = useCallback(() => {
     setShowImproveWizard(true);
@@ -244,7 +246,7 @@ const LLMPromptMessageActions: React.FC<LLMPromptLibraryActionsProps> = ({
                 disabled={isPromptButtonDisabled}
               >
                 <Wand2 className="mr-2 size-4" />
-                Generate prompt
+                {t("promptActions.generatePrompt")}
               </Button>
             </span>
           </TooltipWrapper>
@@ -260,7 +262,7 @@ const LLMPromptMessageActions: React.FC<LLMPromptLibraryActionsProps> = ({
                 disabled={isPromptButtonDisabled}
               >
                 <Wand2 className="mr-2 size-4" />
-                Improve prompt
+                {t("promptActions.improvePrompt")}
               </Button>
             </span>
           </TooltipWrapper>

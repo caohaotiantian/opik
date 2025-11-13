@@ -1,41 +1,42 @@
+import { TFunction } from "i18next";
 import { INTERVAL_TYPE } from "@/api/projects/useProjectMetric";
 import { ChartTooltipRenderValueArguments } from "@/components/shared/ChartTooltipContent/ChartTooltipContent";
 import { formatDuration } from "@/lib/date";
 
 /**
- * Duration labels mapping for percentile charts
+ * Get duration labels for percentile charts
  */
-export const DURATION_LABELS_MAP = {
-  "duration.p50": "Percentile 50",
-  "duration.p90": "Percentile 90",
-  "duration.p99": "Percentile 99",
-} as const;
+export const getDurationLabels = (t: TFunction) => ({
+  "duration.p50": t("metrics.percentiles.p50"),
+  "duration.p90": t("metrics.percentiles.p90"),
+  "duration.p99": t("metrics.percentiles.p99"),
+});
 
 /**
- * Interval descriptions for different chart types and intervals
+ * Get interval descriptions for different chart types and intervals
  */
-export const INTERVAL_DESCRIPTIONS = {
+export const getIntervalDescriptions = (t: TFunction) => ({
   TOTALS: {
-    [INTERVAL_TYPE.HOURLY]: "Hourly totals",
-    [INTERVAL_TYPE.DAILY]: "Daily totals",
-    [INTERVAL_TYPE.WEEKLY]: "Weekly totals",
+    [INTERVAL_TYPE.HOURLY]: t("metrics.intervals.hourlyTotals"),
+    [INTERVAL_TYPE.DAILY]: t("metrics.intervals.dailyTotals"),
+    [INTERVAL_TYPE.WEEKLY]: t("metrics.intervals.weeklyTotals"),
   },
   AVERAGES: {
-    [INTERVAL_TYPE.HOURLY]: "Hourly averages",
-    [INTERVAL_TYPE.DAILY]: "Daily averages",
-    [INTERVAL_TYPE.WEEKLY]: "Weekly averages",
+    [INTERVAL_TYPE.HOURLY]: t("metrics.intervals.hourlyAverages"),
+    [INTERVAL_TYPE.DAILY]: t("metrics.intervals.dailyAverages"),
+    [INTERVAL_TYPE.WEEKLY]: t("metrics.intervals.weeklyAverages"),
   },
   QUANTILES: {
-    [INTERVAL_TYPE.HOURLY]: "Hourly quantiles in seconds",
-    [INTERVAL_TYPE.DAILY]: "Daily quantiles in seconds",
-    [INTERVAL_TYPE.WEEKLY]: "Weekly quantiles in seconds",
+    [INTERVAL_TYPE.HOURLY]: t("metrics.intervals.hourlyQuantiles"),
+    [INTERVAL_TYPE.DAILY]: t("metrics.intervals.dailyQuantiles"),
+    [INTERVAL_TYPE.WEEKLY]: t("metrics.intervals.weeklyQuantiles"),
   },
   COST: {
-    [INTERVAL_TYPE.HOURLY]: "Total hourly cost in USD",
-    [INTERVAL_TYPE.DAILY]: "Total daily cost in USD",
-    [INTERVAL_TYPE.WEEKLY]: "Total weekly cost in USD",
+    [INTERVAL_TYPE.HOURLY]: t("metrics.intervals.hourlyCost"),
+    [INTERVAL_TYPE.DAILY]: t("metrics.intervals.dailyCost"),
+    [INTERVAL_TYPE.WEEKLY]: t("metrics.intervals.weeklyCost"),
   },
-} as const;
+});
 
 /**
  * Renders duration tooltip values in formatted duration string

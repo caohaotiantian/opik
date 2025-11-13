@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ChevronDown, CopyPlus, GripHorizontal, Trash } from "lucide-react";
 import CodeMirror from "@uiw/react-codemirror";
 import { EditorView } from "@codemirror/view";
@@ -76,6 +77,7 @@ const LLMPromptMessage = ({
   disableImages = true,
   improvePromptConfig,
 }: LLMPromptMessageProps) => {
+  const { t } = useTranslation();
   const [isHoldActionsVisible, setIsHoldActionsVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { id, role, content } = message;
@@ -197,7 +199,7 @@ const LLMPromptMessage = ({
                 theme={codeMirrorPromptTheme}
                 value={localText}
                 onChange={handleContentChange}
-                placeholder="Type your message"
+                placeholder={t("playground.typeYourMessage")}
                 basicSetup={{
                   foldGutter: false,
                   allowMultipleSelections: false,

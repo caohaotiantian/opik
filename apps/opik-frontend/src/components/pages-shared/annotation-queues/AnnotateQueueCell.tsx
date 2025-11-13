@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { SquareArrowOutUpRight } from "lucide-react";
 import { CellContext } from "@tanstack/react-table";
 import { Link } from "@tanstack/react-router";
@@ -9,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import useAppStore from "@/store/AppStore";
 
 const AnnotateQueueCell = (context: CellContext<AnnotationQueue, string>) => {
+  const { t } = useTranslation();
   const queue = context.row.original;
   const workspaceName = useAppStore((state) => state.activeWorkspaceName);
 
@@ -28,7 +30,7 @@ const AnnotateQueueCell = (context: CellContext<AnnotationQueue, string>) => {
         target="_blank"
       >
         <Button variant="tableLink" size="sm">
-          Annotate queue
+          {t("annotationQueues.annotateQueue")}
           <SquareArrowOutUpRight className="ml-1.5 mt-1 size-3.5 shrink-0" />
         </Button>
       </Link>

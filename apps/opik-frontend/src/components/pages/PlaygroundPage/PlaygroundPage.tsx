@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Loader } from "lucide-react";
 import useLocalStorageState from "use-local-storage-state";
 
@@ -16,6 +17,7 @@ import { COMPOSED_PROVIDER_TYPE } from "@/types/providers";
 import useNavigationBlocker from "@/hooks/useNavigationBlocker";
 
 const PlaygroundPage = () => {
+  const { t } = useTranslation();
   const workspaceName = useAppStore((state) => state.activeWorkspaceName);
   const [setupDialogOpen, setSetupDialogOpen] = useState(false);
   const [hasCheckedInitialProviders, setHasCheckedInitialProviders] =
@@ -33,13 +35,13 @@ const PlaygroundPage = () => {
   const { DialogComponent } = useNavigationBlocker({
     condition: isRunning,
     title: datasetId
-      ? "Experiment execution in progress"
-      : "Prompt execution in progress",
+      ? t("playground.navigation.experimentTitle")
+      : t("playground.navigation.promptTitle"),
     description: datasetId
-      ? "Your experiment is currently running. Leaving now will interrupt the execution and may result in incomplete experiment items. Are you sure you want to leave?"
-      : "Your prompt is currently running. Leaving now will interrupt the execution and may result in incomplete traces. Are you sure you want to leave?",
-    confirmText: "Leave anyway",
-    cancelText: "Stay and wait",
+      ? t("playground.navigation.experimentDescription")
+      : t("playground.navigation.promptDescription"),
+    confirmText: t("playground.navigation.leaveAnyway"),
+    cancelText: t("playground.navigation.stayAndWait"),
   });
 
   const { data: providerKeysData, isPending: isPendingProviderKeys } =

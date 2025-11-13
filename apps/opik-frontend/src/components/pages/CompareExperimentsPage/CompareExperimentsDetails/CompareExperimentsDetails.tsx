@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import sortBy from "lodash/sortBy";
 import { BooleanParam, useQueryParam } from "use-query-params";
 import { FlaskConical, Maximize2, Minimize2, PenLine } from "lucide-react";
@@ -25,6 +26,7 @@ type CompareExperimentsDetailsProps = {
 const CompareExperimentsDetails: React.FunctionComponent<
   CompareExperimentsDetailsProps
 > = ({ experiments, experimentsIds, isPending }) => {
+  const { t } = useTranslation();
   const setBreadcrumbParam = useBreadcrumbsStore((state) => state.setParam);
 
   const isCompare = experimentsIds.length > 1;
@@ -33,7 +35,7 @@ const CompareExperimentsDetails: React.FunctionComponent<
 
   const title = !isCompare
     ? experiment?.name
-    : `Compare (${experimentsIds.length})`;
+    : `${t("compareExperimentsPage.details.compare")} (${experimentsIds.length})`;
 
   const [showCharts = true, setShowCharts] = useQueryParam(
     "chartsExpanded",
@@ -62,7 +64,9 @@ const CompareExperimentsDetails: React.FunctionComponent<
   const renderCompareFeedbackScoresButton = () => {
     if (!isCompare) return null;
 
-    const text = showCharts ? "Collapse charts" : "Expand charts";
+    const text = showCharts 
+      ? t("compareExperimentsPage.details.collapseCharts")
+      : t("compareExperimentsPage.details.expandCharts");
     const Icon = showCharts ? Minimize2 : Maximize2;
 
     return (
@@ -89,25 +93,25 @@ const CompareExperimentsDetails: React.FunctionComponent<
           </Tag>
         ) : (
           <Tag size="md" variant="gray">
-            {`${experimentsIds.length - 1} experiments`}
+            {`${experimentsIds.length - 1} ${t("compareExperimentsPage.details.experiments")}`}
           </Tag>
         );
 
       return (
         <div className="flex h-11 items-center gap-2">
-          <span className="text-nowrap">Baseline of</span>
+          <span className="text-nowrap">{t("compareExperimentsPage.details.baselineOf")}</span>
           <Tag size="md" variant="gray" className="flex items-center gap-2">
             <FlaskConical className="size-4 shrink-0" />
             <div className="truncate">{experiment?.name}</div>
           </Tag>
-          <span className="text-nowrap">compared against</span>
+          <span className="text-nowrap">{t("compareExperimentsPage.details.comparedAgainst")}</span>
           {tag}
         </div>
       );
     } else {
       return (
         <div className="flex h-11 items-center gap-2">
-          <TooltipWrapper content="Feedback scores">
+          <TooltipWrapper content={t("compareExperimentsPage.details.feedbackScores")}>
             <PenLine className="size-4 shrink-0" />
           </TooltipWrapper>
           <div className="flex gap-1 overflow-x-auto">
@@ -141,7 +145,7 @@ const CompareExperimentsDetails: React.FunctionComponent<
             {radarChartData.length > 1 && (
               <div className="w-1/3 min-w-[400px]">
                 <ExperimentsRadarChart
-                  name="Feedback scores"
+                  name={t("compareExperimentsPage.details.feedbackScores")}
                   chartId="feedback-scores-radar-chart"
                   data={radarChartData}
                   keys={radarChartKeys}
@@ -151,7 +155,7 @@ const CompareExperimentsDetails: React.FunctionComponent<
             )}
             <div className="min-w-[400px] flex-1">
               <ExperimentsBarChart
-                name="Feedback scores distribution"
+                name={t("compareExperimentsPage.details.feedbackScoresDistribution")}
                 chartId="feedback-scores-bar-chart"
                 data={barChartData}
                 keys={barChartKeys}
@@ -160,7 +164,7 @@ const CompareExperimentsDetails: React.FunctionComponent<
           </div>
         ) : (
           <div className="flex h-28 items-center justify-center text-muted-slate">
-            No chart data for selected experiments
+            {t("compareExperimentsPage.details.noChartData")}
           </div>
         )}
       </div>

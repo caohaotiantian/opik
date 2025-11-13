@@ -1,4 +1,6 @@
 import React, { useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import { TFunction } from "i18next";
 import { JsonParam, useQueryParam } from "use-query-params";
 
 import {
@@ -27,76 +29,76 @@ import TracesOrSpansPathsAutocomplete from "@/components/pages-shared/traces/Tra
 import TracesOrSpansFeedbackScoresSelect from "@/components/pages-shared/traces/TracesOrSpansFeedbackScoresSelect/TracesOrSpansFeedbackScoresSelect";
 import MetricContainerChart from "./MetricChart/MetricChartContainer";
 import {
-  DURATION_LABELS_MAP,
-  INTERVAL_DESCRIPTIONS,
+  getDurationLabels,
+  getIntervalDescriptions,
   renderDurationTooltipValue,
   durationYTickFormatter,
 } from "./utils";
 
-const TRACE_FILTER_COLUMNS: ColumnData<BaseTraceData>[] = [
+const getTraceFilterColumns = (t: TFunction): ColumnData<BaseTraceData>[] => [
   {
     id: COLUMN_ID_ID,
-    label: "ID",
+    label: t("traces.columns.id"),
     type: COLUMN_TYPE.string,
   },
   {
     id: "name",
-    label: "Name",
+    label: t("traces.columns.name"),
     type: COLUMN_TYPE.string,
   },
   {
     id: "start_time",
-    label: "Start time",
+    label: t("traces.columns.startTime"),
     type: COLUMN_TYPE.time,
   },
   {
     id: "end_time",
-    label: "End time",
+    label: t("traces.columns.endTime"),
     type: COLUMN_TYPE.time,
   },
   {
     id: "input",
-    label: "Input",
+    label: t("traces.columns.input"),
     type: COLUMN_TYPE.string,
   },
   {
     id: "output",
-    label: "Output",
+    label: t("traces.columns.output"),
     type: COLUMN_TYPE.string,
   },
   {
     id: "duration",
-    label: "Duration",
+    label: t("traces.columns.duration"),
     type: COLUMN_TYPE.duration,
   },
   {
     id: COLUMN_METADATA_ID,
-    label: "Metadata",
+    label: t("traces.columns.metadata"),
     type: COLUMN_TYPE.dictionary,
   },
   {
     id: "tags",
-    label: "Tags",
+    label: t("traces.columns.tags"),
     type: COLUMN_TYPE.list,
   },
   {
     id: "thread_id",
-    label: "Thread ID",
+    label: t("traces.columns.threadId"),
     type: COLUMN_TYPE.string,
   },
   {
     id: "error_info",
-    label: "Errors",
+    label: t("traces.columns.errors"),
     type: COLUMN_TYPE.errors,
   },
   {
     id: COLUMN_FEEDBACK_SCORES_ID,
-    label: "Feedback scores",
+    label: t("traces.columns.feedbackScores"),
     type: COLUMN_TYPE.numberDictionary,
   },
   {
     id: COLUMN_CUSTOM_ID,
-    label: "Custom filter",
+    label: t("traces.columns.customFilter"),
     type: COLUMN_TYPE.dictionary,
   },
 ];
@@ -116,6 +118,10 @@ const TraceMetricsSection: React.FC<TraceMetricsSectionProps> = ({
   intervalEnd,
   hasTraces,
 }) => {
+  const { t } = useTranslation();
+  const intervalDescriptions = useMemo(() => getIntervalDescriptions(t), [t]);
+  const durationLabels = useMemo(() => getDurationLabels(t), [t]);
+  const TRACE_FILTER_COLUMNS = useMemo(() => getTraceFilterColumns(t), [t]);
   const isGuardrailsEnabled = useIsFeatureEnabled(
     FeatureToggleKeys.GUARDRAILS_ENABLED,
   );
@@ -220,7 +226,7 @@ const TraceMetricsSection: React.FC<TraceMetricsSectionProps> = ({
   return (
     <div className="pt-6">
       <div className="sticky top-0 z-10 flex items-center justify-between bg-soft-background pb-3 pt-2">
-        <h2 className="comet-title-s truncate break-words">Trace metrics</h2>
+        <h2 className="comet-title-s truncate break-words">{t("metrics.traceMetrics")}</h2>
         <FiltersButton
           columns={traceFilterColumns}
           filters={traceFilters}
@@ -236,8 +242,8 @@ const TraceMetricsSection: React.FC<TraceMetricsSectionProps> = ({
           <MetricContainerChart
             chartId="feedback_scores_chart"
             key="feedback_scores_chart"
-            name="Trace feedback scores"
-            description={INTERVAL_DESCRIPTIONS.AVERAGES[interval]}
+            name={t("metrics.traceFeedbackScores")}
+            description={intervalDescriptions.AVERAGES[interval]}
             metricName={METRIC_NAME_TYPE.FEEDBACK_SCORES}
             interval={interval}
             intervalStart={intervalStart}
@@ -251,8 +257,8 @@ const TraceMetricsSection: React.FC<TraceMetricsSectionProps> = ({
           <MetricContainerChart
             chartId="number_of_traces_chart"
             key="number_of_traces_chart"
-            name="Number of traces"
-            description={INTERVAL_DESCRIPTIONS.TOTALS[interval]}
+            name={t("metrics.numberOfTraces")}
+            description={intervalDescriptions.TOTALS[interval]}
             metricName={METRIC_NAME_TYPE.TRACE_COUNT}
             interval={interval}
             intervalStart={intervalStart}
@@ -266,15 +272,15 @@ const TraceMetricsSection: React.FC<TraceMetricsSectionProps> = ({
           <MetricContainerChart
             chartId="duration_chart"
             key="duration_chart"
-            name="Trace duration"
-            description={INTERVAL_DESCRIPTIONS.QUANTILES[interval]}
+            name={t("metrics.traceDuration")}
+            description={intervalDescriptions.QUANTILES[interval]}
             metricName={METRIC_NAME_TYPE.TRACE_DURATION}
             interval={interval}
             intervalStart={intervalStart}
             intervalEnd={intervalEnd}
             projectId={projectId}
             renderValue={renderDurationTooltipValue}
-            labelsMap={DURATION_LABELS_MAP}
+            labelsMap={durationLabels}
             customYTickFormatter={durationYTickFormatter}
             chartType="line"
             traceFilters={processedTracesFilters}
@@ -286,7 +292,7 @@ const TraceMetricsSection: React.FC<TraceMetricsSectionProps> = ({
               chartId="failed_guardrails_chart"
               key="failed_guardrails_chart"
               name="Failed guardrails"
-              description={INTERVAL_DESCRIPTIONS.TOTALS[interval]}
+              description={intervalDescriptions.TOTALS[interval]}
               metricName={METRIC_NAME_TYPE.FAILED_GUARDRAILS}
               interval={interval}
               intervalStart={intervalStart}

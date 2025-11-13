@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "@tanstack/react-router";
 import { keepPreviousData } from "@tanstack/react-query";
 import { ColumnPinningState, ColumnSort } from "@tanstack/react-table";
@@ -95,6 +96,7 @@ const StickyTableWrapperWithBorder: React.FC<DataTableWrapperProps> = ({
 };
 
 const CompareOptimizationsPage: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const workspaceName = useAppStore((state) => state.activeWorkspaceName);
   const [search = "", setSearch] = useQueryParam("search", StringParam, {
@@ -190,7 +192,7 @@ const CompareOptimizationsPage: React.FC = () => {
 
   const title = optimization?.name || optimizationId;
   const noData = !search;
-  const noDataText = noData ? "There are no trials yet" : "No search results";
+  const noDataText = noData ? t("optimization.noTrials") : t("optimization.noSearchResults");
   const experiments = useMemo(() => data?.content ?? [], [data?.content]);
 
   useEffect(() => {
@@ -270,13 +272,13 @@ const CompareOptimizationsPage: React.FC = () => {
     return [
       {
         id: COLUMN_ID_ID,
-        label: "ID",
+        label: t("optimization.compareColumns.id"),
         type: COLUMN_TYPE.string,
         cell: IdCell as never,
       },
       {
         id: "optimizer",
-        label: "Optimizer",
+        label: t("optimization.compareColumns.optimizer"),
         type: COLUMN_TYPE.string,
         size: 200,
         accessorFn: (row) => {
@@ -287,7 +289,7 @@ const CompareOptimizationsPage: React.FC = () => {
       },
       {
         id: "prompt",
-        label: "Prompt",
+        label: t("optimization.compareColumns.prompt"),
         type: COLUMN_TYPE.string,
         size: 400,
         accessorFn: (row) => {
@@ -298,7 +300,7 @@ const CompareOptimizationsPage: React.FC = () => {
       },
       {
         id: "examples",
-        label: "Examples",
+        label: t("optimization.compareColumns.examples"),
         type: COLUMN_TYPE.string,
         size: 400,
         accessorFn: (row) => {
@@ -319,23 +321,23 @@ const CompareOptimizationsPage: React.FC = () => {
       },
       {
         id: "created_at",
-        label: "Created",
+        label: t("optimization.compareColumns.created"),
         type: COLUMN_TYPE.time,
         accessorFn: (row) => formatDate(row.created_at),
       },
       {
         id: "created_by",
-        label: "Created by",
+        label: t("optimization.compareColumns.createdBy"),
         type: COLUMN_TYPE.string,
       },
     ];
-  }, [optimization?.objective_name, scoreMap]);
+  }, [optimization?.objective_name, scoreMap, t]);
 
   const columns = useMemo(() => {
     return [
       mapColumnDataFields<Experiment, Experiment>({
         id: COLUMN_NAME_ID,
-        label: "Trial",
+        label: t("optimization.compareColumns.trial"),
         type: COLUMN_TYPE.string,
         cell: ResourceCell as never,
         sortable: true,
@@ -357,7 +359,7 @@ const CompareOptimizationsPage: React.FC = () => {
         sortableColumns: sortableBy,
       }),
     ];
-  }, [columnsDef, columnsOrder, selectedColumns, sortableBy, optimizationId]);
+  }, [columnsDef, columnsOrder, selectedColumns, sortableBy, optimizationId, t]);
 
   const sortConfig = useMemo(
     () => ({
@@ -439,13 +441,13 @@ const CompareOptimizationsPage: React.FC = () => {
             <SearchInput
               searchText={search!}
               setSearchText={setSearch}
-              placeholder="Search by name"
+              placeholder={t("optimization.searchByName")}
               className="w-[320px]"
               dimension="sm"
             ></SearchInput>
           </div>
           <div className="flex items-center gap-2">
-            <TooltipWrapper content={`Refresh trials list`}>
+            <TooltipWrapper content={t("optimization.refreshTrialsList")}>
               <Button
                 variant="outline"
                 size="icon-sm"

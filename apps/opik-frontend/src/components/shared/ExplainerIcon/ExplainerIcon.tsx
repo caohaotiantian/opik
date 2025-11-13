@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { CircleHelp, Info, SquareArrowOutUpRight } from "lucide-react";
 
 import { buildDocsUrl, cn } from "@/lib/utils";
@@ -13,17 +14,21 @@ type ExplainerIconProps = {
 const ExplainerIcon: React.FC<ExplainerIconProps> = ({
   type = "info",
   description,
+  translationKey,
   docLink,
   docHash,
   className,
 }) => {
+  const { t } = useTranslation();
   const Icon = type === "info" ? Info : CircleHelp;
+  const translatedDescription = translationKey ? t(translationKey) : description;
+  
   return (
     <TooltipWrapper
       stopClickPropagation
       content={
         <>
-          {description}
+          {translatedDescription}
           {docLink && (
             <Button variant="link" size="3xs" asChild>
               <a
@@ -31,7 +36,7 @@ const ExplainerIcon: React.FC<ExplainerIconProps> = ({
                 target="_blank"
                 rel="noreferrer"
               >
-                Read more
+                {t("common.readMore")}
                 <SquareArrowOutUpRight className="ml-0.5 size-3 shrink-0" />
               </a>
             </Button>

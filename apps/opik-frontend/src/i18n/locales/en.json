@@ -70,7 +70,34 @@
     "notSet": "Not set",
     "enabled": "Enabled",
     "disabled": "Disabled",
-    "showingRange": "Showing {{from}}-{{to}} of {{total}}"
+    "showingRange": "Showing {{from}}-{{to}} of {{total}}",
+    "rows": "Rows",
+    "rowHeight": {
+      "small": "Small",
+      "medium": "Medium",
+      "large": "Large"
+    }
+  },
+  "promptActions": {
+    "generatePrompt": "Generate prompt",
+    "improvePrompt": "Improve prompt",
+    "configureModelFirst": "Configure model first",
+    "generatePromptWithAI": "Generate prompt with AI",
+    "improvePromptWithAI": "Improve prompt with AI"
+  },
+  "explainers": {
+    "promptGenerationLearnMore": "Not sure where to start? Tell us your goal in plain language, and we'll generate a ready-to-use prompt.",
+    "promptImprovementLearnMore": "Give your prompt a boost! Add optional guidance, or let AI apply best-practice improvements for you.",
+    "promptImprovementOptimizer": "Looking for advanced optimization algorithms? Check out the Opik optimizer!",
+    "whatAreFeedbackScores": "Feedback scores are evaluations of your LLM outputs, obtained via human review, online evaluation rules, or the SDK",
+    "whatAreExperimentItems": "Experiment items are individual evaluations that connect a dataset sample with its LLM output, feedback scores, and trace.",
+    "whatsTheExperimentConfiguration": "The experiment configuration captures key settings, like the prompt, model, and temperature, to keep experiments reproducible and easy to analyze.",
+    "whatDoesItMeanToCompareMyExperiments": "Compare experiments to understand how changes to prompts, models, or rules impact performance. Select at least two experiments from the same dataset to get started.",
+    "whatsTheBestScore": "Highest evaluation result achieved during the optimization run, based on your selected metric.",
+    "whatsTheOptimizer": "An optimizer is a built-in algorithm from the Opik Agent Optimizer SDK that improves prompt effectiveness. Each one uses its own strategy and configurable settings to target specific optimization goals.",
+    "whatsThePlayground": "Test before saving a prompt to the library or running a full experiment. Or use it to explore different prompt variations and see how your LLM responds in real time.",
+    "whatsTheseConfigurationThings": "The model configuration parameters allow you to control output behavior. Tuning these lets you balance between deterministic answers and more diverse, exploratory outputs.",
+    "whatDoesTheDatasetDoHere": "Run a prompt on a dataset in the Playground to preview its performance across multiple inputs. Select one or more metrics to automatically evaluate each dataset item."
   },
   "traces": {
     "pageTitle": "Traces",
@@ -113,6 +140,85 @@
       "addTo": "Add to",
       "dataset": "Dataset",
       "annotationQueue": "Annotation queue"
+    },
+    "explainers": {
+      "whatAreTraces": "A trace is a step-by-step record of how your LLM application processes a single input, including LLM calls and other operations.",
+      "whatAreSpans": "A span represents a single step in the execution of a trace. Use spans to debug, monitor, and evaluate model behavior.",
+      "whatAreThreads": "A thread represents a full conversation session, grouping together multiple related traces. Use threads to review and evaluate entire interactions in chat-based applications."
+    },
+    "title": "Traces",
+    "viewTrace": "View Trace",
+    "traceId": "Trace ID",
+    "spanId": "Span ID",
+    "duration": "Duration",
+    "startTime": "Start time",
+    "endTime": "End time",
+    "status": "Status",
+    "input": "Input",
+    "output": "Output",
+    "metadata": "Metadata",
+    "tags": "Tags",
+    "feedbackScores": "Feedback scores",
+    "noTraces": "No traces",
+    "columns": {
+      "id": "ID",
+      "name": "Name",
+      "type": "Type",
+      "startTime": "Start time",
+      "endTime": "End time",
+      "duration": "Duration",
+      "tokens": "Tokens",
+      "estimatedCost": "Estimated cost",
+      "input": "Input",
+      "output": "Output",
+      "tags": "Tags",
+      "feedbackScores": "Feedback scores",
+      "metadata": "Metadata",
+      "threadId": "Thread ID",
+      "errors": "Errors",
+      "customFilter": "Custom filter",
+      "totalTokens": "Total tokens",
+      "totalInputTokens": "Total input tokens",
+      "totalOutputTokens": "Total output tokens",
+      "createdBy": "Created by",
+      "comments": "Comments",
+      "userFeedback": "User feedback"
+    },
+    "searchTraces": "Search traces...",
+    "spans": "Spans",
+    "viewDetails": "View details"
+  },
+  "metrics": {
+    "requestChart": "Request a chart",
+    "projectMetrics": "Project metrics",
+    "traceMetrics": "Trace metrics",
+    "threadMetrics": "Thread metrics",
+    "tokenUsage": "Token usage",
+    "estimatedCost": "Estimated cost",
+    "traceFeedbackScores": "Trace feedback scores",
+    "numberOfTraces": "Number of traces",
+    "traceDuration": "Trace duration",
+    "threadsFeedbackScores": "Threads feedback scores",
+    "numberOfThreads": "Number of threads",
+    "threadDuration": "Thread duration",
+    "intervals": {
+      "hourlyTotals": "Hourly totals",
+      "dailyTotals": "Daily totals",
+      "weeklyTotals": "Weekly totals",
+      "hourlyAverages": "Hourly averages",
+      "dailyAverages": "Daily averages",
+      "weeklyAverages": "Weekly averages",
+      "hourlyQuantiles": "Hourly quantiles in seconds",
+      "dailyQuantiles": "Daily quantiles in seconds",
+      "weeklyQuantiles": "Weekly quantiles in seconds",
+      "hourlyCost": "Total hourly cost in USD",
+      "dailyCost": "Total daily cost in USD",
+      "weeklyCost": "Total weekly cost in USD"
+    },
+    "percentiles": {
+      "p50": "Percentile 50",
+      "p90": "Percentile 90",
+      "p99": "Percentile 99"
     }
   },
   "threads": {
@@ -123,6 +229,20 @@
     "actions": {
       "deleteThreads": "Delete threads",
       "deleteConfirm": "Deleting threads will also remove all linked traces and their data. This action cannot be undone. Are you sure you want to continue?"
+    },
+    "columns": {
+      "id": "ID",
+      "firstMessage": "First message",
+      "lastMessage": "Last message",
+      "messageCount": "Message count",
+      "status": "Status",
+      "createdAt": "Created at",
+      "lastUpdated": "Last updated",
+      "duration": "Duration",
+      "tags": "Tags",
+      "startTime": "Start time",
+      "endTime": "End time",
+      "feedbackScores": "Feedback scores"
     }
   },
   "navigation": {
@@ -274,6 +394,12 @@
       "cancel": "Cancel",
       "logTracesToProject": "Log traces to your project"
     },
+    "toast": {
+      "created": {
+        "title": "Project created",
+        "description": "Log traces to your project to capture LLM interactions, analyze performance, run experiments, and improve your application over time."
+      }
+    },
     "actions": {
       "delete": "Delete",
       "deleteTooltip": "Delete"
@@ -423,86 +549,58 @@
     }
   },
   "prompts": {
-    "title": "Prompts",
+    "title": "Prompt library",
     "library": "Prompt Library",
     "createNew": "Create new prompt",
-    "noPrompts": "No prompts yet",
+    "noPrompts": "There are no prompts yet",
+    "noSearchResults": "No search results",
+    "searchByName": "Search by name",
+    "searchPrompts": "Search prompts...",
     "editPrompt": "Edit prompt",
     "deletePrompt": "Delete prompt",
+    "deletePromptConfirm": "Deleting a prompt will also remove all associated commits. This action can't be undone. Are you sure you want to continue?",
+    "deletePrompts": "Delete prompts",
+    "deletePromptsConfirm": "Deleting these prompts will also remove all associated commits. This action cannot be undone. Are you sure you want to continue?",
+    "deleteConfirm": "Are you sure you want to delete this prompt?",
+    "addPrompt": "Add prompt",
+    "viewPrompt": "View prompt",
+    "actionsMenu": "Actions menu",
     "version": "Version",
     "commit": "Commit",
     "variables": "Variables",
+    "explainers": {
+      "whatsThePromptLibrary": "Store and version prompts to maintain consistency and simplify experimentation across projects",
+      "howDoIWriteMyPrompt": "Write prompts as your LLM would receive them, including any dynamic placeholders or formatting.",
+      "whatFormatShouldThePromptBe": "Use mustache syntax to reference dataset variables in your prompt. Example: {{question}}.",
+      "whatFormatShouldTheMetadataBe": "Use a valid JSON object with key-value pairs. Example: {\"key\": \"value\"}"
+    },
     "columns": {
       "id": "ID",
       "name": "Name",
       "description": "Description",
       "versions": "Versions",
+      "tags": "Tags",
       "createdAt": "Created at",
       "createdBy": "Created by",
+      "lastUpdated": "Last updated",
+      "created": "Created",
       "lastUpdatedAt": "Last updated"
     },
-    "searchPrompts": "Search prompts...",
-    "deleteConfirm": "Are you sure you want to delete this prompt?",
-    "addPrompt": "Add prompt",
-    "viewPrompt": "View prompt"
-  },
-  "playground": {
-    "title": "Playground",
-    "newChat": "New chat",
-    "selectModel": "Select model",
-    "temperature": "Temperature",
-    "maxTokens": "Max tokens",
-    "systemPrompt": "System prompt",
-    "userMessage": "User message",
-    "send": "Send",
-    "stop": "Stop",
-    "clear": "Clear",
-    "saveAsPrompt": "Save as prompt"
-  },
-  "traces": {
-    "title": "Traces",
-    "viewTrace": "View trace",
-    "traceId": "Trace ID",
-    "spanId": "Span ID",
-    "duration": "Duration",
-    "startTime": "Start time",
-    "endTime": "End time",
-    "status": "Status",
-    "input": "Input",
-    "output": "Output",
-    "metadata": "Metadata",
-    "tags": "Tags",
-    "feedbackScores": "Feedback scores",
-    "noTraces": "No traces yet",
-    "columns": {
-      "id": "ID",
+    "dialog": {
+      "createTitle": "Create a new prompt",
+      "editTitle": "Edit prompt",
+      "createButton": "Create prompt",
+      "updateButton": "Update prompt",
       "name": "Name",
-      "type": "Type",
-      "startTime": "Start time",
-      "endTime": "End time",
-      "duration": "Duration",
-      "tokens": "Tokens",
-      "estimatedCost": "Est. cost",
-      "input": "Input",
-      "output": "Output",
-      "tags": "Tags",
-      "feedbackScores": "Feedback scores"
-    },
-    "searchTraces": "Search traces...",
-    "spans": "Spans",
-    "viewDetails": "View details"
-  },
-  "configuration": {
-    "title": "Configuration",
-    "general": "General",
-    "apiKeys": "API Keys",
-    "providerKeys": "Provider Keys",
-    "alerts": "Alerts",
-    "integrations": "Integrations",
-    "teamSettings": "Team Settings",
-    "workspace": "Workspace",
-    "members": "Members",
-    "billing": "Billing"
+      "namePlaceholder": "Prompt name",
+      "prompt": "Prompt",
+      "promptPlaceholder": "Prompt",
+      "description": "Description",
+      "descriptionPlaceholder": "Prompt description",
+      "images": "Images",
+      "metadata": "Metadata",
+      "metadataInvalid": "Metadata field is not valid"
+    }
   },
   "alerts": {
     "title": "Alerts",
@@ -569,6 +667,25 @@
     },
     "explainer": {
       "description": "Optimization runs help you systematically improve your LLM prompts and configurations using automated algorithms."
+    },
+    "deleteOptimization": "Delete optimization",
+    "deleteOptimizationConfirm": "Deleting an optimization run will remove all its trials and their data. Related traces won't be affected. This action can't be undone. Are you sure you want to continue?",
+    "noTrials": "There are no trials yet",
+    "refreshTrialsList": "Refresh trials list",
+    "bestPrompt": "Best prompt",
+    "compareWithBaseline": "Compare with baseline prompt",
+    "diff": "Diff",
+    "comparePrompts": "Compare prompts",
+    "baseline": "Baseline",
+    "current": "Current",
+    "compareColumns": {
+      "id": "ID",
+      "trial": "Trial",
+      "optimizer": "Optimizer",
+      "prompt": "Prompt",
+      "examples": "Examples",
+      "created": "Created",
+      "createdBy": "Created by"
     }
   },
   "annotationQueues": {
@@ -639,6 +756,14 @@
       "description": "Annotation queues let you organize traces for review and labeling, making it easy to collect feedback and improve LLM outputs.",
       "readDocumentation": "Read documentation",
       "createFirstQueue": "Create your first queue"
+    },
+    "annotateQueue": "Annotate queue",
+    "rowActions": {
+      "linkCopied": "Annotation queue link copied to clipboard",
+      "linkCopiedDescription": "Share this queue with your annotators so they can start annotating and provide feedback to improve the evaluation of your LLM application.",
+      "deleteTitle": "Delete annotation queue?",
+      "deleteDescription": "Deleting an annotation queue will permanently remove it from the system. All associated data and configurations will be lost. This action can't be undone. Are you sure you want to continue?",
+      "copySharingLink": "Copy sharing link"
     }
   },
   "onlineEvaluation": {
@@ -792,6 +917,14 @@
   },
   "configuration": {
     "title": "Configuration",
+    "general": "General",
+    "apiKeys": "API Keys",
+    "providerKeys": "Provider Keys",
+    "integrations": "Integrations",
+    "teamSettings": "Team Settings",
+    "workspace": "Workspace",
+    "members": "Members",
+    "billing": "Billing",
     "tabs": {
       "feedbackDefinitions": "Feedback definitions",
       "aiProviders": "AI Providers",
@@ -958,7 +1091,7 @@
     "compareExperiments": "Compare experiments",
     "experimentStoredSingle": "Your run was stored in this experiment. Explore your results to find insights.",
     "experimentStoredMultiple": "Your run was stored in experiments. Explore comparison results to get insights.",
-    "referenceDatasetVariables": "Reference dataset variables using mustache syntax: {variables}",
+    "referenceDatasetVariables": "Reference dataset variables using mustache syntax: {{variables}}",
     "tooltips": {
       "imageCompatibility": "Some prompts contain images but the selected model doesn't support image input. Please change the model or remove images from the messages",
       "datasetRemoved": "Your dataset has been removed. Select another one",
@@ -967,6 +1100,76 @@
       "selectModels": "Please select an LLM model for your prompts",
       "emptyMessages": "Some messages are empty. Please add some text to proceed",
       "actionDisabled": "Action is disabled"
+    },
+    "navigation": {
+      "experimentTitle": "Experiment execution in progress",
+      "promptTitle": "Prompt execution in progress",
+      "experimentDescription": "Your experiment is currently running. Leaving now will interrupt the execution and may result in incomplete experiment items. Are you sure you want to leave?",
+      "promptDescription": "Your prompt is currently running. Leaving now will interrupt the execution and may result in incomplete traces. Are you sure you want to leave?",
+      "leaveAnyway": "Leave anyway",
+      "stayAndWait": "Stay and wait"
+    },
+    "typeYourMessage": "Type your message"
+  },
+  "modelConfig": {
+    "temperature": "Temperature",
+    "temperatureTooltip": "Controls randomness: Lowering results in less random completions. As the temperature approaches zero, the model will become deterministic and repetitive.",
+    "temperatureReasoningTooltip": "Reasoning models require temperature = 1.0. This setting controls randomness in completions.",
+    "maxOutputTokens": "Max output tokens",
+    "maxOutputTokensTooltip": "The maximum number of tokens to generate shared between the prompt and completion. The exact limit varies by model. (One token is roughly 4 characters for standard English text).",
+    "topP": "Top P",
+    "topPTooltip": "Controls diversity via nucleus sampling: 0.5 means half of all likelihood-weighted options are considered",
+    "frequencyPenalty": "Frequency penalty",
+    "frequencyPenaltyTooltip": "How much to penalize new tokens based on their existing frequency in the text so far. Decreases the model's likelihood to repeat the same line verbatim",
+    "presencePenalty": "Presence penalty",
+    "presencePenaltyTooltip": "How much to penalize new tokens based on whether they appear in the text so far. Increases the model's likelihood to talk about new topics",
+    "reasoningEffort": "Reasoning effort",
+    "reasoningEffortTooltip": "Controls how much effort the model puts into reasoning before responding. Higher effort may result in more thoughtful but slower responses.",
+    "selectReasoningEffort": "Select reasoning effort",
+    "minimal": "Minimal",
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High"
+  },
+  "promptImprovement": {
+    "generatePrompt": "Generate prompt",
+    "improvePrompt": "Improve prompt",
+    "notConfigured": "not configured",
+    "progress": {
+      "analyzing": "Analyzing your instructions...",
+      "defining": "Defining the prompt structure...",
+      "scoping": "Scoping the role and perspective...",
+      "applying": "Applying best practices...",
+      "synthesizing": "Synthesizing the full prompt...",
+      "polishing": "Polishing the output..."
+    },
+    "errors": {
+      "generationError": "An error occurred during generation",
+      "tokenLimitExceeded": "The generated prompt was cut off due to token limits. Please try increasing the max_tokens setting in the model configuration or use a shorter instruction.",
+      "emptyResult": "The model did not return any content. Please try again or adjust your instructions.",
+      "generateFailed": "Failed to generate prompt",
+      "improveFailed": "Failed to improve prompt"
+    },
+    "instructionsPlaceholder": {
+      "generate": "What do you want your AI to do?",
+      "improve": "What do you want to improve (e.g., tone, length)"
+    },
+    "generatedPromptDescription": "This is your generated prompt, created with the selected model ({{model}}) and parameters. It's editable.",
+    "emptyPromptPlaceholder": "The generated prompt will be shown here, ready for you to review and edit",
+    "buttons": {
+      "generate": "Generate prompt",
+      "improve": "Improve prompt",
+      "regenerate": "Re-generate prompt",
+      "rerun": "Re-run improvement",
+      "usePrompt": "Use this prompt"
+    },
+    "sections": {
+      "initialPrompt": "Your initial prompt",
+      "initialPromptDescription": "This is your initial prompt. Optional instructions can guide improvements, or we'll optimize it automatically.",
+      "improvedPrompt": "Improved prompt",
+      "generatedPrompt": "Generated prompt",
+      "instructions": "Instructions (optional)",
+      "instructionsDescription": "Write your instructions in plain language. We'll turn them into a best-practice prompt that you can review and iterate on."
     }
   },
   "promptPage": {
@@ -981,6 +1184,59 @@
       "experimentItems": "Experiment items",
       "configuration": "Configuration",
       "feedbackScores": "Feedback scores"
+    },
+    "details": {
+      "compare": "Compare",
+      "collapseCharts": "Collapse charts",
+      "expandCharts": "Expand charts",
+      "experiments": "experiments",
+      "baselineOf": "Baseline of",
+      "comparedAgainst": "compared against",
+      "feedbackScores": "Feedback scores",
+      "feedbackScoresDistribution": "Feedback scores distribution",
+      "noChartData": "No chart data for selected experiments"
+    },
+    "experimentItems": {
+      "noData": "There is no data for the selected experiments",
+      "idDatasetItem": "ID (Dataset item)",
+      "duration": "Duration",
+      "comments": "Comments",
+      "evaluationTask": "Evaluation task",
+      "feedbackScores": "Feedback scores",
+      "selectScore": "Select score",
+      "searchDatasetItems": "Search dataset items",
+      "dataset": "Dataset",
+      "experiments": "Experiments",
+      "name": "Name",
+      "labelDataset": "(Dataset)",
+      "labelOutput": "(Output)"
+    },
+    "configuration": {
+      "name": "Name",
+      "noSearchResults": "No search results",
+      "noConfigurationMultiple": "These experiments have no configuration",
+      "noConfigurationSingle": "This experiment has no configuration",
+      "searchByName": "Search by name",
+      "showDifferencesOnly": "Show differences only"
+    },
+    "feedbackScores": {
+      "feedbackScore": "Feedback score",
+      "noScoresMultiple": "These experiments have no feedback scores",
+      "noScoresSingle": "This experiment has no feedback scores"
+    },
+    "actionsPanel": {
+      "compare": "Compare",
+      "compareExperiments": "Compare experiments"
+    },
+    "compareDialog": {
+      "title": "Compare experiments",
+      "searchByName": "Search by name",
+      "noSearchResults": "No search results",
+      "selectExperiment": "Select experiment",
+      "cancel": "Cancel",
+      "compareButton": "Compare",
+      "experiment": "experiment",
+      "experiments": "experiments"
     }
   },
   "compareTrialsPage": {
@@ -996,49 +1252,6 @@
     "searchByName": "Search by name",
     "noExperiments": "No experiments to compare",
     "noSearchResults": "No search results"
-  },
-  "prompts": {
-    "title": "Prompt library",
-    "createNew": "Create new prompt",
-    "noPrompts": "There are no prompts yet",
-    "noSearchResults": "No search results",
-    "searchByName": "Search by name",
-    "deletePrompts": "Delete prompts",
-    "deletePromptsConfirm": "Deleting these prompts will also remove all associated commits. This action cannot be undone. Are you sure you want to continue?",
-    "deletePrompt": "Delete prompt",
-    "deletePromptConfirm": "Deleting a prompt will also remove all associated commits. This action can't be undone. Are you sure you want to continue?",
-    "actionsMenu": "Actions menu",
-    "explainers": {
-      "whatsThePromptLibrary": "Store and version prompts to maintain consistency and simplify experimentation across projects",
-      "howDoIWriteMyPrompt": "Write prompts as your LLM would receive them, including any dynamic placeholders or formatting.",
-      "whatFormatShouldThePromptBe": "Use mustache syntax to reference dataset variables in your prompt. Example: {{question}}.",
-      "whatFormatShouldTheMetadataBe": "Use a valid JSON object with key-value pairs. Example: {\"key\": \"value\"}"
-    },
-    "columns": {
-      "id": "ID",
-      "name": "Name",
-      "description": "Description",
-      "versions": "Versions",
-      "tags": "Tags",
-      "lastUpdated": "Last updated",
-      "created": "Created",
-      "createdBy": "Created by"
-    },
-    "dialog": {
-      "createTitle": "Create a new prompt",
-      "editTitle": "Edit prompt",
-      "createButton": "Create prompt",
-      "updateButton": "Update prompt",
-      "name": "Name",
-      "namePlaceholder": "Prompt name",
-      "prompt": "Prompt",
-      "promptPlaceholder": "Prompt",
-      "description": "Description",
-      "descriptionPlaceholder": "Prompt description",
-      "images": "Images",
-      "metadata": "Metadata",
-      "metadataInvalid": "Metadata field is not valid"
-    }
   },
   "onboarding": {
     "quickstart": {
@@ -1153,4 +1366,3 @@
     "outputTokens": "Output tokens"
   }
 }
-

@@ -57,8 +57,8 @@ const AddEditProjectDialog: React.FC<AddEditProjectDialogProps> = ({
         EXPLAINERS_MAP[EXPLAINER_ID.i_created_a_project_now_what];
 
       toast({
-        title: explainer.title,
-        description: explainer.description,
+        title: t("projects.toast.created.title"),
+        description: t("projects.toast.created.description"),
         actions: [
           <ToastAction
             variant="link"
@@ -88,7 +88,7 @@ const AddEditProjectDialog: React.FC<AddEditProjectDialogProps> = ({
         });
       }
     },
-    [navigate, toast, workspaceName],
+    [navigate, toast, workspaceName, t],
   );
 
   const submitHandler = useCallback(() => {

@@ -70,15 +70,42 @@
     "notSet": "未设置",
     "enabled": "已启用",
     "disabled": "已禁用",
-    "showingRange": "显示 {{from}}-{{to}} / 共 {{total}}"
+    "showingRange": "显示 {{from}}-{{to}} / 共 {{total}}",
+    "rows": "行",
+    "rowHeight": {
+      "small": "小",
+      "medium": "中",
+      "large": "大"
+    }
+  },
+  "promptActions": {
+    "generatePrompt": "生成 Prompt",
+    "improvePrompt": "改进 Prompt",
+    "configureModelFirst": "请先配置模型",
+    "generatePromptWithAI": "使用 AI 生成 Prompt",
+    "improvePromptWithAI": "使用 AI 改进 Prompt"
+  },
+  "explainers": {
+    "promptGenerationLearnMore": "不知道从哪里开始？用简单的语言告诉我们您的目标，我们将生成一个可直接使用的 Prompt。",
+    "promptImprovementLearnMore": "提升您的 Prompt 效果！添加可选的指导，或让 AI 为您应用最佳实践改进。",
+    "promptImprovementOptimizer": "在寻找高级优化算法？请查看 Opik 优化器！",
+    "whatAreFeedbackScores": "反馈分数是对 LLM 输出的评估，可通过人工审核、在线评估规则或 SDK 获得",
+    "whatAreExperimentItems": "实验项目是将数据集样本与其 LLM 输出、反馈分数和追踪连接起来的单独评估。",
+    "whatsTheExperimentConfiguration": "实验配置捕获关键设置，如 prompt、模型和温度，以保持实验的可重现性和易于分析。",
+    "whatDoesItMeanToCompareMyExperiments": "对比实验以了解 prompt、模型或规则的更改如何影响性能。从同一数据集中至少选择两个实验以开始。",
+    "whatsTheBestScore": "优化运行期间达到的最高评估结果，基于您选择的指标。",
+    "whatsTheOptimizer": "优化器是 Opik Agent Optimizer SDK 中的内置算法，可提高 Prompt 的有效性。每个优化器都使用自己的策略和可配置设置来针对特定的优化目标。",
+    "whatsThePlayground": "在保存 Prompt 到库或运行完整实验之前进行测试。或使用它来探索不同的 Prompt 变体，并实时查看您的 LLM 如何响应。",
+    "whatsTheseConfigurationThings": "模型配置参数允许您控制输出行为。调整这些参数可以让您在确定性答案和更多样化、探索性的输出之间取得平衡。",
+    "whatDoesTheDatasetDoHere": "在 Playground 中对数据集运行 Prompt，以预览其在多个输入上的性能。选择一个或多个指标以自动评估每个数据集项目。"
   },
   "traces": {
     "pageTitle": "追踪",
     "setGuardrail": "设置防护栏",
     "tabs": {
-      "traces": "追踪",
-      "spans": "跨度",
-      "threads": "线程",
+      "traces": "Traces",
+      "spans": "Spans",
+      "threads": "Threads",
       "metrics": "指标",
       "onlineEvaluation": "在线评估",
       "annotationQueues": "标注队列"
@@ -113,6 +140,85 @@
       "addTo": "添加到",
       "dataset": "数据集",
       "annotationQueue": "标注队列"
+    },
+    "explainers": {
+      "whatAreTraces": "Trace 是 LLM 应用处理单个输入的逐步记录，包括 LLM 调用和其他操作。",
+      "whatAreSpans": "Span 代表 trace 执行过程中的单个步骤。使用 span 来调试、监控和评估模型行为。",
+      "whatAreThreads": "Thread 代表完整的对话会话，将多个相关的 trace 组合在一起。使用 thread 来审查和评估聊天应用中的整个交互过程。"
+    },
+    "title": "追踪",
+    "viewTrace": "查看 Trace",
+    "traceId": "Trace ID",
+    "spanId": "Span ID",
+    "duration": "持续时间",
+    "startTime": "开始时间",
+    "endTime": "结束时间",
+    "status": "状态",
+    "input": "输入",
+    "output": "输出",
+    "metadata": "元数据",
+    "tags": "标签",
+    "feedbackScores": "反馈分数",
+    "noTraces": "暂无追踪记录",
+    "columns": {
+      "id": "ID",
+      "name": "名称",
+      "type": "类型",
+      "startTime": "开始时间",
+      "endTime": "结束时间",
+      "duration": "持续时间",
+      "tokens": "Tokens",
+      "estimatedCost": "预估成本",
+      "input": "输入",
+      "output": "输出",
+      "tags": "标签",
+      "feedbackScores": "反馈分数",
+      "metadata": "元数据",
+      "threadId": "线程 ID",
+      "errors": "错误",
+      "customFilter": "自定义筛选",
+      "totalTokens": "总 Tokens",
+      "totalInputTokens": "总输入 Tokens",
+      "totalOutputTokens": "总输出 Tokens",
+      "createdBy": "创建者",
+      "comments": "评论",
+      "userFeedback": "用户反馈"
+    },
+    "searchTraces": "搜索 Traces...",
+    "spans": "Spans",
+    "viewDetails": "查看详情"
+  },
+  "metrics": {
+    "requestChart": "请求图表",
+    "projectMetrics": "项目指标",
+    "traceMetrics": "追踪指标",
+    "threadMetrics": "线程指标",
+    "tokenUsage": "Token 使用量",
+    "estimatedCost": "预估成本",
+    "traceFeedbackScores": "追踪反馈分数",
+    "numberOfTraces": "追踪数量",
+    "traceDuration": "追踪持续时间",
+    "threadsFeedbackScores": "线程反馈分数",
+    "numberOfThreads": "线程数量",
+    "threadDuration": "线程持续时间",
+    "intervals": {
+      "hourlyTotals": "每小时总计",
+      "dailyTotals": "每日总计",
+      "weeklyTotals": "每周总计",
+      "hourlyAverages": "每小时平均值",
+      "dailyAverages": "每日平均值",
+      "weeklyAverages": "每周平均值",
+      "hourlyQuantiles": "每小时分位数（秒）",
+      "dailyQuantiles": "每日分位数（秒）",
+      "weeklyQuantiles": "每周分位数（秒）",
+      "hourlyCost": "每小时总成本（美元）",
+      "dailyCost": "每日总成本（美元）",
+      "weeklyCost": "每周总成本（美元）"
+    },
+    "percentiles": {
+      "p50": "第 50 百分位",
+      "p90": "第 90 百分位",
+      "p99": "第 99 百分位"
     }
   },
   "threads": {
@@ -123,6 +229,20 @@
     "actions": {
       "deleteThreads": "删除线程",
       "deleteConfirm": "删除线程还将删除所有链接的追踪及其数据。此操作无法撤销。确定要继续吗？"
+    },
+    "columns": {
+      "id": "ID",
+      "firstMessage": "首条消息",
+      "lastMessage": "最后一条消息",
+      "messageCount": "消息数量",
+      "status": "状态",
+      "createdAt": "创建时间",
+      "lastUpdated": "最后更新时间",
+      "duration": "持续时间",
+      "tags": "标签",
+      "startTime": "开始时间",
+      "endTime": "结束时间",
+      "feedbackScores": "反馈分数"
     }
   },
   "navigation": {
@@ -274,6 +394,12 @@
       "cancel": "取消",
       "logTracesToProject": "记录 Traces 到您的项目"
     },
+    "toast": {
+      "created": {
+        "title": "项目已创建",
+        "description": "记录 Traces 到您的项目以捕获 LLM 交互、分析性能、运行实验并随着时间改进您的应用。"
+      }
+    },
     "actions": {
       "delete": "删除",
       "deleteTooltip": "删除"
@@ -423,86 +549,58 @@
     }
   },
   "prompts": {
-    "title": "Prompts",
+    "title": "Prompt 库",
     "library": "Prompt 库",
     "createNew": "创建新 Prompt",
     "noPrompts": "暂无 Prompt",
+    "noSearchResults": "无搜索结果",
+    "searchByName": "按名称搜索",
+    "searchPrompts": "搜索 Prompts...",
     "editPrompt": "编辑 Prompt",
     "deletePrompt": "删除 Prompt",
+    "deletePromptConfirm": "删除此 Prompt 将同时删除所有相关的提交记录。此操作无法撤销。确定要继续吗？",
+    "deletePrompts": "删除 Prompts",
+    "deletePromptsConfirm": "删除这些 Prompts 将同时删除所有相关的提交记录。此操作无法撤销。确定要继续吗？",
+    "deleteConfirm": "确定要删除此 Prompt 吗？",
+    "addPrompt": "添加 Prompt",
+    "viewPrompt": "查看 Prompt",
+    "actionsMenu": "操作菜单",
     "version": "版本",
     "commit": "提交",
     "variables": "变量",
+    "explainers": {
+      "whatsThePromptLibrary": "存储和版本化 Prompts 以保持一致性并简化跨项目的实验",
+      "howDoIWriteMyPrompt": "编写 LLM 将接收到的 Prompts，包括任何动态占位符或格式。",
+      "whatFormatShouldThePromptBe": "使用 mustache 语法引用数据集变量。示例：{{question}}。",
+      "whatFormatShouldTheMetadataBe": "使用有效的 JSON 对象，包含键值对。示例：{\"key\": \"value\"}"
+    },
     "columns": {
       "id": "ID",
       "name": "名称",
       "description": "描述",
       "versions": "版本",
+      "tags": "标签",
       "createdAt": "创建时间",
       "createdBy": "创建者",
+      "lastUpdated": "最后更新",
+      "created": "创建时间",
       "lastUpdatedAt": "最后更新"
     },
-    "searchPrompts": "搜索 Prompts...",
-    "deleteConfirm": "确定要删除此 Prompt 吗？",
-    "addPrompt": "添加 Prompt",
-    "viewPrompt": "查看 Prompt"
-  },
-  "playground": {
-    "title": "Playground",
-    "newChat": "新对话",
-    "selectModel": "选择模型",
-    "temperature": "温度",
-    "maxTokens": "最大 Token 数",
-    "systemPrompt": "系统提示词",
-    "userMessage": "用户消息",
-    "send": "发送",
-    "stop": "停止",
-    "clear": "清空",
-    "saveAsPrompt": "保存为 Prompt"
-  },
-  "traces": {
-    "title": "追踪",
-    "viewTrace": "查看 Trace",
-    "traceId": "Trace ID",
-    "spanId": "Span ID",
-    "duration": "持续时间",
-    "startTime": "开始时间",
-    "endTime": "结束时间",
-    "status": "状态",
-    "input": "输入",
-    "output": "输出",
-    "metadata": "元数据",
-    "tags": "标签",
-    "feedbackScores": "反馈分数",
-    "noTraces": "暂无追踪记录",
-    "columns": {
-      "id": "ID",
+    "dialog": {
+      "createTitle": "创建新 Prompt",
+      "editTitle": "编辑 Prompt",
+      "createButton": "创建 Prompt",
+      "updateButton": "更新 Prompt",
       "name": "名称",
-      "type": "类型",
-      "startTime": "开始时间",
-      "endTime": "结束时间",
-      "duration": "持续时间",
-      "tokens": "Tokens",
-      "estimatedCost": "预估成本",
-      "input": "输入",
-      "output": "输出",
-      "tags": "标签",
-      "feedbackScores": "反馈分数"
-    },
-    "searchTraces": "搜索 Traces...",
-    "spans": "Spans",
-    "viewDetails": "查看详情"
-  },
-  "configuration": {
-    "title": "配置",
-    "general": "常规",
-    "apiKeys": "API 密钥",
-    "providerKeys": "Provider 密钥",
-    "alerts": "告警",
-    "integrations": "集成",
-    "teamSettings": "团队设置",
-    "workspace": "工作空间",
-    "members": "成员",
-    "billing": "账单"
+      "namePlaceholder": "Prompt 名称",
+      "prompt": "Prompt",
+      "promptPlaceholder": "Prompt",
+      "description": "描述",
+      "descriptionPlaceholder": "Prompt 描述",
+      "images": "图片",
+      "metadata": "元数据",
+      "metadataInvalid": "元数据字段无效"
+    }
   },
   "alerts": {
     "title": "告警",
@@ -569,6 +667,25 @@
     },
     "explainer": {
       "description": "优化运行帮助您使用自动化算法系统地改进 LLM Prompts 和配置。"
+    },
+    "deleteOptimization": "删除优化",
+    "deleteOptimizationConfirm": "删除优化运行将删除其所有试验及其数据。相关的追踪不会受影响。此操作无法撤销。确定要继续吗？",
+    "noTrials": "暂无试验",
+    "refreshTrialsList": "刷新试验列表",
+    "bestPrompt": "最佳 Prompt",
+    "compareWithBaseline": "与基线 Prompt 对比",
+    "diff": "差异",
+    "comparePrompts": "对比 Prompts",
+    "baseline": "基线",
+    "current": "当前",
+    "compareColumns": {
+      "id": "ID",
+      "trial": "试验",
+      "optimizer": "优化器",
+      "prompt": "Prompt",
+      "examples": "示例",
+      "created": "创建时间",
+      "createdBy": "创建者"
     }
   },
   "annotationQueues": {
@@ -637,6 +754,14 @@
       "description": "标注队列让您可以组织 Traces 以进行审核和标记，使收集反馈和改进 LLM 输出变得容易。",
       "readDocumentation": "阅读文档",
       "createFirstQueue": "创建您的第一个队列"
+    },
+    "annotateQueue": "标注队列",
+    "rowActions": {
+      "linkCopied": "标注队列链接已复制到剪贴板",
+      "linkCopiedDescription": "与您的标注者共享此队列，以便他们可以开始标注并提供反馈，从而改进您的 LLM 应用的评估。",
+      "deleteTitle": "删除标注队列？",
+      "deleteDescription": "删除标注队列将永久从系统中删除它。所有相关数据和配置都将丢失。此操作无法撤销。确定要继续吗？",
+      "copySharingLink": "复制共享链接"
     }
   },
   "onlineEvaluation": {
@@ -790,6 +915,14 @@
   },
   "configuration": {
     "title": "配置",
+    "general": "常规",
+    "apiKeys": "API 密钥",
+    "providerKeys": "Provider 密钥",
+    "integrations": "集成",
+    "teamSettings": "团队设置",
+    "workspace": "工作空间",
+    "members": "成员",
+    "billing": "账单",
     "tabs": {
       "feedbackDefinitions": "反馈定义",
       "aiProviders": "AI 提供商",
@@ -956,7 +1089,7 @@
     "compareExperiments": "对比实验",
     "experimentStoredSingle": "您的运行已存储在此实验中。浏览结果以发现洞察。",
     "experimentStoredMultiple": "您的运行已存储在多个实验中。浏览对比结果以获得洞察。",
-    "referenceDatasetVariables": "使用 mustache 语法引用数据集变量：{variables}",
+    "referenceDatasetVariables": "使用 mustache 语法引用数据集变量：{{variables}}",
     "tooltips": {
       "imageCompatibility": "某些 Prompts 包含图片，但所选模型不支持图片输入。请更换模型或从消息中移除图片",
       "datasetRemoved": "您的数据集已被删除。请选择其他数据集",
@@ -965,6 +1098,76 @@
       "selectModels": "请为您的 Prompts 选择 LLM 模型",
       "emptyMessages": "某些消息为空。请添加一些文本以继续",
       "actionDisabled": "操作已禁用"
+    },
+    "navigation": {
+      "experimentTitle": "实验执行中",
+      "promptTitle": "Prompt 执行中",
+      "experimentDescription": "您的实验正在运行。现在离开将中断执行，并可能导致实验项目不完整。确定要离开吗？",
+      "promptDescription": "您的 Prompt 正在运行。现在离开将中断执行，并可能导致追踪不完整。确定要离开吗？",
+      "leaveAnyway": "仍然离开",
+      "stayAndWait": "留下等待"
+    },
+    "typeYourMessage": "输入您的消息"
+  },
+  "modelConfig": {
+    "temperature": "Temperature",
+    "temperatureTooltip": "控制随机性：降低会导致更少的随机完成。当温度接近零时，模型将变得确定性和重复性。",
+    "temperatureReasoningTooltip": "推理模型要求 temperature = 1.0。此设置控制完成中的随机性。",
+    "maxOutputTokens": "最大输出 Token 数",
+    "maxOutputTokensTooltip": "在 Prompt 和完成之间共享生成的最大 Token 数。确切限制因模型而异。（对于标准英文文本，一个 token 大约是 4 个字符）。",
+    "topP": "Top P",
+    "topPTooltip": "通过核采样控制多样性：0.5 表示考虑所有可能性加权选项的一半",
+    "frequencyPenalty": "频率惩罚",
+    "frequencyPenaltyTooltip": "根据新 Token 在文本中到目前为止的现有频率对其进行惩罚的程度。降低模型逐字重复同一行的可能性",
+    "presencePenalty": "存在惩罚",
+    "presencePenaltyTooltip": "根据新 Token 是否出现在文本中对其进行惩罚的程度。增加模型谈论新话题的可能性",
+    "reasoningEffort": "推理努力程度",
+    "reasoningEffortTooltip": "控制模型在响应前投入多少努力进行推理。更高的努力可能会导致更深思熟虑但更慢的响应。",
+    "selectReasoningEffort": "选择推理努力程度",
+    "minimal": "最小",
+    "low": "低",
+    "medium": "中",
+    "high": "高"
+  },
+  "promptImprovement": {
+    "generatePrompt": "生成 Prompt",
+    "improvePrompt": "改进 Prompt",
+    "notConfigured": "未配置",
+    "progress": {
+      "analyzing": "正在分析您的说明...",
+      "defining": "正在定义 Prompt 结构...",
+      "scoping": "正在确定角色和视角...",
+      "applying": "正在应用最佳实践...",
+      "synthesizing": "正在合成完整的 Prompt...",
+      "polishing": "正在优化输出..."
+    },
+    "errors": {
+      "generationError": "生成过程中发生错误",
+      "tokenLimitExceeded": "生成的 Prompt 因 token 限制而被截断。请尝试在模型配置中增加 max_tokens 设置或使用更短的说明。",
+      "emptyResult": "模型未返回任何内容。请重试或调整您的说明。",
+      "generateFailed": "生成 Prompt 失败",
+      "improveFailed": "改进 Prompt 失败"
+    },
+    "instructionsPlaceholder": {
+      "generate": "您希望 AI 做什么？",
+      "improve": "您想改进什么（例如：语气、长度）"
+    },
+    "generatedPromptDescription": "这是使用所选模型（{{model}}）和参数生成的 Prompt。可以编辑。",
+    "emptyPromptPlaceholder": "生成的 Prompt 将显示在此处，供您审核和编辑",
+    "buttons": {
+      "generate": "生成 Prompt",
+      "improve": "改进 Prompt",
+      "regenerate": "重新生成 Prompt",
+      "rerun": "重新运行改进",
+      "usePrompt": "使用此 Prompt"
+    },
+    "sections": {
+      "initialPrompt": "您的初始 Prompt",
+      "initialPromptDescription": "这是您的初始 Prompt。可选的说明可以指导改进，或者我们将自动优化它。",
+      "improvedPrompt": "改进后的 Prompt",
+      "generatedPrompt": "生成的 Prompt",
+      "instructions": "说明（可选）",
+      "instructionsDescription": "用简单的语言编写您的说明。我们将把它们转换为最佳实践 Prompt，供您审核和迭代。"
     }
   },
   "promptPage": {
@@ -979,6 +1182,59 @@
       "experimentItems": "实验项目",
       "configuration": "配置",
       "feedbackScores": "反馈分数"
+    },
+    "details": {
+      "compare": "对比",
+      "collapseCharts": "收起图表",
+      "expandCharts": "展开图表",
+      "experiments": "个实验",
+      "baselineOf": "基线",
+      "comparedAgainst": "对比",
+      "feedbackScores": "反馈分数",
+      "feedbackScoresDistribution": "反馈分数分布",
+      "noChartData": "所选实验没有图表数据"
+    },
+    "experimentItems": {
+      "noData": "所选实验没有数据",
+      "idDatasetItem": "ID（数据集项）",
+      "duration": "持续时间",
+      "comments": "评论",
+      "evaluationTask": "评估任务",
+      "feedbackScores": "反馈分数",
+      "selectScore": "选择分数",
+      "searchDatasetItems": "搜索数据集项",
+      "dataset": "数据集",
+      "experiments": "实验",
+      "name": "名称",
+      "labelDataset": "（数据集）",
+      "labelOutput": "（输出）"
+    },
+    "configuration": {
+      "name": "名称",
+      "noSearchResults": "无搜索结果",
+      "noConfigurationMultiple": "这些实验没有配置",
+      "noConfigurationSingle": "该实验没有配置",
+      "searchByName": "按名称搜索",
+      "showDifferencesOnly": "仅显示差异"
+    },
+    "feedbackScores": {
+      "feedbackScore": "反馈分数",
+      "noScoresMultiple": "这些实验没有反馈分数",
+      "noScoresSingle": "该实验没有反馈分数"
+    },
+    "actionsPanel": {
+      "compare": "对比",
+      "compareExperiments": "对比实验"
+    },
+    "compareDialog": {
+      "title": "对比实验",
+      "searchByName": "按名称搜索",
+      "noSearchResults": "无搜索结果",
+      "selectExperiment": "选择实验",
+      "cancel": "取消",
+      "compareButton": "对比",
+      "experiment": "个实验",
+      "experiments": "个实验"
     }
   },
   "compareTrialsPage": {
@@ -994,49 +1250,6 @@
     "searchByName": "按名称搜索",
     "noExperiments": "没有要对比的实验",
     "noSearchResults": "无搜索结果"
-  },
-  "prompts": {
-    "title": "Prompt 库",
-    "createNew": "创建新 Prompt",
-    "noPrompts": "暂无 Prompt",
-    "noSearchResults": "无搜索结果",
-    "searchByName": "按名称搜索",
-    "deletePrompts": "删除 Prompts",
-    "deletePromptsConfirm": "删除这些 Prompts 将同时删除所有相关的提交记录。此操作无法撤销。确定要继续吗？",
-    "deletePrompt": "删除 Prompt",
-    "deletePromptConfirm": "删除此 Prompt 将同时删除所有相关的提交记录。此操作无法撤销。确定要继续吗？",
-    "actionsMenu": "操作菜单",
-    "explainers": {
-      "whatsThePromptLibrary": "存储和版本化 Prompts 以保持一致性并简化跨项目的实验",
-      "howDoIWriteMyPrompt": "编写 LLM 将接收到的 Prompts，包括任何动态占位符或格式。",
-      "whatFormatShouldThePromptBe": "使用 mustache 语法引用数据集变量。示例：{{question}}。",
-      "whatFormatShouldTheMetadataBe": "使用有效的 JSON 对象，包含键值对。示例：{\"key\": \"value\"}"
-    },
-    "columns": {
-      "id": "ID",
-      "name": "名称",
-      "description": "描述",
-      "versions": "版本",
-      "tags": "标签",
-      "lastUpdated": "最后更新",
-      "created": "创建时间",
-      "createdBy": "创建者"
-    },
-    "dialog": {
-      "createTitle": "创建新 Prompt",
-      "editTitle": "编辑 Prompt",
-      "createButton": "创建 Prompt",
-      "updateButton": "更新 Prompt",
-      "name": "名称",
-      "namePlaceholder": "Prompt 名称",
-      "prompt": "Prompt",
-      "promptPlaceholder": "Prompt",
-      "description": "描述",
-      "descriptionPlaceholder": "Prompt 描述",
-      "images": "图片",
-      "metadata": "元数据",
-      "metadataInvalid": "元数据字段无效"
-    }
   },
   "onboarding": {
     "quickstart": {
@@ -1151,4 +1364,3 @@
     "outputTokens": "输出 Tokens"
   }
 }
-

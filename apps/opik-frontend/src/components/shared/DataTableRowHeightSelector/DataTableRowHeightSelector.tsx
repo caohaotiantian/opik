@@ -1,4 +1,5 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { DropdownOption, ROW_HEIGHT } from "@/types/shared";
 import { Check, Rows3 } from "lucide-react";
 import {
@@ -14,15 +15,20 @@ type DataTableRowHeightSelectorProps = {
   setType: (type: ROW_HEIGHT) => void;
 };
 
-const OPTIONS: DropdownOption<ROW_HEIGHT>[] = [
-  { value: ROW_HEIGHT.small, label: "Small" },
-  { value: ROW_HEIGHT.medium, label: "Medium" },
-  { value: ROW_HEIGHT.large, label: "Large" },
-];
-
 const DataTableRowHeightSelector: React.FunctionComponent<
   DataTableRowHeightSelectorProps
 > = ({ type, setType }) => {
+  const { t } = useTranslation();
+
+  const OPTIONS: DropdownOption<ROW_HEIGHT>[] = useMemo(
+    () => [
+      { value: ROW_HEIGHT.small, label: t("common.rowHeight.small") },
+      { value: ROW_HEIGHT.medium, label: t("common.rowHeight.medium") },
+      { value: ROW_HEIGHT.large, label: t("common.rowHeight.large") },
+    ],
+    [t],
+  );
+
   const handleSelect = useCallback(
     (value: ROW_HEIGHT) => {
       setType(value);
@@ -35,7 +41,7 @@ const DataTableRowHeightSelector: React.FunctionComponent<
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm">
           <Rows3 className="mr-1.5 size-3.5" />
-          Rows
+          {t("common.rows")}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

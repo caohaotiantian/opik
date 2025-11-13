@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Split } from "lucide-react";
 import isUndefined from "lodash/isUndefined";
@@ -78,6 +79,7 @@ const BestPrompt: React.FC<BestPromptProps> = ({
   scoreMap,
   baselineExperiment,
 }) => {
+  const { t } = useTranslation();
   const workspaceName = useAppStore((state) => state.activeWorkspaceName);
   const [diffOpen, setDiffOpen] = useState(false);
 
@@ -149,7 +151,7 @@ const BestPrompt: React.FC<BestPromptProps> = ({
       <CardHeader className="gap-y-0.5 px-5">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="comet-body-s-accented">Best prompt</CardTitle>
+            <CardTitle className="comet-body-s-accented">{t("optimization.bestPrompt")}</CardTitle>
             <CardDescription className="!mt-0">
               <ColoredTagNew
                 label={optimization.objective_name}
@@ -190,12 +192,12 @@ const BestPrompt: React.FC<BestPromptProps> = ({
             search={{ trials: [experiment.id] }}
           >
             <Button variant="ghost" className="flex items-center pl-0">
-              View details <ArrowRight className="size-4" />
+              {t("optimization.viewDetails")} <ArrowRight className="size-4" />
             </Button>
           </Link>
           {baselinePrompt && (
             <>
-              <TooltipWrapper content="Compare with baseline prompt">
+              <TooltipWrapper content={t("optimization.compareWithBaseline")}>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -203,18 +205,18 @@ const BestPrompt: React.FC<BestPromptProps> = ({
                   className="flex items-center gap-1"
                 >
                   <Split className="size-4" />
-                  Diff
+                  {t("optimization.diff")}
                 </Button>
               </TooltipWrapper>
               <Dialog open={diffOpen} onOpenChange={setDiffOpen}>
                 <DialogContent className="max-w-lg sm:max-w-[880px]">
                   <DialogHeader>
-                    <DialogTitle>Compare prompts</DialogTitle>
+                    <DialogTitle>{t("optimization.comparePrompts")}</DialogTitle>
                   </DialogHeader>
                   <div className="grid grid-cols-2 gap-4 pb-2">
                     <div>
                       <div className="mb-2 px-0.5">
-                        <span className="comet-body-s-accented">Baseline</span>
+                        <span className="comet-body-s-accented">{t("optimization.baseline")}</span>
                       </div>
                       <div className="comet-code h-[620px] overflow-y-auto whitespace-pre-line break-words rounded-md border px-2.5 py-1.5">
                         {baselinePrompt}
@@ -222,7 +224,7 @@ const BestPrompt: React.FC<BestPromptProps> = ({
                     </div>
                     <div>
                       <div className="mb-2 px-0.5">
-                        <span className="comet-body-s-accented">Current</span>
+                        <span className="comet-body-s-accented">{t("optimization.current")}</span>
                       </div>
                       <div className="comet-code h-[620px] overflow-y-auto whitespace-pre-line break-words rounded-md border px-2.5 py-1.5">
                         <TextDiff

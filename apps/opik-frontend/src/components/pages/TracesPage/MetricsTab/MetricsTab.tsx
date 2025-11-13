@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { ChartLine as ChartLineIcon } from "lucide-react";
 import React, { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import RequestChartDialog from "@/components/pages/TracesPage/MetricsTab/RequestChartDialog/RequestChartDialog";
 import useTracesList from "@/api/traces/useTracesList";
 import useThreadList from "@/api/traces/useThreadsList";
@@ -20,6 +21,7 @@ interface MetricsTabProps {
 }
 
 const MetricsTab = ({ projectId }: MetricsTabProps) => {
+  const { t } = useTranslation();
   const [requestChartOpen, setRequestChartOpen] = useState(false);
 
   const {
@@ -80,7 +82,7 @@ const MetricsTab = ({ projectId }: MetricsTabProps) => {
           onClick={() => setRequestChartOpen(true)}
         >
           <ChartLineIcon className="mr-1.5 size-3.5" />
-          Request a chart
+          {t("metrics.requestChart")}
         </Button>
         <MetricDateRangeSelect
           value={dateRange}

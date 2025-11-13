@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { BooleanParam, StringParam, useQueryParam } from "use-query-params";
 import { ColumnPinningState } from "@tanstack/react-table";
 import useLocalStorageState from "use-local-storage-state";
@@ -36,10 +37,10 @@ export const DEFAULT_COLUMN_PINNING: ColumnPinningState = {
   right: [],
 };
 
-export const DEFAULT_COLUMNS: ColumnData<CompareConfig>[] = [
+const getDefaultColumns = (t: (key: string) => string): ColumnData<CompareConfig>[] => [
   {
     id: "name",
-    label: "Name",
+    label: t("compareExperimentsPage.configuration.name"),
     type: COLUMN_TYPE.string,
   },
 ];
@@ -55,6 +56,7 @@ const ConfigurationTab: React.FunctionComponent<ConfigurationTabProps> = ({
   experiments,
   isPending,
 }) => {
+  const { t } = useTranslation();
   const [search = "", setSearch] = useQueryParam("searchConfig", StringParam, {
     updateType: "replaceIn",
   });
@@ -73,7 +75,7 @@ const ConfigurationTab: React.FunctionComponent<ConfigurationTabProps> = ({
 
   const columns = useMemo(() => {
     const retVal = convertColumnDataToColumn<CompareConfig, CompareConfig>(
-      DEFAULT_COLUMNS,
+      getDefaultColumns(t),
       {},
     );
 
@@ -94,7 +96,7 @@ const ConfigurationTab: React.FunctionComponent<ConfigurationTabProps> = ({
     });
 
     return retVal;
-  }, [experimentsIds, onlyDiff, experiments]);
+  }, [experimentsIds, onlyDiff, experiments, t]);
 
   const flattenExperimentMetadataMap = useMemo(() => {
     return experiments.reduce<
@@ -146,10 +148,10 @@ const ConfigurationTab: React.FunctionComponent<ConfigurationTabProps> = ({
   }, [rows, search, onlyDiff, isCompare]);
 
   const noDataText = search
-    ? "No search results"
+    ? t("compareExperimentsPage.configuration.noSearchResults")
     : isCompare
-      ? "These experiments have no configuration"
-      : "This experiment has no configuration";
+      ? t("compareExperimentsPage.configuration.noConfigurationMultiple")
+      : t("compareExperimentsPage.configuration.noConfigurationSingle");
 
   const resizeConfig = useMemo(
     () => ({
@@ -181,7 +183,7 @@ const ConfigurationTab: React.FunctionComponent<ConfigurationTabProps> = ({
           <SearchInput
             searchText={search as string}
             setSearchText={setSearch}
-            placeholder="Search by name"
+            placeholder={t("compareExperimentsPage.configuration.searchByName")}
             className="w-[320px]"
             dimension="sm"
           ></SearchInput>
@@ -192,7 +194,7 @@ const ConfigurationTab: React.FunctionComponent<ConfigurationTabProps> = ({
             <>
               <Separator orientation="vertical" className="mx-2 h-4" />
               <div className="flex items-center space-x-2">
-                <Label htmlFor="show-doff-only">Show differences only</Label>
+                <Label htmlFor="show-doff-only">{t("compareExperimentsPage.configuration.showDifferencesOnly")}</Label>
                 <Switch
                   id="show-doff-only"
                   onCheckedChange={setOnlyDiff}
