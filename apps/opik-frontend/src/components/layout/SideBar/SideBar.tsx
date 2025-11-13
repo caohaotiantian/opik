@@ -1,14 +1,14 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 
 import {
-  Book,
+  // Book, // Removed - no longer needed
   Database,
   FlaskConical,
-  GraduationCap,
+  // GraduationCap, // Removed - no longer needed
   LayoutGrid,
-  MessageCircleQuestion,
+  // MessageCircleQuestion, // Removed - no longer needed
   FileTerminal,
   LucideHome,
   Blocks,
@@ -29,15 +29,15 @@ import useRulesList from "@/api/automations/useRulesList";
 import useOptimizationsList from "@/api/optimizations/useOptimizationsList";
 import { OnChangeFn } from "@/types/shared";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { buildDocsUrl, cn } from "@/lib/utils";
+// import { Separator } from "@/components/ui/separator"; // Removed - no longer needed
+import { cn } from "@/lib/utils"; // buildDocsUrl removed - no longer needed
 import Logo from "@/components/layout/Logo/Logo";
 import usePluginsStore from "@/store/PluginsStore";
-import ProvideFeedbackDialog from "@/components/layout/SideBar/FeedbackDialog/ProvideFeedbackDialog";
+// import ProvideFeedbackDialog from "@/components/layout/SideBar/FeedbackDialog/ProvideFeedbackDialog"; // Removed - no longer needed
 import usePromptsList from "@/api/prompts/usePromptsList";
 import useAnnotationQueuesList from "@/api/annotation-queues/useAnnotationQueuesList";
-import { useOpenQuickStartDialog } from "@/components/pages-shared/onboarding/QuickstartDialog/QuickstartDialog";
-import GitHubStarListItem from "@/components/layout/SideBar/GitHubStarListItem/GitHubStarListItem";
+// import { useOpenQuickStartDialog } from "@/components/pages-shared/onboarding/QuickstartDialog/QuickstartDialog"; // Removed - no longer needed
+// import GitHubStarListItem from "@/components/layout/SideBar/GitHubStarListItem/GitHubStarListItem"; // Removed - no longer needed
 import SidebarMenuItem, {
   MENU_ITEM_TYPE,
   MenuItem,
@@ -175,8 +175,8 @@ const SideBar: React.FunctionComponent<SideBarProps> = ({
   setExpanded,
 }) => {
   const { t } = useTranslation();
-  const [openProvideFeedback, setOpenProvideFeedback] = useState(false);
-  const { open: openQuickstart } = useOpenQuickStartDialog();
+  // const [openProvideFeedback, setOpenProvideFeedback] = useState(false); // Removed - no longer needed
+  // const { open: openQuickstart } = useOpenQuickStartDialog(); // Removed - no longer needed
 
   const { activeWorkspaceName: workspaceName } = useAppStore();
   const LogoComponent = usePluginsStore((state) => state.Logo);
@@ -297,41 +297,7 @@ const SideBar: React.FunctionComponent<SideBarProps> = ({
     ));
   };
 
-  const renderBottomItems = () => {
-    const bottomItems = renderItems([
-      {
-        id: "documentation",
-        path: buildDocsUrl(),
-        type: MENU_ITEM_TYPE.link,
-        icon: Book,
-        label: t("navigation.documentation"),
-      },
-      {
-        id: "quickstart",
-        type: MENU_ITEM_TYPE.button,
-        icon: GraduationCap,
-        label: t("navigation.quickstartGuide"),
-        onClick: openQuickstart,
-      },
-      {
-        id: "provideFeedback",
-        type: MENU_ITEM_TYPE.button,
-        icon: MessageCircleQuestion,
-        label: t("navigation.provideFeedback"),
-        onClick: () => setOpenProvideFeedback(true),
-      },
-    ]);
-
-    if (SidebarInviteDevButton) {
-      bottomItems.splice(
-        2,
-        0,
-        <SidebarInviteDevButton key="inviteDevButton" expanded={expanded} />,
-      );
-    }
-
-    return bottomItems;
-  };
+  // renderBottomItems function removed - bottom section no longer needed
 
   const renderGroups = (groups: MenuItemGroup[]) => {
     return groups.map((group) => {
@@ -380,25 +346,16 @@ const SideBar: React.FunctionComponent<SideBarProps> = ({
         </div>
         <div className="relative flex h-[calc(100%-var(--header-height))]">
           {renderExpandCollapseButton()}
-          <div className="flex min-h-0 grow flex-col justify-between overflow-auto px-3 py-4">
+          <div className="flex min-h-0 grow flex-col overflow-auto px-3 py-4">
             <ul className="flex flex-col gap-1 pb-2">
               {renderGroups(MENU_ITEMS)}
             </ul>
-            <div className="flex flex-col gap-4">
-              <Separator />
-              <ul className="flex flex-col gap-1">
-                <GitHubStarListItem expanded={expanded} />
-                {renderBottomItems()}
-              </ul>
-            </div>
+            {/* Bottom section with Separator, GitHub Star, Documentation, Quickstart Guide, and Provide Feedback removed as per user request */}
           </div>
         </div>
       </aside>
 
-      <ProvideFeedbackDialog
-        open={openProvideFeedback}
-        setOpen={setOpenProvideFeedback}
-      />
+      {/* ProvideFeedbackDialog removed as per user request */}
     </>
   );
 };

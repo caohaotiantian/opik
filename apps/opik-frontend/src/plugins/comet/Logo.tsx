@@ -2,8 +2,8 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/components/theme-provider";
 import { THEME_MODE } from "@/constants/theme";
-import imageLogoUrl from "/images/opik-logo.png";
-import imageLogoInvertedUrl from "/images/opik-logo-inverted.png";
+import imageLogoUrl from "/images/ai-benchmark-logo.png";
+import imageLogoInvertedUrl from "/images/ai-benchmark-logo-inverted.png";
 
 type LogoProps = {
   expanded: boolean;
@@ -18,7 +18,7 @@ const Logo: React.FunctionComponent<LogoProps> = ({ expanded }) => {
         "w-[32px]": !expanded,
       })}
       src={themeMode === THEME_MODE.DARK ? imageLogoInvertedUrl : imageLogoUrl}
-      alt="opik logo"
+      alt="ai-benchmark logo"
     />
   );
 };
