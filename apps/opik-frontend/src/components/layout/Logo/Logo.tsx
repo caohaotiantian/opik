@@ -14,8 +14,9 @@ const Logo: React.FunctionComponent<LogoProps> = ({ expanded }) => {
 
   return (
     <img
-      className={cn("h-12 object-contain object-left -ml-[3px] mr-[3px]", {
+      className={cn("h-12 object-contain object-left", {
         "w-[48px]": !expanded,
+        "w-full": expanded,
       })}
       src={themeMode === THEME_MODE.DARK ? imageLogoInvertedUrl : imageLogoUrl}
       alt="ai-benchmark logo"
