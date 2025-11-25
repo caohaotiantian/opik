@@ -4,6 +4,8 @@ import com.comet.opik.api.MemberStatus;
 import com.comet.opik.api.RoleScope;
 import com.comet.opik.api.WorkspaceMember;
 import com.comet.opik.api.error.ConflictException;
+import com.comet.opik.infrastructure.audit.Auditable;
+import com.comet.opik.infrastructure.audit.Operation;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.BadRequestException;
@@ -34,6 +36,7 @@ public class WorkspaceMemberService {
      * @param addedBy the user who added the member
      * @return the created workspace member
      */
+    @Auditable(action = "Add Workspace Member", resourceType = "workspace_member", operation = Operation.CREATE)
     public WorkspaceMember addMember(String workspaceId, String userId, String roleId, String addedBy) {
         log.info("Adding user '{}' to workspace '{}' with role '{}'", userId, workspaceId, roleId);
 
@@ -113,6 +116,7 @@ public class WorkspaceMemberService {
      * @param roleId the new role ID
      * @param updatedBy the user who made the update
      */
+    @Auditable(action = "Update Workspace Member Role", resourceType = "workspace_member", operation = Operation.UPDATE)
     public void updateMemberRole(String workspaceId, String userId, String roleId, String updatedBy) {
         log.info("Updating role for user '{}' in workspace '{}' to '{}'", userId, workspaceId, roleId);
 
@@ -161,6 +165,7 @@ public class WorkspaceMemberService {
      * @param workspaceId the workspace ID
      * @param userId the user ID
      */
+    @Auditable(action = "Remove Workspace Member", resourceType = "workspace_member", operation = Operation.DELETE)
     public void removeMember(String workspaceId, String userId) {
         log.info("Removing user '{}' from workspace '{}'", userId, workspaceId);
 

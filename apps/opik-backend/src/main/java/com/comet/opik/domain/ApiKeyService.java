@@ -2,6 +2,8 @@ package com.comet.opik.domain;
 
 import com.comet.opik.api.ApiKey;
 import com.comet.opik.api.ApiKeyStatus;
+import com.comet.opik.infrastructure.audit.Auditable;
+import com.comet.opik.infrastructure.audit.Operation;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.BadRequestException;
@@ -45,6 +47,7 @@ public class ApiKeyService {
      * @param expiryDays the expiry days (optional, null means no expiry)
      * @return the generated API key (plain text, only returned once)
      */
+    @Auditable(action = "Generate API Key", resourceType = "api_key", operation = Operation.CREATE)
     public ApiKeyResult generateApiKey(String userId, String workspaceId, String name, String description,
             Set<String> scopes, Integer expiryDays) {
         log.info("Generating API key for user: '{}' in workspace: '{}'", userId, workspaceId);
@@ -133,6 +136,7 @@ public class ApiKeyService {
      * @param apiKeyId the API key ID
      * @param revokedBy the user who revoked the key
      */
+    @Auditable(action = "Revoke API Key", resourceType = "api_key", operation = Operation.DELETE)
     public void revokeApiKey(String apiKeyId, String revokedBy) {
         log.info("Revoking API key: '{}'", apiKeyId);
 

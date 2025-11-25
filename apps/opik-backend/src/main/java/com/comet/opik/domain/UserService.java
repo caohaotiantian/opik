@@ -3,6 +3,8 @@ package com.comet.opik.domain;
 import com.comet.opik.api.User;
 import com.comet.opik.api.UserStatus;
 import com.comet.opik.api.error.ConflictException;
+import com.comet.opik.infrastructure.audit.Auditable;
+import com.comet.opik.infrastructure.audit.Operation;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.BadRequestException;
@@ -33,6 +35,7 @@ public class UserService {
      * @param fullName the full name (optional)
      * @return the created user
      */
+    @Auditable(action = "Register User", resourceType = "user", operation = Operation.CREATE)
     public User registerUser(String username, String email, String password, String fullName) {
         log.info("Registering new user: '{}'", username);
 
@@ -91,6 +94,7 @@ public class UserService {
      * @param userAgent the user agent
      * @return login result with session token and user info
      */
+    @Auditable(action = "User Login", resourceType = "user", operation = Operation.LOGIN)
     public LoginResult login(String username, String password, String ipAddress, String userAgent) {
         log.info("User login attempt: '{}'", username);
 
@@ -129,6 +133,7 @@ public class UserService {
      *
      * @param sessionToken the session token
      */
+    @Auditable(action = "User Logout", resourceType = "user", operation = Operation.LOGOUT)
     public void logout(String sessionToken) {
         log.info("User logout");
         sessionService.invalidateSession(sessionToken);
@@ -176,6 +181,7 @@ public class UserService {
      * @param updatedBy the user who made the update
      * @return the updated user
      */
+    @Auditable(action = "Update User Profile", resourceType = "user", operation = Operation.UPDATE)
     public User updateUser(String userId, String email, String fullName, String avatarUrl, String locale,
             String updatedBy) {
         log.info("Updating user: '{}'", userId);
@@ -210,6 +216,7 @@ public class UserService {
      * @param newPassword the new password
      * @param updatedBy the user who made the change
      */
+    @Auditable(action = "Change Password", resourceType = "user", operation = Operation.UPDATE)
     public void changePassword(String userId, String oldPassword, String newPassword, String updatedBy) {
         log.info("Changing password for user: '{}'", userId);
 
@@ -259,6 +266,7 @@ public class UserService {
      * @param userId the user ID
      * @param deletedBy the user who made the deletion
      */
+    @Auditable(action = "Delete User", resourceType = "user", operation = Operation.DELETE)
     public void deleteUser(String userId, String deletedBy) {
         log.info("Deleting user: '{}'", userId);
 

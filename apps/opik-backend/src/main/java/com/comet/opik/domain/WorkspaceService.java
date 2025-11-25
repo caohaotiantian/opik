@@ -4,6 +4,8 @@ import com.comet.opik.api.RoleScope;
 import com.comet.opik.api.Workspace;
 import com.comet.opik.api.WorkspaceStatus;
 import com.comet.opik.api.error.ConflictException;
+import com.comet.opik.infrastructure.audit.Auditable;
+import com.comet.opik.infrastructure.audit.Operation;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.NotFoundException;
@@ -38,6 +40,7 @@ public class WorkspaceService {
      * @param ownerUserId the owner user ID
      * @return the created workspace
      */
+    @Auditable(action = "Create Workspace", resourceType = "workspace", operation = Operation.CREATE)
     public Workspace createWorkspace(String name, String displayName, String description, String ownerUserId) {
         log.info("Creating workspace: '{}' by user: '{}'", name, ownerUserId);
 
@@ -124,6 +127,7 @@ public class WorkspaceService {
      * @param updatedBy the user who made the update
      * @return the updated workspace
      */
+    @Auditable(action = "Update Workspace", resourceType = "workspace", operation = Operation.UPDATE, logChanges = true)
     public Workspace updateWorkspace(String workspaceId, String name, String displayName, String description,
             Integer quotaLimit, Integer maxMembers, String settings, String updatedBy) {
         log.info("Updating workspace: '{}'", workspaceId);
@@ -176,6 +180,7 @@ public class WorkspaceService {
      * @param workspaceId the workspace ID
      * @param deletedBy the user who made the deletion
      */
+    @Auditable(action = "Delete Workspace", resourceType = "workspace", operation = Operation.DELETE)
     public void deleteWorkspace(String workspaceId, String deletedBy) {
         log.info("Deleting workspace: '{}'", workspaceId);
 

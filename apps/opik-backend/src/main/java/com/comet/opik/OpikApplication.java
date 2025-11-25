@@ -5,7 +5,9 @@ import com.comet.opik.infrastructure.ConfigurationModule;
 import com.comet.opik.infrastructure.DatabaseUtils;
 import com.comet.opik.infrastructure.EncryptionUtils;
 import com.comet.opik.infrastructure.OpikConfiguration;
+import com.comet.opik.infrastructure.audit.AuditModule;
 import com.comet.opik.infrastructure.auth.AuthModule;
+import com.comet.opik.infrastructure.authorization.AuthorizationModule;
 import com.comet.opik.infrastructure.aws.AwsModule;
 import com.comet.opik.infrastructure.bi.OpikGuiceyLifecycleEventListener;
 import com.comet.opik.infrastructure.bundle.LiquibaseBundle;
@@ -94,7 +96,8 @@ public class OpikApplication extends Application<OpikConfiguration> {
                         new RateLimitModule(), new NameGeneratorModule(), new HttpModule(), new EventModule(),
                         new ConfigurationModule(), new CacheModule(), new JobModule(), new AnthropicModule(),
                         new GeminiModule(), new OpenAIModule(), new OpenRouterModule(), new LlmModule(),
-                        new AwsModule(), new UsageLimitModule(), new VertexAIModule(), new CustomLlmModule())
+                        new AwsModule(), new UsageLimitModule(), new VertexAIModule(), new CustomLlmModule(),
+                        new AuthorizationModule(), new AuditModule())
                 .installers(JobGuiceyInstaller.class)
                 .listen(new OpikGuiceyLifecycleEventListener(), new EventListenerRegistrar())
                 .enableAutoConfig()
