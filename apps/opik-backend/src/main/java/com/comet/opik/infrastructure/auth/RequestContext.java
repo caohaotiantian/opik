@@ -29,11 +29,13 @@ public class RequestContext {
     public static final String RATE_LIMIT_RESET = "RateLimit-Reset";
 
     public static final String PROJECT_NAME = "projectName";
+    public static final String PROJECT_ID = "projectId";
 
     private String userId;
     private String userName;
     private String workspaceId;
     private String workspaceName;
+    private String projectId;
     private String apiKey;
     private MultivaluedMap<String, String> headers;
     private List<Quota> quotas;
