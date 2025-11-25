@@ -19,6 +19,7 @@
         <dropwizard.version>5.0.0</dropwizard.version>
         <swagger.version>2.2.33</swagger.version>
         <lombok.version>1.18.38</lombok.version>
+        <jbcrypt.version>0.4</jbcrypt.version>
         <mysql.version>9.5.0</mysql.version>
         <dropwizard-guicey.version>8.0.0</dropwizard-guicey.version>
         <stringtemplate.version>3.50.0</stringtemplate.version>
@@ -88,6 +89,11 @@
     </dependencyManagement>
 
     <dependencies>
+        <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>${jbcrypt.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.github.spullara.mustache.java</groupId>
             <artifactId>compiler</artifactId>
