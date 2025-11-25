@@ -6,7 +6,9 @@ import com.google.inject.servlet.RequestScoped;
 import jakarta.ws.rs.core.MultivaluedMap;
 import lombok.Data;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @RequestScoped
 @Data
@@ -15,6 +17,7 @@ public class RequestContext {
     public static final String WORKSPACE_HEADER = "Comet-Workspace";
     public static final String WORKSPACE_QUERY_PARAM = "workspace_name";
     public static final String USER_NAME = "userName";
+    public static final String USER_ID = "userId";
     public static final String WORKSPACE_NAME = "workspaceName";
     public static final String SESSION_COOKIE = "sessionToken";
     public static final String WORKSPACE_ID = "workspaceId";
@@ -27,6 +30,7 @@ public class RequestContext {
 
     public static final String PROJECT_NAME = "projectName";
 
+    private String userId;
     private String userName;
     private String workspaceId;
     private String workspaceName;
@@ -34,4 +38,6 @@ public class RequestContext {
     private MultivaluedMap<String, String> headers;
     private List<Quota> quotas;
     private Visibility visibility;
+    private boolean systemAdmin;
+    private Set<String> permissions = new HashSet<>();
 }
