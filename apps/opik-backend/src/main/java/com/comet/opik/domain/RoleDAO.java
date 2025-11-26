@@ -2,10 +2,11 @@ package com.comet.opik.domain;
 
 import com.comet.opik.api.Role;
 import com.comet.opik.api.RoleScope;
+import com.comet.opik.infrastructure.db.SetFlatArgumentFactory;
+import org.jdbi.v3.sqlobject.config.RegisterArgumentFactory;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
-import org.jdbi.v3.sqlobject.customizer.BindBean;
-import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
+import org.jdbi.v3.sqlobject.customizer.BindMethods;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
@@ -13,19 +14,19 @@ import java.util.List;
 import java.util.Optional;
 
 @RegisterRowMapper(RoleRowMapper.class)
+@RegisterArgumentFactory(SetFlatArgumentFactory.class)
 public interface RoleDAO {
 
     @SqlUpdate("""
             INSERT INTO roles (
-                id, name, display_name, description, scope, is_builtin, permissions, version,
+                id, name, description, scope, is_builtin, permissions,
                 created_at, created_by, last_updated_at, last_updated_by
             ) VALUES (
-                :id, :name, :displayName, :description, :scope, :builtin, :permissions::json, :version,
+                :id, :name, :description, :scope, :builtin, :permissions,
                 :createdAt, :createdBy, :lastUpdatedAt, :lastUpdatedBy
             )
             """)
-    @GetGeneratedKeys
-    void insert(@BindBean Role role);
+    void insert(@BindMethods Role role);
 
     @SqlQuery("""
             SELECT * FROM roles WHERE id = :id
@@ -51,7 +52,7 @@ public interface RoleDAO {
             UPDATE roles
             SET display_name = :displayName,
                 description = :description,
-                permissions = :permissions::json,
+                permissions = :permissions,
                 version = version + 1,
                 last_updated_at = CURRENT_TIMESTAMP(6),
                 last_updated_by = :updatedBy

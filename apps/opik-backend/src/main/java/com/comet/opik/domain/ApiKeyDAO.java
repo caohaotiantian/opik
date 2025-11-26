@@ -2,10 +2,11 @@ package com.comet.opik.domain;
 
 import com.comet.opik.api.ApiKey;
 import com.comet.opik.api.ApiKeyStatus;
+import com.comet.opik.infrastructure.db.SetFlatArgumentFactory;
+import org.jdbi.v3.sqlobject.config.RegisterArgumentFactory;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
-import org.jdbi.v3.sqlobject.customizer.BindBean;
-import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
+import org.jdbi.v3.sqlobject.customizer.BindMethods;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RegisterRowMapper(ApiKeyRowMapper.class)
+@RegisterArgumentFactory(SetFlatArgumentFactory.class)
 public interface ApiKeyDAO {
 
     @SqlUpdate("""
@@ -23,12 +25,11 @@ public interface ApiKeyDAO {
                 created_at, created_by, last_updated_at, last_updated_by
             ) VALUES (
                 :id, :userId, :workspaceId, :name, :description, :keyHash, :keyPrefix,
-                :status, :scopes::json, :expiresAt, :version,
+                :status, :scopes, :expiresAt, :version,
                 :createdAt, :createdBy, :lastUpdatedAt, :lastUpdatedBy
             )
             """)
-    @GetGeneratedKeys
-    void insert(@BindBean ApiKey apiKey);
+    void insert(@BindMethods ApiKey apiKey);
 
     @SqlQuery("""
             SELECT * FROM user_api_keys WHERE id = :id

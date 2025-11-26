@@ -4,8 +4,7 @@ import com.comet.opik.api.MemberStatus;
 import com.comet.opik.api.WorkspaceMember;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
-import org.jdbi.v3.sqlobject.customizer.BindBean;
-import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
+import org.jdbi.v3.sqlobject.customizer.BindMethods;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
@@ -24,8 +23,7 @@ public interface WorkspaceMemberDAO {
                 :createdAt, :createdBy, :lastUpdatedAt, :lastUpdatedBy
             )
             """)
-    @GetGeneratedKeys
-    void insert(@BindBean WorkspaceMember member);
+    void insert(@BindMethods WorkspaceMember member);
 
     @SqlQuery("""
             SELECT * FROM workspace_members

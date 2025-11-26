@@ -4,8 +4,7 @@ import com.comet.opik.api.Workspace;
 import com.comet.opik.api.WorkspaceStatus;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
-import org.jdbi.v3.sqlobject.customizer.BindBean;
-import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
+import org.jdbi.v3.sqlobject.customizer.BindMethods;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
@@ -26,8 +25,7 @@ public interface WorkspaceDAO {
                 :createdAt, :createdBy, :lastUpdatedAt, :lastUpdatedBy
             )
             """)
-    @GetGeneratedKeys
-    void insert(@BindBean Workspace workspace);
+    void insert(@BindMethods Workspace workspace);
 
     @SqlQuery("""
             SELECT * FROM workspaces WHERE id = :id

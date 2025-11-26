@@ -4,8 +4,7 @@ import com.comet.opik.api.MemberStatus;
 import com.comet.opik.api.ProjectMember;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
-import org.jdbi.v3.sqlobject.customizer.BindBean;
-import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
+import org.jdbi.v3.sqlobject.customizer.BindMethods;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
@@ -24,8 +23,7 @@ public interface ProjectMemberDAO {
                 :createdAt, :createdBy, :lastUpdatedAt, :lastUpdatedBy
             )
             """)
-    @GetGeneratedKeys
-    void insert(@BindBean ProjectMember member);
+    void insert(@BindMethods ProjectMember member);
 
     @SqlQuery("""
             SELECT * FROM project_members
