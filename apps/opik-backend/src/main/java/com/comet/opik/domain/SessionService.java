@@ -245,7 +245,7 @@ public class SessionService {
         long ttlSeconds = session.expiresAt().getEpochSecond() - Instant.now().getEpochSecond();
 
         if (ttlSeconds > 0) {
-            redissonClient.getBucket(key).set(session, ttlSeconds, TimeUnit.SECONDS);
+            redissonClient.<com.comet.opik.api.Session>getBucket(key).set(session, ttlSeconds, TimeUnit.SECONDS);
             log.debug("Session cached with TTL: '{}' seconds", ttlSeconds);
         }
     }
@@ -255,7 +255,7 @@ public class SessionService {
      */
     private com.comet.opik.api.Session getFromCache(String sessionToken) {
         String key = SESSION_CACHE_PREFIX + sessionToken;
-        return (com.comet.opik.api.Session) redissonClient.getBucket(key).get();
+        return redissonClient.<com.comet.opik.api.Session>getBucket(key).get();
     }
 
     /**

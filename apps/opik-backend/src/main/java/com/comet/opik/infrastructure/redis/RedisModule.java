@@ -11,6 +11,7 @@ import com.comet.opik.infrastructure.ratelimit.RateLimitService;
 import com.google.inject.Provides;
 import jakarta.inject.Singleton;
 import org.redisson.Redisson;
+import org.redisson.api.RedissonClient;
 import org.redisson.api.RedissonReactiveClient;
 import ru.vyarus.dropwizard.guice.module.support.DropwizardAwareModule;
 import ru.vyarus.dropwizard.guice.module.yaml.bind.Config;
@@ -19,8 +20,14 @@ public class RedisModule extends DropwizardAwareModule<OpikConfiguration> {
 
     @Provides
     @Singleton
-    public RedissonReactiveClient redisClient(@Config("redis") RedisConfig config) {
-        return Redisson.create(config.build()).reactive();
+    public RedissonClient redissonClient(@Config("redis") RedisConfig config) {
+        return Redisson.create(config.build());
+    }
+
+    @Provides
+    @Singleton
+    public RedissonReactiveClient redisClient(RedissonClient redissonClient) {
+        return redissonClient.reactive();
     }
 
     @Provides

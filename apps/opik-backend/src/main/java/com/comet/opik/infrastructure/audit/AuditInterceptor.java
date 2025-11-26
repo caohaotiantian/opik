@@ -27,7 +27,7 @@ import java.util.UUID;
 @RequiredArgsConstructor(onConstructor_ = @jakarta.inject.Inject)
 public class AuditInterceptor implements MethodInterceptor {
 
-    private final @NonNull AuditLogService auditLogService;
+    private final @NonNull Provider<AuditLogService> auditLogServiceProvider;
     private final @NonNull Provider<RequestContext> requestContextProvider;
     private final @NonNull Provider<HttpServletRequest> httpServletRequestProvider;
 
@@ -44,6 +44,9 @@ public class AuditInterceptor implements MethodInterceptor {
             // 没有@Auditable注解，直接执行方法
             return invocation.proceed();
         }
+
+        // Get AuditLogService instance
+        AuditLogService auditLogService = auditLogServiceProvider.get();
 
         // 记录开始时间
         long startTime = System.currentTimeMillis();

@@ -2,15 +2,20 @@ package com.comet.opik.infrastructure;
 
 import com.comet.opik.infrastructure.aws.AwsIamCredentialsResolver;
 import com.comet.opik.infrastructure.redis.RedisUrl;
-import com.comet.opik.utils.JsonUtils;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.dropwizard.util.Duration;
 import io.dropwizard.validation.MinDuration;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import org.redisson.codec.JsonJacksonCodec;
+import org.redisson.codec.SerializationCodec;
 import org.redisson.config.Config;
 import org.redisson.config.SingleServerConfig;
 
@@ -45,8 +50,31 @@ public class RedisConfig {
         singleServerConfig
                 .setDatabase(redisUrl.database());
 
-        config.setCodec(new JsonJacksonCodec(JsonUtils.getMapper()));
+        // Use SerializationCodec instead of JsonJacksonCodec to avoid Jackson type handling issues
+        // This uses Java serialization which is simpler and doesn't require @class properties
+        config.setCodec(new SerializationCodec());
         return config;
+    }
+
+    /**
+     * Create a simple ObjectMapper for Redis without polymorphic type handling
+     */
+    private static ObjectMapper createRedisObjectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+
+        // Basic configuration
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        mapper.setPropertyNamingStrategy(PropertyNamingStrategies.SnakeCaseStrategy.INSTANCE);
+        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        // Register JavaTimeModule for Instant, LocalDateTime, etc.
+        mapper.registerModule(new JavaTimeModule());
+
+        // IMPORTANT: Do NOT activate default typing - this causes the @class property requirement
+        // mapper.activateDefaultTyping(...) is NOT called
+
+        return mapper;
     }
 
     @Data

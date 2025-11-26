@@ -18,13 +18,12 @@ public class AuthorizationModule extends AbstractModule {
 
         // Configure AOP interceptor for @RequiresPermission annotation
         // Intercepts all methods annotated with @RequiresPermission
-        PermissionInterceptor permissionInterceptor = new PermissionInterceptor(
-                getProvider(com.comet.opik.infrastructure.auth.RequestContext.class),
-                getProvider(PermissionService.class).get());
-
+        // Note: We use getProvider() without .get() to avoid early instantiation
         bindInterceptor(
                 Matchers.any(), // Match all classes
                 Matchers.annotatedWith(RequiresPermission.class), // Match methods with @RequiresPermission
-                permissionInterceptor);
+                new PermissionInterceptor(
+                        getProvider(com.comet.opik.infrastructure.auth.RequestContext.class),
+                        getProvider(PermissionService.class)));
     }
 }

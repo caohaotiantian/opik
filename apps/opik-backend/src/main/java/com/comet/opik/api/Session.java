@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
+import java.io.Serializable;
 import java.time.Instant;
 
 @Builder(toBuilder = true)
@@ -37,5 +38,5 @@ public record Session(
 
         @Schema(description = "Last update timestamp") Instant lastUpdatedAt,
 
-        @Schema(description = "Last updated by user") String lastUpdatedBy) {
+        @Schema(description = "Last updated by user") String lastUpdatedBy) implements Serializable {
 }

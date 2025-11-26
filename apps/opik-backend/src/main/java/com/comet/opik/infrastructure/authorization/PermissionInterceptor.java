@@ -35,7 +35,7 @@ import java.util.Arrays;
 public class PermissionInterceptor implements MethodInterceptor {
 
     private final @NonNull Provider<RequestContext> requestContextProvider;
-    private final @NonNull PermissionService permissionService;
+    private final @NonNull Provider<PermissionService> permissionServiceProvider;
 
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
@@ -49,6 +49,7 @@ public class PermissionInterceptor implements MethodInterceptor {
         }
 
         RequestContext context = requestContextProvider.get();
+        PermissionService permissionService = permissionServiceProvider.get();
 
         // Extract required permissions
         String[] requiredPermissions = annotation.value();

@@ -14,7 +14,7 @@ public class SessionRowMapper implements RowMapper<Session> {
         return Session.builder()
                 .id(rs.getString("id"))
                 .userId(rs.getString("user_id"))
-                .sessionToken(rs.getString("token_hash"))
+                .sessionToken(rs.getString("session_token"))
                 .fingerprint(rs.getString("fingerprint"))
                 .ipAddress(rs.getString("ip_address"))
                 .userAgent(rs.getString("user_agent"))

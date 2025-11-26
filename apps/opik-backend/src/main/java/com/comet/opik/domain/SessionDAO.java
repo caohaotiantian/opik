@@ -3,8 +3,7 @@ package com.comet.opik.domain;
 import com.comet.opik.api.Session;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
-import org.jdbi.v3.sqlobject.customizer.BindBean;
-import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
+import org.jdbi.v3.sqlobject.customizer.BindMethods;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
@@ -16,7 +15,7 @@ public interface SessionDAO {
 
     @SqlUpdate("""
             INSERT INTO user_sessions (
-                id, user_id, token_hash, fingerprint, ip_address, user_agent,
+                id, user_id, session_token, fingerprint, ip_address, user_agent,
                 expires_at, last_activity_at, version,
                 created_at, created_by, last_updated_at, last_updated_by
             ) VALUES (
@@ -25,8 +24,7 @@ public interface SessionDAO {
                 :createdAt, :createdBy, :lastUpdatedAt, :lastUpdatedBy
             )
             """)
-    @GetGeneratedKeys
-    void insert(@BindBean Session session);
+    void insert(@BindMethods Session session);
 
     @SqlQuery("""
             SELECT * FROM user_sessions WHERE id = :id
@@ -34,7 +32,7 @@ public interface SessionDAO {
     Optional<Session> findById(@Bind("id") String id);
 
     @SqlQuery("""
-            SELECT * FROM user_sessions WHERE token_hash = :tokenHash
+            SELECT * FROM user_sessions WHERE session_token = :tokenHash
             """)
     Optional<Session> findByTokenHash(@Bind("tokenHash") String tokenHash);
 
@@ -55,7 +53,7 @@ public interface SessionDAO {
             @Bind("lastActivityAt") Instant lastActivityAt);
 
     @SqlUpdate("""
-            DELETE FROM user_sessions WHERE token_hash = :tokenHash
+            DELETE FROM user_sessions WHERE session_token = :tokenHash
             """)
     void deleteByTokenHash(@Bind("tokenHash") String tokenHash);
 
@@ -68,10 +66,12 @@ public interface SessionDAO {
             DELETE FROM user_sessions
             WHERE user_id = :userId
             AND id NOT IN (
-                SELECT id FROM user_sessions
-                WHERE user_id = :userId
-                ORDER BY created_at DESC
-                LIMIT :keepCount
+                SELECT id FROM (
+                    SELECT id FROM user_sessions
+                    WHERE user_id = :userId
+                    ORDER BY created_at DESC
+                    LIMIT :keepCount
+                ) AS keep_sessions
             )
             """)
     int deleteOldUserSessions(
