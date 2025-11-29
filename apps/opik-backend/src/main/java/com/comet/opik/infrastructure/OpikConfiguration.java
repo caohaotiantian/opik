@@ -26,6 +26,9 @@ public class OpikConfiguration extends JobConfiguration {
     private AuthenticationConfig authentication = new AuthenticationConfig();
 
     @Valid @NotNull @JsonProperty
+    private SessionConfig session = new SessionConfig();
+
+    @Valid @NotNull @JsonProperty
     private RedisConfig redis = new RedisConfig();
 
     @Valid @NotNull @JsonProperty

@@ -186,6 +186,54 @@ public class AuthResource {
                 .build();
     }
 
+    @POST
+    @Path("/logout-all")
+    @Operation(operationId = "logoutAll", summary = "Logout all sessions", description = "Invalidate all user sessions", responses = {
+            @ApiResponse(responseCode = "204", description = "All sessions invalidated"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorMessage.class)))
+    })
+    public Response logoutAll(@CookieParam(RequestContext.SESSION_COOKIE) Cookie sessionCookie) {
+
+        if (sessionCookie == null || sessionCookie.getValue() == null) {
+            log.warn("Logout all failed: no session cookie");
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity(new io.dropwizard.jersey.errors.ErrorMessage(401, "Session required"))
+                    .build();
+        }
+
+        String sessionToken = sessionCookie.getValue();
+
+        // Validate session to get userId
+        var sessionOpt = sessionService.validateSession(sessionToken, "0.0.0.0", "");
+        if (sessionOpt.isEmpty()) {
+            log.warn("Logout all failed: invalid session");
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity(new io.dropwizard.jersey.errors.ErrorMessage(401, "Invalid session"))
+                    .build();
+        }
+
+        var session = sessionOpt.get();
+
+        String userId = session.userId();
+        log.info("Logout all sessions request for user '{}'", userId);
+
+        int deleted = sessionService.invalidateAllSessions(userId);
+
+        log.info("Invalidated '{}' sessions for user '{}'", deleted, userId);
+
+        NewCookie clearCookie = new NewCookie.Builder(RequestContext.SESSION_COOKIE)
+                .value("")
+                .path("/")
+                .maxAge(0)
+                .httpOnly(true)
+                .secure(true)
+                .build();
+
+        return Response.noContent()
+                .cookie(clearCookie)
+                .build();
+    }
+
     private NewCookie createSessionCookie(String sessionToken) {
         return new NewCookie.Builder(RequestContext.SESSION_COOKIE)
                 .value(sessionToken)

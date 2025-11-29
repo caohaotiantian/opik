@@ -77,4 +77,9 @@ public interface SessionDAO {
     int deleteOldUserSessions(
             @Bind("userId") String userId,
             @Bind("keepCount") int keepCount);
+
+    @SqlUpdate("""
+            DELETE FROM user_sessions WHERE user_id = :userId
+            """)
+    int deleteAllByUser(@Bind("userId") String userId);
 }

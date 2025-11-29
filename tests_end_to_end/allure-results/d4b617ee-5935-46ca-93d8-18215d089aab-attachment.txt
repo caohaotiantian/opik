@@ -1,0 +1,3 @@
+16:56:11 [INFO] Testing weak password rejection
+16:56:11 [INFO] Testing weak password: 123
+16:56:11 [INFO] Registering user: testuser_4lgwjdby_0

@@ -169,6 +169,63 @@ public class ApiKeyService {
     }
 
     /**
+     * List API keys for a user in a workspace
+     *
+     * @param userId the user ID
+     * @param workspaceId the workspace ID
+     * @return list of API keys
+     */
+    public java.util.List<ApiKey> listApiKeys(String userId, String workspaceId) {
+        log.info("Listing API keys for user: '{}' in workspace: '{}'", userId, workspaceId);
+        return apiKeyDAO.findByUserAndWorkspace(userId, workspaceId);
+    }
+
+    /**
+     * Check if an API key has a specific scope
+     *
+     * @param apiKey the API key to check
+     * @param requiredScope the required scope
+     * @return true if the API key has the scope, false otherwise
+     */
+    public boolean checkScope(ApiKey apiKey, String requiredScope) {
+        if (apiKey.scopes() == null || apiKey.scopes().isEmpty()) {
+            // No scopes defined means full access
+            log.debug("API key '{}' has full access (no scopes defined)", apiKey.id());
+            return true;
+        }
+
+        // Check for wildcard scope (full access)
+        if (apiKey.scopes().contains("*")) {
+            log.debug("API key '{}' has wildcard scope (full access)", apiKey.id());
+            return true;
+        }
+
+        // Check for exact scope match
+        boolean hasScope = apiKey.scopes().contains(requiredScope);
+        log.debug("API key '{}' scope check for '{}': '{}'", apiKey.id(), requiredScope, hasScope);
+        return hasScope;
+    }
+
+    /**
+     * Check if an API key has read-only access
+     *
+     * @param apiKey the API key to check
+     * @return true if the API key has only read scope, false otherwise
+     */
+    public boolean isReadOnly(ApiKey apiKey) {
+        if (apiKey.scopes() == null || apiKey.scopes().isEmpty()) {
+            return false; // No scopes means full access
+        }
+
+        if (apiKey.scopes().contains("*")) {
+            return false; // Wildcard means full access
+        }
+
+        // Read-only if only contains "read" scope
+        return apiKey.scopes().size() == 1 && apiKey.scopes().contains("read");
+    }
+
+    /**
      * Generate a secure random API key
      */
     private String generateSecureApiKey() {

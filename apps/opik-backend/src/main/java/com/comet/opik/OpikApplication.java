@@ -97,7 +97,8 @@ public class OpikApplication extends Application<OpikConfiguration> {
                         new ConfigurationModule(), new CacheModule(), new JobModule(), new AnthropicModule(),
                         new GeminiModule(), new OpenAIModule(), new OpenRouterModule(), new LlmModule(),
                         new AwsModule(), new UsageLimitModule(), new VertexAIModule(), new CustomLlmModule(),
-                        new com.comet.opik.domain.AuthenticationModule(), new AuthorizationModule(), new AuditModule())
+                        new com.comet.opik.domain.AuthenticationModule(), new AuthorizationModule(), new AuditModule(),
+                        new com.comet.opik.infrastructure.lifecycle.LifecycleModule())
                 .installers(JobGuiceyInstaller.class)
                 .listen(new OpikGuiceyLifecycleEventListener(), new EventListenerRegistrar())
                 .enableAutoConfig()

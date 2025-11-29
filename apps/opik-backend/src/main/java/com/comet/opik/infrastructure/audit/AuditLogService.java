@@ -238,6 +238,188 @@ public class AuditLogService {
     }
 
     /**
+     * 查询审计日志
+     *
+     * @param request 查询请求
+     * @return Mono<AuditLogPage> 审计日志分页结果
+     */
+    public Mono<com.comet.opik.api.AuditLogPage> query(@NonNull com.comet.opik.api.AuditLogQueryRequest request) {
+        log.debug("Querying audit logs: workspaceId='{}', operation='{}', startTime='{}', endTime='{}'",
+                request.workspaceId(), request.operation(), request.startTime(), request.endTime());
+
+        return transactionTemplate.nonTransaction(connection -> {
+            // Build query
+            StringBuilder sql = new StringBuilder("SELECT * FROM audit_logs WHERE 1=1");
+            List<Object> params = new ArrayList<>();
+
+            // Add filters
+            if (request.workspaceId() != null) {
+                sql.append(" AND workspace_id = ?");
+                params.add(request.workspaceId());
+            }
+
+            if (request.userId() != null) {
+                sql.append(" AND user_id = ?");
+                params.add(request.userId());
+            }
+
+            if (request.operation() != null) {
+                sql.append(" AND operation = ?");
+                params.add(request.operation().getCode());
+            }
+
+            if (request.resourceType() != null) {
+                sql.append(" AND resource_type = ?");
+                params.add(request.resourceType());
+            }
+
+            if (request.resourceId() != null) {
+                sql.append(" AND resource_id = ?");
+                params.add(request.resourceId());
+            }
+
+            if (request.status() != null) {
+                sql.append(" AND status = ?");
+                params.add(request.status().getCode());
+            }
+
+            if (request.startTime() != null) {
+                sql.append(" AND timestamp >= ?");
+                params.add(request.startTime().toString());
+            }
+
+            if (request.endTime() != null) {
+                sql.append(" AND timestamp <= ?");
+                params.add(request.endTime().toString());
+            }
+
+            // Add ordering and pagination
+            String sortBy = request.sortBy() != null ? request.sortBy() : "timestamp";
+            String sortDirection = request.sortDirection() != null ? request.sortDirection() : "DESC";
+            sql.append(" ORDER BY ").append(sortBy).append(" ").append(sortDirection);
+
+            int page = request.page() != null ? request.page() : 0;
+            int size = request.size() != null ? request.size() : 20;
+            int offset = (page - 1) * size;
+
+            sql.append(" LIMIT ? OFFSET ?");
+            params.add(size);
+            params.add(offset);
+
+            // Execute query
+            Statement statement = connection.createStatement(sql.toString());
+            for (int i = 0; i < params.size(); i++) {
+                statement.bind(i, params.get(i));
+            }
+
+            return Flux.from(statement.execute())
+                    .flatMap(result -> result.map((row, metadata) -> {
+                        // Map row to AuditLog
+                        return AuditLog.builder()
+                                .id(row.get("id", String.class))
+                                .workspaceId(row.get("workspace_id", String.class))
+                                .userId(row.get("user_id", String.class))
+                                .username(row.get("username", String.class))
+                                .action(row.get("action", String.class))
+                                .resourceType(row.get("resource_type", String.class))
+                                .resourceId(row.get("resource_id", String.class))
+                                .resourceName(row.get("resource_name", String.class))
+                                .operation(com.comet.opik.infrastructure.audit.Operation.fromCode(
+                                        row.get("operation", String.class)))
+                                .status(AuditStatus.fromCode(row.get("status", String.class)))
+                                .ipAddress(row.get("ip_address", String.class))
+                                .userAgent(row.get("user_agent", String.class))
+                                .requestPath(row.get("request_path", String.class))
+                                .requestMethod(row.get("request_method", String.class))
+                                .changes(row.get("changes", String.class))
+                                .errorMessage(row.get("error_message", String.class))
+                                .durationMs(row.get("duration_ms", Integer.class))
+                                .timestamp(Instant.parse(row.get("timestamp", String.class)))
+                                .createdAt(Instant.parse(row.get("created_at", String.class)))
+                                .createdBy(row.get("created_by", String.class))
+                                .build();
+                    }))
+                    .collectList()
+                    .flatMap(logs -> {
+                        // Get total count
+                        return countLogs(connection, request).map(total -> {
+                            int totalPages = (int) Math.ceil((double) total / size);
+                            boolean isFirst = page == 0;
+                            boolean isLast = page >= totalPages - 1;
+
+                            return com.comet.opik.api.AuditLogPage.builder()
+                                    .content(logs)
+                                    .page(page)
+                                    .size(size)
+                                    .totalElements(total)
+                                    .totalPages(totalPages)
+                                    .first(isFirst)
+                                    .last(isLast)
+                                    .build();
+                        });
+                    });
+        });
+    }
+
+    /**
+     * Count audit logs matching the query
+     */
+    private Mono<Long> countLogs(Connection connection, com.comet.opik.api.AuditLogQueryRequest request) {
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) as count FROM audit_logs WHERE 1=1");
+        List<Object> params = new ArrayList<>();
+
+        // Add same filters as query
+        if (request.workspaceId() != null) {
+            sql.append(" AND workspace_id = ?");
+            params.add(request.workspaceId());
+        }
+
+        if (request.userId() != null) {
+            sql.append(" AND user_id = ?");
+            params.add(request.userId());
+        }
+
+        if (request.operation() != null) {
+            sql.append(" AND operation = ?");
+            params.add(request.operation().getCode());
+        }
+
+        if (request.resourceType() != null) {
+            sql.append(" AND resource_type = ?");
+            params.add(request.resourceType());
+        }
+
+        if (request.resourceId() != null) {
+            sql.append(" AND resource_id = ?");
+            params.add(request.resourceId());
+        }
+
+        if (request.status() != null) {
+            sql.append(" AND status = ?");
+            params.add(request.status().getCode());
+        }
+
+        if (request.startTime() != null) {
+            sql.append(" AND timestamp >= ?");
+            params.add(request.startTime().toString());
+        }
+
+        if (request.endTime() != null) {
+            sql.append(" AND timestamp <= ?");
+            params.add(request.endTime().toString());
+        }
+
+        Statement statement = connection.createStatement(sql.toString());
+        for (int i = 0; i < params.size(); i++) {
+            statement.bind(i, params.get(i));
+        }
+
+        return Flux.from(statement.execute())
+                .flatMap(result -> result.map((row, metadata) -> row.get("count", Long.class)))
+                .next();
+    }
+
+    /**
      * 获取队列当前大小
      */
     public int getQueueSize() {

@@ -12,7 +12,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -25,9 +24,8 @@ public class SessionService {
 
     private final @NonNull SessionDAO sessionDAO;
     private final @NonNull RedissonClient redissonClient;
+    private final @NonNull com.comet.opik.infrastructure.SessionConfig sessionConfig;
 
-    private static final int SESSION_TIMEOUT_HOURS = 24;
-    private static final int MAX_CONCURRENT_SESSIONS = 5;
     private static final String SESSION_CACHE_PREFIX = "session:";
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
@@ -43,17 +41,21 @@ public class SessionService {
         log.info("Creating session for user: '{}'", userId);
 
         // Check and clean old sessions if limit exceeded
+        int maxConcurrent = sessionConfig.getMaxConcurrentSessions();
         int activeCount = sessionDAO.countActiveByUser(userId);
-        if (activeCount >= MAX_CONCURRENT_SESSIONS) {
+        if (activeCount >= maxConcurrent) {
             log.info("User '{}' has '{}' active sessions, cleaning old ones", userId, activeCount);
-            sessionDAO.deleteOldUserSessions(userId, MAX_CONCURRENT_SESSIONS - 1);
+            sessionDAO.deleteOldUserSessions(userId, maxConcurrent - 1);
         }
 
         // Generate secure session token
         String sessionToken = generateSecureToken();
         String tokenHash = hashToken(sessionToken);
         String fingerprint = generateFingerprint(ipAddress, userAgent);
-        Instant expiresAt = Instant.now().plus(SESSION_TIMEOUT_HOURS, ChronoUnit.HOURS);
+
+        // Use configured session timeout
+        long timeoutSeconds = sessionConfig.getSessionTimeoutSeconds();
+        Instant expiresAt = Instant.now().plusSeconds(timeoutSeconds);
         Instant now = Instant.now();
 
         // Create session entity
@@ -174,6 +176,24 @@ public class SessionService {
         removeFromCache(sessionToken);
 
         log.info("Session invalidated successfully");
+    }
+
+    /**
+     * Invalidate all sessions for a user
+     *
+     * @param userId the user ID
+     * @return number of sessions deleted
+     */
+    public int invalidateAllSessions(String userId) {
+        log.info("Invalidating all sessions for user: '{}'", userId);
+
+        int deleted = sessionDAO.deleteAllByUser(userId);
+
+        // Note: Cannot easily clear all cached sessions without tracking them
+        // They will expire naturally or be invalidated on next use
+
+        log.info("Invalidated '{}' sessions for user: '{}'", deleted, userId);
+        return deleted;
     }
 
     /**

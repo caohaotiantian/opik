@@ -1,0 +1,4 @@
+16:56:11 [INFO] Creating registered test user: testuser_i6dxvzc2
+16:56:11 [INFO] Registering user: testuser_i6dxvzc2
+16:56:11 [INFO] Cleaning up test user: testuser_i6dxvzc2
+16:56:11 [INFO] Cleaning up test user: testuser_i6dxvzc2

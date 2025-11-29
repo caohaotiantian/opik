@@ -1,12 +1,14 @@
 package com.comet.opik.api.resources.v1.priv;
 
 import com.codahale.metrics.annotation.Timed;
+import com.comet.opik.api.ApiKey;
 import com.comet.opik.api.ApiKeyCreateRequest;
 import com.comet.opik.api.ApiKeyResponse;
 import com.comet.opik.api.error.ErrorMessage;
 import com.comet.opik.domain.ApiKeyService;
 import com.comet.opik.infrastructure.auth.RequestContext;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
@@ -17,10 +19,12 @@ import jakarta.inject.Provider;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -30,7 +34,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Path("/v1/private/api-keys")
 @Produces(MediaType.APPLICATION_JSON)
@@ -43,6 +49,37 @@ public class ApiKeyManagementResource {
 
     private final @NonNull ApiKeyService apiKeyService;
     private final @NonNull Provider<RequestContext> requestContext;
+
+    @GET
+    @Operation(operationId = "listApiKeys", summary = "List API keys", description = "List all API keys for a workspace (without plaintext keys)", responses = {
+            @ApiResponse(responseCode = "200", description = "List of API keys", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ApiKeyResponse.class)))),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(schema = @Schema(implementation = ErrorMessage.class)))
+    })
+    public Response listApiKeys(@QueryParam("workspace_id") String workspaceId) {
+        String userId = requestContext.get().getUserId();
+
+        log.info("Listing API keys for user '{}' in workspace '{}'", userId, workspaceId);
+
+        List<ApiKey> apiKeys = apiKeyService.listApiKeys(userId, workspaceId);
+
+        List<ApiKeyResponse> response = apiKeys.stream()
+                .map(apiKey -> ApiKeyResponse.builder()
+                        .id(apiKey.id())
+                        .name(apiKey.name())
+                        .apiKey(null)
+                        .workspaceId(apiKey.workspaceId())
+                        .description(apiKey.description())
+                        .status(apiKey.status())
+                        .expiresAt(apiKey.expiresAt())
+                        .createdAt(apiKey.createdAt())
+                        .lastUsedAt(apiKey.lastUsedAt())
+                        .build())
+                .collect(Collectors.toList());
+
+        log.info("Found '{}' API keys", response.size());
+
+        return Response.ok(response).build();
+    }
 
     @POST
     @Operation(operationId = "createApiKey", summary = "Create API key", description = "Create a new API key (returns plaintext key only once)", responses = {

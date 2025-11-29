@@ -37,9 +37,29 @@ public class RequestContext {
     private String workspaceName;
     private String projectId;
     private String apiKey;
+    private Set<String> apiKeyScopes = new HashSet<>();
     private MultivaluedMap<String, String> headers;
     private List<Quota> quotas;
     private Visibility visibility;
     private boolean systemAdmin;
     private Set<String> permissions = new HashSet<>();
+
+    /**
+     * Check if API Key authentication is used
+     */
+    public boolean isApiKeyAuth() {
+        return apiKey != null && !apiKey.isEmpty();
+    }
+
+    /**
+     * Check if API Key has a specific scope
+     */
+    public boolean hasApiKeyScope(String scope) {
+        if (apiKeyScopes == null || apiKeyScopes.isEmpty()) {
+            // No scopes means full access
+            return true;
+        }
+        // Check for wildcard or specific scope
+        return apiKeyScopes.contains("*") || apiKeyScopes.contains(scope);
+    }
 }
