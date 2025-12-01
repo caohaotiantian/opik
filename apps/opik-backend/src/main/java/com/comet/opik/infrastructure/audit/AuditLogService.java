@@ -198,40 +198,60 @@ public class AuditLogService {
                 ) VALUES
                 """);
 
-        // 添加VALUES占位符
+        // 添加VALUES占位符（使用命名参数）
         for (int i = 0; i < logs.size(); i++) {
             if (i > 0) sql.append(",\n");
-            sql.append("(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+            sql.append("(:id").append(i)
+                    .append(", :workspace_id").append(i)
+                    .append(", :user_id").append(i)
+                    .append(", :username").append(i)
+                    .append(", :action").append(i)
+                    .append(", :resource_type").append(i)
+                    .append(", :resource_id").append(i)
+                    .append(", :resource_name").append(i)
+                    .append(", :operation").append(i)
+                    .append(", :status").append(i)
+                    .append(", :ip_address").append(i)
+                    .append(", :user_agent").append(i)
+                    .append(", :request_path").append(i)
+                    .append(", :request_method").append(i)
+                    .append(", :changes").append(i)
+                    .append(", :error_message").append(i)
+                    .append(", :duration_ms").append(i)
+                    .append(", :timestamp").append(i)
+                    .append(", :created_at").append(i)
+                    .append(", :created_by").append(i)
+                    .append(")");
         }
 
         Statement statement = connection.createStatement(sql.toString());
 
-        // 绑定参数
-        int paramIndex = 0;
-        for (AuditLog log : logs) {
+        // 绑定参数（使用命名参数）
+        for (int i = 0; i < logs.size(); i++) {
+            AuditLog log = logs.get(i);
             Instant timestamp = log.timestamp() != null ? log.timestamp() : Instant.now();
             Instant createdAt = log.createdAt() != null ? log.createdAt() : Instant.now();
 
-            statement.bind(paramIndex++, log.id() != null ? log.id() : UUID.randomUUID().toString())
-                    .bind(paramIndex++, log.workspaceId() != null ? log.workspaceId() : "")
-                    .bind(paramIndex++, log.userId() != null ? log.userId() : "")
-                    .bind(paramIndex++, log.username() != null ? log.username() : "")
-                    .bind(paramIndex++, log.action())
-                    .bind(paramIndex++, log.resourceType())
-                    .bind(paramIndex++, log.resourceId() != null ? log.resourceId() : "")
-                    .bind(paramIndex++, log.resourceName() != null ? log.resourceName() : "")
-                    .bind(paramIndex++, log.operation().getCode())
-                    .bind(paramIndex++, log.status().getCode())
-                    .bind(paramIndex++, log.ipAddress() != null ? log.ipAddress() : "")
-                    .bind(paramIndex++, log.userAgent() != null ? log.userAgent() : "")
-                    .bind(paramIndex++, log.requestPath() != null ? log.requestPath() : "")
-                    .bind(paramIndex++, log.requestMethod() != null ? log.requestMethod() : "")
-                    .bind(paramIndex++, log.changes() != null ? log.changes() : "")
-                    .bind(paramIndex++, log.errorMessage() != null ? log.errorMessage() : "")
-                    .bind(paramIndex++, log.durationMs() != null ? log.durationMs() : 0)
-                    .bind(paramIndex++, timestamp.toString())
-                    .bind(paramIndex++, createdAt.toString())
-                    .bind(paramIndex++, log.createdBy() != null ? log.createdBy() : "system");
+            statement.bind("id" + i, log.id() != null ? log.id() : UUID.randomUUID().toString());
+            statement.bind("workspace_id" + i, log.workspaceId() != null ? log.workspaceId() : "");
+            statement.bind("user_id" + i, log.userId() != null ? log.userId() : "");
+            statement.bind("username" + i, log.username() != null ? log.username() : "");
+            statement.bind("action" + i, log.action());
+            statement.bind("resource_type" + i, log.resourceType());
+            statement.bind("resource_id" + i, log.resourceId() != null ? log.resourceId() : "");
+            statement.bind("resource_name" + i, log.resourceName() != null ? log.resourceName() : "");
+            statement.bind("operation" + i, log.operation().getCode());
+            statement.bind("status" + i, log.status().getCode());
+            statement.bind("ip_address" + i, log.ipAddress() != null ? log.ipAddress() : "");
+            statement.bind("user_agent" + i, log.userAgent() != null ? log.userAgent() : "");
+            statement.bind("request_path" + i, log.requestPath() != null ? log.requestPath() : "");
+            statement.bind("request_method" + i, log.requestMethod() != null ? log.requestMethod() : "");
+            statement.bind("changes" + i, log.changes() != null ? log.changes() : "");
+            statement.bind("error_message" + i, log.errorMessage() != null ? log.errorMessage() : "");
+            statement.bind("duration_ms" + i, log.durationMs() != null ? log.durationMs() : 0L);
+            statement.bind("timestamp" + i, timestamp.toString());
+            statement.bind("created_at" + i, createdAt.toString());
+            statement.bind("created_by" + i, log.createdBy() != null ? log.createdBy() : "system");
         }
 
         return statement;

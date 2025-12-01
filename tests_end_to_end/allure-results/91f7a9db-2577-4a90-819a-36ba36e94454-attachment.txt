@@ -1,0 +1,4 @@
+15:43:23 [INFO] Creating registered test user: testuser_uiirvpyo
+15:43:23 [INFO] Registering user: testuser_uiirvpyo
+15:43:23 [INFO] Cleaning up test user: testuser_uiirvpyo
+15:43:23 [INFO] Cleaning up test user: testuser_uiirvpyo

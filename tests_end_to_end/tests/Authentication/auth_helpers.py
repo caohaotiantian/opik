@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 def get_auth_api_base_url() -> str:
     """Get the base URL for authentication APIs"""
     config = get_environment_config()
-    return f"{config.api_url}/v1/auth"
+    return f"{config.api_url}/v1/public/auth"
 
 
 def register_user(

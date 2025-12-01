@@ -35,7 +35,7 @@ public class UserService {
      * @param fullName the full name (optional)
      * @return the created user
      */
-    @Auditable(action = "Register User", resourceType = "user", operation = Operation.CREATE)
+    // @Auditable(action = "Register User", resourceType = "user", operation = Operation.CREATE)
     public User registerUser(String username, String email, String password, String fullName) {
         log.info("Registering new user: '{}'", username);
 
@@ -94,7 +94,7 @@ public class UserService {
      * @param userAgent the user agent
      * @return login result with session token and user info
      */
-    @Auditable(action = "User Login", resourceType = "user", operation = Operation.LOGIN)
+    // @Auditable(action = "User Login", resourceType = "user", operation = Operation.LOGIN)
     public LoginResult login(String username, String password, String ipAddress, String userAgent) {
         log.info("User login attempt: '{}'", username);
 

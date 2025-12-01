@@ -1,0 +1,4 @@
+15:43:21 [INFO] Creating registered test user: testuser_s34vc02v
+15:43:21 [INFO] Registering user: testuser_s34vc02v
+15:43:21 [INFO] Cleaning up test user: testuser_s34vc02v
+15:43:21 [INFO] Cleaning up test user: testuser_s34vc02v

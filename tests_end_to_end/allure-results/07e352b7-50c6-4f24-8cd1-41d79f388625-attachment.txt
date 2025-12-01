@@ -1,0 +1,3 @@
+15:43:22 [INFO] Testing invalid email format
+15:43:22 [INFO] Testing invalid email: not-an-email
+15:43:22 [INFO] Registering user: testuser_ix21ik8v_0

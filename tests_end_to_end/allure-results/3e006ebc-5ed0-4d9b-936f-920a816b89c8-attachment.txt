@@ -1,0 +1,2 @@
+15:43:20 [INFO] Testing API auth with invalid key
+15:43:20 [INFO] Validating API key

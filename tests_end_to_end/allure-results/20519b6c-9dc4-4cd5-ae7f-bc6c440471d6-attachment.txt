@@ -1,0 +1,4 @@
+15:43:22 [INFO] Creating registered test user: testuser_0thhsu83
+15:43:22 [INFO] Registering user: testuser_0thhsu83
+15:43:22 [INFO] Cleaning up test user: testuser_0thhsu83
+15:43:22 [INFO] Cleaning up test user: testuser_0thhsu83

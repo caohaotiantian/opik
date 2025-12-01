@@ -1,0 +1,2 @@
+15:43:22 [INFO] Testing get user profile with invalid session
+15:43:22 [INFO] Getting user profile
