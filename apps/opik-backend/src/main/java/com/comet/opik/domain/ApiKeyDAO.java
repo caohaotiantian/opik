@@ -20,12 +20,12 @@ public interface ApiKeyDAO {
 
     @SqlUpdate("""
             INSERT INTO user_api_keys (
-                id, user_id, workspace_id, name, description, api_key_hash, key_prefix,
-                status, scopes, expires_at, version,
+                id, user_id, workspace_id, name, key_hash, key_prefix,
+                status, permissions, expires_at,
                 created_at, created_by, last_updated_at, last_updated_by
             ) VALUES (
-                :id, :userId, :workspaceId, :name, :description, :keyHash, :keyPrefix,
-                :status, :scopes, :expiresAt, :version,
+                :id, :userId, :workspaceId, :name, :keyHash, :keyPrefix,
+                :status, :scopes, :expiresAt,
                 :createdAt, :createdBy, :lastUpdatedAt, :lastUpdatedBy
             )
             """)
@@ -37,7 +37,7 @@ public interface ApiKeyDAO {
     Optional<ApiKey> findById(@Bind("id") String id);
 
     @SqlQuery("""
-            SELECT * FROM user_api_keys WHERE api_key_hash = :keyHash
+            SELECT * FROM user_api_keys WHERE key_hash = :keyHash
             """)
     Optional<ApiKey> findByKeyHash(@Bind("keyHash") String keyHash);
 
@@ -58,7 +58,6 @@ public interface ApiKeyDAO {
     @SqlUpdate("""
             UPDATE user_api_keys
             SET status = :status,
-                version = version + 1,
                 last_updated_at = CURRENT_TIMESTAMP(6),
                 last_updated_by = :updatedBy
             WHERE id = :id

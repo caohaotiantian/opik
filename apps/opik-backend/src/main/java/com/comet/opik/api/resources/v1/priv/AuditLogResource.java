@@ -164,4 +164,109 @@ public class AuditLogResource {
                 "success", success,
                 "failure", failure)).build();
     }
+
+    @GET
+    @Path("/export")
+    @RequiresPermission("SYSTEM_AUDIT_READ")
+    @Produces({MediaType.APPLICATION_JSON, "text/csv"})
+    @Operation(operationId = "exportAuditLogs", summary = "Export audit logs", description = "Export audit logs to CSV or JSON format (System Admin only)", responses = {
+            @ApiResponse(responseCode = "200", description = "Exported audit logs"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorMessage.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(schema = @Schema(implementation = ErrorMessage.class)))
+    })
+    public Response exportAuditLogs(
+            @QueryParam("workspace_id") String workspaceId,
+            @QueryParam("user_id") String userId,
+            @QueryParam("resource_type") String resourceType,
+            @QueryParam("operation") com.comet.opik.infrastructure.audit.Operation operation,
+            @QueryParam("status") AuditStatus status,
+            @QueryParam("start_time") Instant startTime,
+            @QueryParam("end_time") Instant endTime,
+            @QueryParam("format") @Schema(description = "Export format: csv or json", defaultValue = "json") String format) {
+
+        log.info("Exporting audit logs: format='{}', workspaceId='{}', startTime='{}', endTime='{}'",
+                format, workspaceId, startTime, endTime);
+
+        // Build query request with large size for export
+        AuditLogQueryRequest request = AuditLogQueryRequest.builder()
+                .workspaceId(workspaceId)
+                .userId(userId)
+                .resourceType(resourceType)
+                .operation(operation)
+                .status(status)
+                .startTime(startTime)
+                .endTime(endTime)
+                .page(1)
+                .size(100000) // Large size for export
+                .build();
+
+        AuditLogPage result = auditLogService.query(request).block();
+        java.util.List<AuditLog> logs = result.content();
+
+        log.info("Exporting '{}' audit logs in '{}' format", logs.size(), format);
+
+        // Determine export format
+        boolean isCsv = "csv".equalsIgnoreCase(format);
+        String contentType = isCsv ? "text/csv" : MediaType.APPLICATION_JSON;
+        String filename = "audit_logs_" + Instant.now().toString().replace(":", "-") +
+                (isCsv ? ".csv" : ".json");
+
+        Object exportData;
+        if (isCsv) {
+            exportData = convertToCsv(logs);
+        } else {
+            exportData = logs;
+        }
+
+        return Response.ok(exportData, contentType)
+                .header("Content-Disposition", "attachment; filename=\"" + filename + "\"")
+                .build();
+    }
+
+    /**
+     * Convert audit logs to CSV format
+     */
+    private String convertToCsv(java.util.List<AuditLog> logs) {
+        StringBuilder sb = new StringBuilder();
+
+        // CSV header
+        sb.append("id,timestamp,workspace_id,user_id,username,action,resource_type,resource_id,")
+                .append("resource_name,operation,status,ip_address,user_agent,error_message,created_at\n");
+
+        // CSV rows
+        for (AuditLog auditLog : logs) {
+            sb.append(escapeCsv(auditLog.id())).append(",")
+                    .append(escapeCsv(auditLog.timestamp() != null ? auditLog.timestamp().toString() : "")).append(",")
+                    .append(escapeCsv(auditLog.workspaceId())).append(",")
+                    .append(escapeCsv(auditLog.userId())).append(",")
+                    .append(escapeCsv(auditLog.username())).append(",")
+                    .append(escapeCsv(auditLog.action())).append(",")
+                    .append(escapeCsv(auditLog.resourceType())).append(",")
+                    .append(escapeCsv(auditLog.resourceId())).append(",")
+                    .append(escapeCsv(auditLog.resourceName())).append(",")
+                    .append(escapeCsv(auditLog.operation() != null ? auditLog.operation().name() : "")).append(",")
+                    .append(escapeCsv(auditLog.status() != null ? auditLog.status().name() : "")).append(",")
+                    .append(escapeCsv(auditLog.ipAddress())).append(",")
+                    .append(escapeCsv(auditLog.userAgent())).append(",")
+                    .append(escapeCsv(auditLog.errorMessage())).append(",")
+                    .append(escapeCsv(auditLog.createdAt() != null ? auditLog.createdAt().toString() : ""))
+                    .append("\n");
+        }
+
+        return sb.toString();
+    }
+
+    /**
+     * Escape special characters for CSV
+     */
+    private String escapeCsv(String value) {
+        if (value == null) {
+            return "";
+        }
+        // Escape quotes and wrap in quotes if needed
+        if (value.contains(",") || value.contains("\"") || value.contains("\n")) {
+            return "\"" + value.replace("\"", "\"\"") + "\"";
+        }
+        return value;
+    }
 }

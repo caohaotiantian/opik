@@ -23,10 +23,14 @@ public class AuthModule extends DropwizardAwareModule<OpikConfiguration> {
     public AuthService authService(
             @Config("authentication") AuthenticationConfig config,
             @NonNull Provider<RequestContext> requestContext,
-            @NonNull RedissonReactiveClient redissonClient) {
+            @NonNull RedissonReactiveClient redissonClient,
+            @NonNull com.comet.opik.domain.SessionService sessionService,
+            @NonNull com.comet.opik.domain.WorkspaceService workspaceService,
+            @NonNull com.comet.opik.domain.ApiKeyService apiKeyService,
+            @NonNull com.comet.opik.domain.UserService userService) {
 
         if (!config.isEnabled()) {
-            return new AuthServiceImpl(requestContext);
+            return new AuthServiceImpl(requestContext, sessionService, workspaceService, apiKeyService, userService);
         }
 
         Objects.requireNonNull(config.getReactService(),

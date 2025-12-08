@@ -19,7 +19,7 @@ public class RequestContext {
     public static final String USER_NAME = "userName";
     public static final String USER_ID = "userId";
     public static final String WORKSPACE_NAME = "workspaceName";
-    public static final String SESSION_COOKIE = "sessionToken";
+    public static final String SESSION_COOKIE = "session_token"; // Use snake_case to match global naming strategy
     public static final String WORKSPACE_ID = "workspaceId";
     public static final String API_KEY = "apiKey";
     public static final String LIMIT = "Opik-%s-Limit";

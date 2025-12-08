@@ -6,6 +6,7 @@ import com.comet.opik.api.Workspace;
 import com.comet.opik.api.WorkspaceStatus;
 import com.comet.opik.api.error.ConflictException;
 import jakarta.ws.rs.NotFoundException;
+import org.jdbi.v3.core.Handle;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -13,6 +14,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.vyarus.guicey.jdbi3.tx.TxAction;
+import ru.vyarus.guicey.jdbi3.tx.TxConfig;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -44,6 +48,9 @@ class WorkspaceServiceTest {
     private WorkspaceDAO workspaceDAO;
 
     @Mock
+    private WorkspaceMemberDAO workspaceMemberDAO;
+
+    @Mock
     private WorkspaceMemberService memberService;
 
     @Mock
@@ -55,16 +62,33 @@ class WorkspaceServiceTest {
     @Mock
     private IdGenerator idGenerator;
 
+    @Mock
+    private ru.vyarus.guicey.jdbi3.tx.TransactionTemplate transactionTemplate;
+
+    @Mock
+    private Handle handle;
+
     private WorkspaceService workspaceService;
 
     @BeforeEach
+    @SuppressWarnings("unchecked")
     void setUp() {
         workspaceService = new WorkspaceService(
                 workspaceDAO,
                 memberService,
                 roleService,
                 userService,
-                idGenerator);
+                idGenerator,
+                transactionTemplate);
+
+        // Mock TransactionTemplate to execute the action with our mocked handle
+        lenient().when(transactionTemplate.inTransaction(any(TxConfig.class), any(TxAction.class)))
+                .thenAnswer(invocation -> {
+                    TxAction<Object> action = invocation.getArgument(1);
+                    lenient().when(handle.attach(WorkspaceDAO.class)).thenReturn(workspaceDAO);
+                    lenient().when(handle.attach(WorkspaceMemberDAO.class)).thenReturn(workspaceMemberDAO);
+                    return action.execute(handle);
+                });
     }
 
     @Nested
@@ -80,6 +104,7 @@ class WorkspaceServiceTest {
             String description = "Test Description";
             String ownerUserId = UUID.randomUUID().toString();
             String workspaceId = UUID.randomUUID().toString();
+            String memberId = UUID.randomUUID().toString();
             String roleId = UUID.randomUUID().toString();
 
             when(workspaceDAO.existsByName(name)).thenReturn(false);
@@ -88,14 +113,17 @@ class WorkspaceServiceTest {
                             .id(ownerUserId)
                             .username("testuser")
                             .build()));
-            when(idGenerator.generateId()).thenReturn(UUID.fromString(workspaceId));
+            // idGenerator is called twice: once for workspace, once for member
+            when(idGenerator.generateId())
+                    .thenReturn(UUID.fromString(workspaceId))
+                    .thenReturn(UUID.fromString(memberId));
 
             Role workspaceAdminRole = Role.builder()
                     .id(roleId)
-                    .name("workspace_admin")
+                    .name("Workspace Admin")
                     .scope(RoleScope.WORKSPACE)
                     .build();
-            when(roleService.getBuiltinRole("workspace_admin", RoleScope.WORKSPACE))
+            when(roleService.getBuiltinRole("Workspace Admin", RoleScope.WORKSPACE))
                     .thenReturn(workspaceAdminRole);
 
             // When
@@ -115,7 +143,7 @@ class WorkspaceServiceTest {
             verify(workspaceDAO).existsByName(name);
             verify(userService).getUser(ownerUserId);
             verify(workspaceDAO).insert(any(Workspace.class));
-            verify(memberService).addMember(eq(workspaceId), eq(ownerUserId), eq(roleId), eq("system"));
+            verify(workspaceMemberDAO).insert(any(com.comet.opik.api.WorkspaceMember.class));
         }
 
         @Test

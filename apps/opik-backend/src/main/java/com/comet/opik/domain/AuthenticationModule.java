@@ -63,5 +63,9 @@ public class AuthenticationModule extends AbstractModule {
         return jdbi.onDemand(SessionDAO.class);
     }
 
-    // Note: PasswordResetTokenDAO not yet implemented
+    @Provides
+    @Singleton
+    public PasswordResetTokenDAO passwordResetTokenDAO(Jdbi jdbi) {
+        return jdbi.onDemand(PasswordResetTokenDAO.class);
+    }
 }

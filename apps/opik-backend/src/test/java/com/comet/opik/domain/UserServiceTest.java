@@ -6,6 +6,7 @@ import com.comet.opik.api.UserStatus;
 import com.comet.opik.api.error.ConflictException;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
+import org.jdbi.v3.core.Handle;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -13,6 +14,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.vyarus.guicey.jdbi3.tx.TransactionTemplate;
+import ru.vyarus.guicey.jdbi3.tx.TxAction;
+import ru.vyarus.guicey.jdbi3.tx.TxConfig;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -23,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -53,11 +58,27 @@ class UserServiceTest {
     @Mock
     private IdGenerator idGenerator;
 
+    @Mock
+    private TransactionTemplate transactionTemplate;
+
+    @Mock
+    private Handle handle;
+
     private UserService userService;
 
     @BeforeEach
+    @SuppressWarnings("unchecked")
     void setUp() {
-        userService = new UserService(userDAO, passwordService, sessionService, idGenerator);
+        userService = new UserService(userDAO, passwordService, sessionService, idGenerator, transactionTemplate);
+
+        // Mock TransactionTemplate to execute the action with our mocked handle
+        lenient().when(transactionTemplate.inTransaction(any(TxConfig.class), any(TxAction.class)))
+                .thenAnswer(invocation -> {
+                    TxAction<Object> action = invocation.getArgument(1);
+                    // Mock handle.attach to return our mocked DAO
+                    lenient().when(handle.attach(UserDAO.class)).thenReturn(userDAO);
+                    return action.execute(handle);
+                });
     }
 
     @Nested

@@ -4,6 +4,7 @@ import com.comet.opik.api.ApiKey;
 import com.comet.opik.api.ApiKeyStatus;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
+import org.jdbi.v3.core.Handle;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -12,6 +13,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.vyarus.guicey.jdbi3.tx.TransactionTemplate;
+import ru.vyarus.guicey.jdbi3.tx.TxAction;
+import ru.vyarus.guicey.jdbi3.tx.TxConfig;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -24,6 +28,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -47,11 +52,24 @@ class ApiKeyServiceTest {
     @Mock
     private IdGenerator idGenerator;
 
+    @Mock
+    private TransactionTemplate transactionTemplate;
+
+    @Mock
+    private Handle handle;
+
     private ApiKeyService apiKeyService;
 
     @BeforeEach
     void setUp() {
-        apiKeyService = new ApiKeyService(apiKeyDAO, idGenerator);
+        apiKeyService = new ApiKeyService(apiKeyDAO, idGenerator, transactionTemplate);
+        // Setup transaction template to execute the callback directly
+        lenient().when(transactionTemplate.inTransaction(any(TxConfig.class), any(TxAction.class)))
+                .thenAnswer(invocation -> {
+                    TxAction<?> action = invocation.getArgument(1);
+                    when(handle.attach(ApiKeyDAO.class)).thenReturn(apiKeyDAO);
+                    return action.execute(handle);
+                });
     }
 
     @Nested
@@ -142,6 +160,9 @@ class ApiKeyServiceTest {
             String userId = UUID.randomUUID().toString();
             String workspaceId = UUID.randomUUID().toString();
 
+            // Note: idGenerator.generateId() is called before the limit check in the current implementation
+            // So we need to mock it to avoid NullPointerException
+            when(idGenerator.generateId()).thenReturn(UUID.randomUUID());
             when(apiKeyDAO.countActiveByUser(userId)).thenReturn(50); // At limit
 
             // When & Then

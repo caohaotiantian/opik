@@ -1,7 +1,9 @@
 package com.comet.opik.domain;
 
+import com.comet.opik.api.MemberStatus;
 import com.comet.opik.api.RoleScope;
 import com.comet.opik.api.Workspace;
+import com.comet.opik.api.WorkspaceMember;
 import com.comet.opik.api.WorkspaceStatus;
 import com.comet.opik.api.error.ConflictException;
 import com.comet.opik.infrastructure.audit.Auditable;
@@ -12,10 +14,13 @@ import jakarta.ws.rs.NotFoundException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import ru.vyarus.guicey.jdbi3.tx.TransactionTemplate;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+
+import static com.comet.opik.infrastructure.db.TransactionTemplateAsync.WRITE;
 
 @Slf4j
 @Singleton
@@ -27,6 +32,7 @@ public class WorkspaceService {
     private final @NonNull RoleService roleService;
     private final @NonNull UserService userService;
     private final @NonNull IdGenerator idGenerator;
+    private final @NonNull TransactionTemplate transactionTemplate;
 
     private static final int DEFAULT_QUOTA = 10;
     private static final int DEFAULT_MAX_MEMBERS = 100;
@@ -73,11 +79,31 @@ public class WorkspaceService {
                 .lastUpdatedBy(ownerUserId)
                 .build();
 
-        workspaceDAO.insert(workspace);
+        // Create workspace and add owner as admin (within write transaction)
+        transactionTemplate.inTransaction(WRITE, handle -> {
+            var wDao = handle.attach(WorkspaceDAO.class);
+            var wmDao = handle.attach(WorkspaceMemberDAO.class);
 
-        // Add owner as Workspace Admin
-        var workspaceAdminRole = roleService.getBuiltinRole("workspace_admin", RoleScope.WORKSPACE);
-        memberService.addMember(workspace.id(), ownerUserId, workspaceAdminRole.id(), "system");
+            wDao.insert(workspace);
+
+            // Add owner as Workspace Admin
+            var workspaceAdminRole = roleService.getBuiltinRole("Workspace Admin", RoleScope.WORKSPACE);
+            var member = WorkspaceMember.builder()
+                    .id(idGenerator.generateId().toString())
+                    .workspaceId(workspace.id())
+                    .userId(ownerUserId)
+                    .roleId(workspaceAdminRole.id())
+                    .status(MemberStatus.ACTIVE)
+                    .version(0)
+                    .createdAt(now)
+                    .createdBy("system")
+                    .lastUpdatedAt(now)
+                    .lastUpdatedBy("system")
+                    .build();
+            wmDao.insert(member);
+
+            return null;
+        });
 
         log.info("Workspace '{}' created successfully", workspace.name());
 

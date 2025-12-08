@@ -12,9 +12,12 @@ import jakarta.ws.rs.NotFoundException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import ru.vyarus.guicey.jdbi3.tx.TransactionTemplate;
 
 import java.time.Instant;
 import java.util.Optional;
+
+import static com.comet.opik.infrastructure.db.TransactionTemplateAsync.WRITE;
 
 @Slf4j
 @Singleton
@@ -25,6 +28,7 @@ public class UserService {
     private final @NonNull PasswordService passwordService;
     private final @NonNull SessionService sessionService;
     private final @NonNull IdGenerator idGenerator;
+    private final @NonNull TransactionTemplate transactionTemplate;
 
     /**
      * Register a new user
@@ -78,7 +82,11 @@ public class UserService {
                 .lastUpdatedBy("system")
                 .build();
 
-        userDAO.insert(user);
+        transactionTemplate.inTransaction(WRITE, handle -> {
+            var dao = handle.attach(UserDAO.class);
+            dao.insert(user);
+            return null;
+        });
 
         log.info("User registered successfully: '{}'", username);
 

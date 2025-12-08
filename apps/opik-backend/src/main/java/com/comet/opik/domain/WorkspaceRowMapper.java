@@ -17,7 +17,7 @@ public class WorkspaceRowMapper implements RowMapper<Workspace> {
                 .name(rs.getString("name"))
                 .displayName(rs.getString("display_name"))
                 .description(rs.getString("description"))
-                .status(WorkspaceStatus.valueOf(rs.getString("status")))
+                .status(WorkspaceStatus.valueOf(rs.getString("status").toUpperCase()))
                 .ownerUserId(rs.getString("owner_user_id"))
                 .quotaLimit(rs.getInt("quota_limit"))
                 .allowPublicAccess(rs.getBoolean("allow_public_access"))

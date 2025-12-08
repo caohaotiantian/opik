@@ -37,7 +37,7 @@ public record ApiKey(
 
         @Schema(description = "Last used timestamp") Instant lastUsedAt,
 
-        @Schema(description = "Version for optimistic locking", example = "0") int version,
+        @Schema(description = "Version for optimistic locking (optional)", example = "0") Integer version,
 
         @Schema(description = "Creation timestamp") Instant createdAt,
 

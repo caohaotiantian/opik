@@ -31,7 +31,7 @@ public class RoleRowMapper implements RowMapper<Role> {
                 .name(rs.getString("name"))
                 .displayName(rs.getString("display_name"))
                 .description(rs.getString("description"))
-                .scope(RoleScope.valueOf(rs.getString("scope")))
+                .scope(RoleScope.valueOf(rs.getString("scope").toUpperCase()))
                 .builtin(rs.getBoolean("is_builtin"))
                 .permissions(permissions)
                 .version(rs.getInt("version"))

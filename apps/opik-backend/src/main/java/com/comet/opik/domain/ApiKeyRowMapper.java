@@ -20,9 +20,9 @@ public class ApiKeyRowMapper implements RowMapper<ApiKey> {
     @Override
     @SneakyThrows
     public ApiKey map(ResultSet rs, StatementContext ctx) throws SQLException {
-        String scopesJson = rs.getString("scopes");
-        Set<String> scopes = scopesJson != null
-                ? OBJECT_MAPPER.readValue(scopesJson, new TypeReference<Set<String>>() {
+        String permissionsJson = rs.getString("permissions");
+        Set<String> scopes = permissionsJson != null
+                ? OBJECT_MAPPER.readValue(permissionsJson, new TypeReference<Set<String>>() {
                 })
                 : new HashSet<>();
 
@@ -31,10 +31,9 @@ public class ApiKeyRowMapper implements RowMapper<ApiKey> {
                 .userId(rs.getString("user_id"))
                 .workspaceId(rs.getString("workspace_id"))
                 .name(rs.getString("name"))
-                .description(rs.getString("description"))
-                .keyHash(rs.getString("api_key_hash"))
+                .keyHash(rs.getString("key_hash"))
                 .keyPrefix(rs.getString("key_prefix"))
-                .status(ApiKeyStatus.valueOf(rs.getString("status")))
+                .status(ApiKeyStatus.valueOf(rs.getString("status").toUpperCase()))
                 .scopes(scopes)
                 .expiresAt(rs.getTimestamp("expires_at") != null
                         ? rs.getTimestamp("expires_at").toInstant()
@@ -42,7 +41,6 @@ public class ApiKeyRowMapper implements RowMapper<ApiKey> {
                 .lastUsedAt(rs.getTimestamp("last_used_at") != null
                         ? rs.getTimestamp("last_used_at").toInstant()
                         : null)
-                .version(rs.getInt("version"))
                 .createdAt(rs.getTimestamp("created_at").toInstant())
                 .createdBy(rs.getString("created_by"))
                 .lastUpdatedAt(rs.getTimestamp("last_updated_at").toInstant())

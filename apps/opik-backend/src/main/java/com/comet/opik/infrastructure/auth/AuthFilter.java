@@ -34,12 +34,14 @@ public class AuthFilter implements ContainerRequestFilter {
 
         UriInfo uriInfo = context.getUriInfo();
 
-        if (Pattern.matches("/v1/private/.*", uriInfo.getRequestUri().getPath())) {
+        String path = uriInfo.getRequestUri().getPath();
+        if (Pattern.matches("/v1/private/.*", path) || Pattern.matches("/v1/api-keys.*", path)
+                || Pattern.matches("/v1/audit-logs.*", path)) {
             authService.authenticate(headers, sessionToken, ContextInfoHolder.builder()
                     .uriInfo(uriInfo)
                     .method(context.getMethod())
                     .build());
-        } else if (Pattern.matches("/v1/session/.*", uriInfo.getRequestUri().getPath())) {
+        } else if (Pattern.matches("/v1/session/.*", path)) {
             authService.authenticateSession(sessionToken);
         }
 

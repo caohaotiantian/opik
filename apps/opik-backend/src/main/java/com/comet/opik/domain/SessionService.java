@@ -6,6 +6,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
+import ru.vyarus.guicey.jdbi3.tx.TransactionTemplate;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -17,6 +18,8 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
+import static com.comet.opik.infrastructure.db.TransactionTemplateAsync.WRITE;
+
 @Slf4j
 @Singleton
 @RequiredArgsConstructor(onConstructor_ = @Inject)
@@ -25,6 +28,7 @@ public class SessionService {
     private final @NonNull SessionDAO sessionDAO;
     private final @NonNull RedissonClient redissonClient;
     private final @NonNull com.comet.opik.infrastructure.SessionConfig sessionConfig;
+    private final @NonNull TransactionTemplate transactionTemplate;
 
     private static final String SESSION_CACHE_PREFIX = "session:";
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
@@ -75,8 +79,12 @@ public class SessionService {
                 .lastUpdatedBy("system")
                 .build();
 
-        // Save to database
-        sessionDAO.insert(session);
+        // Save to database (within write transaction)
+        transactionTemplate.inTransaction(WRITE, handle -> {
+            var dao = handle.attach(SessionDAO.class);
+            dao.insert(session);
+            return null;
+        });
 
         // Cache to Redis
         cacheSession(sessionToken, session);
@@ -103,15 +111,22 @@ public class SessionService {
         var cached = getFromCache(sessionToken);
         if (cached != null) {
             if (cached.expiresAt().isAfter(Instant.now())) {
-                // Verify fingerprint
-                if (verifyFingerprint(cached, currentIp, currentUserAgent)) {
-                    log.debug("Session validated from cache");
-                    return Optional.of(cached);
-                } else {
-                    log.warn("Session fingerprint mismatch for user: '{}'", cached.userId());
-                    invalidateSession(sessionToken);
+                // Double-check database to handle logout-all scenario
+                String tokenHash = hashToken(sessionToken);
+                var dbSession = sessionDAO.findByTokenHash(tokenHash);
+                if (dbSession.isEmpty()) {
+                    log.debug("Session found in cache but not in database - invalidated");
+                    removeFromCache(sessionToken);
                     return Optional.empty();
                 }
+
+                // Verify fingerprint (audit only - log but don't invalidate)
+                if (!verifyFingerprint(cached, currentIp, currentUserAgent)) {
+                    log.warn("Session fingerprint mismatch for user: '{}' - continuing anyway (audit only)",
+                            cached.userId());
+                }
+                log.debug("Session validated from cache");
+                return Optional.of(cached);
             } else {
                 log.debug("Cached session expired");
                 removeFromCache(sessionToken);
@@ -130,16 +145,16 @@ public class SessionService {
 
         // Check expiration
         if (session.get().expiresAt().isBefore(Instant.now())) {
-            log.debug("Session expired");
-            sessionDAO.deleteByTokenHash(tokenHash);
+            log.debug("Session expired - will be cleaned up by background task");
+            // Don't delete here - will be cleaned up by cleanupExpiredSessions()
             return Optional.empty();
         }
 
-        // Verify fingerprint
+        // Verify fingerprint (audit only - log but don't invalidate)
         if (!verifyFingerprint(session.get(), currentIp, currentUserAgent)) {
-            log.warn("Session fingerprint mismatch for user: '{}'", session.get().userId());
-            invalidateSession(sessionToken);
-            return Optional.empty();
+            log.warn("Session fingerprint mismatch for user: '{}' - continuing anyway (audit only)",
+                    session.get().userId());
+            // Don't invalidate session - fingerprint is for audit purposes only
         }
 
         // Cache and return

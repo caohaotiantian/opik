@@ -45,6 +45,9 @@ public class AuditInterceptor implements MethodInterceptor {
             return invocation.proceed();
         }
 
+        log.debug("Processing @Auditable annotation: action='{}', resourceType='{}'",
+                auditable.action(), auditable.resourceType());
+
         // Get AuditLogService instance
         AuditLogService auditLogService = auditLogServiceProvider.get();
 
@@ -85,6 +88,10 @@ public class AuditInterceptor implements MethodInterceptor {
 
             // 构建并记录审计日志
             AuditLog auditLog = logBuilder.build();
+
+            log.debug("Recording audit log: action='{}', resourceType='{}', userId='{}', workspaceId='{}', async='{}'",
+                    auditLog.action(), auditLog.resourceType(), auditLog.userId(), auditLog.workspaceId(),
+                    auditable.async());
 
             if (auditable.async()) {
                 // 异步记录

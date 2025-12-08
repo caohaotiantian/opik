@@ -12,7 +12,7 @@ import java.time.Instant;
 
 @Builder(toBuilder = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+@JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
 public record Session(
         @Schema(description = "Session ID (UUIDv7)", example = "018c5678-4d9a-7890-b123-456789abcdef") String id,
 

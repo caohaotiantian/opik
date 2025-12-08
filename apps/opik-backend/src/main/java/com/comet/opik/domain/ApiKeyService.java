@@ -11,6 +11,7 @@ import jakarta.ws.rs.NotFoundException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import ru.vyarus.guicey.jdbi3.tx.TransactionTemplate;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -23,6 +24,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
+import static com.comet.opik.infrastructure.db.TransactionTemplateAsync.READ_ONLY;
+import static com.comet.opik.infrastructure.db.TransactionTemplateAsync.WRITE;
+
 @Slf4j
 @Singleton
 @RequiredArgsConstructor(onConstructor_ = @Inject)
@@ -30,6 +34,7 @@ public class ApiKeyService {
 
     private final @NonNull ApiKeyDAO apiKeyDAO;
     private final @NonNull IdGenerator idGenerator;
+    private final @NonNull TransactionTemplate transactionTemplate;
 
     private static final String API_KEY_PREFIX = "opik_";
     private static final int API_KEY_LENGTH = 48;
@@ -52,17 +57,10 @@ public class ApiKeyService {
             Set<String> scopes, Integer expiryDays) {
         log.info("Generating API key for user: '{}' in workspace: '{}'", userId, workspaceId);
 
-        // Check user's API key count
-        int userKeyCount = apiKeyDAO.countActiveByUser(userId);
-        if (userKeyCount >= MAX_API_KEYS_PER_USER) {
-            throw new BadRequestException(
-                    "Maximum API keys limit reached. Maximum allowed: " + MAX_API_KEYS_PER_USER);
-        }
-
         // Generate API key
         String apiKey = generateSecureApiKey();
         String keyHash = hashApiKey(apiKey);
-        String keyPrefix = apiKey.substring(0, Math.min(12, apiKey.length()));
+        String keyPrefix = apiKey.substring(0, Math.min(10, apiKey.length())); // Max 10 chars to match DB column
 
         // Calculate expiry
         Instant expiresAt = expiryDays != null ? Instant.now().plus(expiryDays, ChronoUnit.DAYS) : null;
@@ -88,13 +86,25 @@ public class ApiKeyService {
                 .lastUpdatedBy(userId)
                 .build();
 
-        // Save to database
-        apiKeyDAO.insert(apiKeyEntity);
+        // Save to database within transaction
+        transactionTemplate.inTransaction(WRITE, handle -> {
+            var dao = handle.attach(ApiKeyDAO.class);
+
+            // Check user's API key count
+            int userKeyCount = dao.countActiveByUser(userId);
+            if (userKeyCount >= MAX_API_KEYS_PER_USER) {
+                throw new BadRequestException(
+                        "Maximum API keys limit reached. Maximum allowed: " + MAX_API_KEYS_PER_USER);
+            }
+
+            dao.insert(apiKeyEntity);
+            return null;
+        });
 
         log.info("API key generated successfully: '{}' for user: '{}'", apiKeyEntity.id(), userId);
 
         // Return API key with plain text (only time it's exposed)
-        return new ApiKeyResult(apiKey, apiKeyEntity);
+        return new ApiKeyResult(apiKey, apiKeyEntity); // plainApiKey, apiKey
     }
 
     /**
@@ -107,7 +117,9 @@ public class ApiKeyService {
         log.debug("Validating API key");
 
         String keyHash = hashApiKey(apiKey);
-        var apiKeyInfo = apiKeyDAO.findByKeyHash(keyHash);
+        var apiKeyInfo = transactionTemplate.inTransaction(READ_ONLY, handle -> {
+            return handle.attach(ApiKeyDAO.class).findByKeyHash(keyHash);
+        });
 
         if (apiKeyInfo.isEmpty()) {
             log.debug("API key not found");
@@ -140,17 +152,22 @@ public class ApiKeyService {
     public void revokeApiKey(String apiKeyId, String revokedBy) {
         log.info("Revoking API key: '{}'", apiKeyId);
 
-        var apiKey = apiKeyDAO.findById(apiKeyId)
-                .orElseThrow(() -> new NotFoundException("API key not found: '%s'".formatted(apiKeyId)));
+        transactionTemplate.inTransaction(WRITE, handle -> {
+            var dao = handle.attach(ApiKeyDAO.class);
 
-        if (apiKey.status() == ApiKeyStatus.REVOKED) {
-            log.warn("API key is already revoked: '{}'", apiKeyId);
-            return;
-        }
+            var apiKey = dao.findById(apiKeyId)
+                    .orElseThrow(() -> new NotFoundException("API key not found: '%s'".formatted(apiKeyId)));
 
-        apiKeyDAO.updateStatus(apiKeyId, ApiKeyStatus.REVOKED, revokedBy);
+            if (apiKey.status() == ApiKeyStatus.REVOKED) {
+                log.warn("API key is already revoked: '{}'", apiKeyId);
+                return null;
+            }
 
-        log.info("API key revoked successfully: '{}'", apiKeyId);
+            dao.updateStatus(apiKeyId, ApiKeyStatus.REVOKED, revokedBy);
+
+            log.info("API key revoked successfully: '{}'", apiKeyId);
+            return null;
+        });
     }
 
     /**
@@ -161,7 +178,10 @@ public class ApiKeyService {
     public void updateLastUsedAsync(String apiKeyId) {
         CompletableFuture.runAsync(() -> {
             try {
-                apiKeyDAO.updateLastUsed(apiKeyId, Instant.now());
+                transactionTemplate.inTransaction(WRITE, handle -> {
+                    handle.attach(ApiKeyDAO.class).updateLastUsed(apiKeyId, Instant.now());
+                    return null;
+                });
             } catch (Exception e) {
                 log.error("Failed to update API key last used time: '{}'", apiKeyId, e);
             }
@@ -177,7 +197,9 @@ public class ApiKeyService {
      */
     public java.util.List<ApiKey> listApiKeys(String userId, String workspaceId) {
         log.info("Listing API keys for user: '{}' in workspace: '{}'", userId, workspaceId);
-        return apiKeyDAO.findByUserAndWorkspace(userId, workspaceId);
+        return transactionTemplate.inTransaction(READ_ONLY, handle -> {
+            return handle.attach(ApiKeyDAO.class).findByUserAndWorkspace(userId, workspaceId);
+        });
     }
 
     /**
