@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import ru.vyarus.guicey.jdbi3.tx.TransactionTemplate;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 import static com.comet.opik.infrastructure.db.TransactionTemplateAsync.WRITE;
@@ -281,6 +282,76 @@ public class UserService {
         updateUserStatus(userId, UserStatus.DELETED, deletedBy);
 
         log.info("User '{}' deleted successfully", userId);
+    }
+
+    /**
+     * Get user by ID (alias for getUser)
+     *
+     * @param userId the user ID
+     * @return the user
+     */
+    public Optional<User> getUserById(String userId) {
+        return getUser(userId);
+    }
+
+    /**
+     * Get all users with pagination and filtering
+     *
+     * @param search search term (username or email)
+     * @param status filter by status
+     * @param systemAdmin filter by system admin flag
+     * @param page page number (1-based)
+     * @param size page size
+     * @return list of users
+     */
+    public List<User> getAllUsers(String search, String status, Boolean systemAdmin, int page, int size) {
+        log.debug("Getting all users - search: '{}', status: '{}', systemAdmin: '{}', page: '{}', size: '{}'",
+                search, status, systemAdmin, page, size);
+
+        int offset = (page - 1) * size;
+        return userDAO.findAll(search, status, systemAdmin, offset, size);
+    }
+
+    /**
+     * Count all users with filtering
+     *
+     * @param search search term (username or email)
+     * @param status filter by status
+     * @param systemAdmin filter by system admin flag
+     * @return count of users
+     */
+    public int countAllUsers(String search, String status, Boolean systemAdmin) {
+        return userDAO.countAll(search, status, systemAdmin);
+    }
+
+    /**
+     * Update user status (string version for REST API)
+     *
+     * @param userId the user ID
+     * @param statusStr the new status as string
+     * @param updatedBy the user who made the update
+     * @return updated user
+     */
+    @Auditable(action = "Update User Status", resourceType = "user", operation = Operation.UPDATE)
+    public User updateUserStatus(String userId, String statusStr, String updatedBy) {
+        log.info("Updating user status: '{}' to '{}'", userId, statusStr);
+
+        UserStatus status;
+        try {
+            status = UserStatus.valueOf(statusStr.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(
+                    "Invalid status: '%s'. Valid values: active, suspended, deleted".formatted(statusStr));
+        }
+
+        var user = getUser(userId)
+                .orElseThrow(() -> new NotFoundException("User not found: '%s'".formatted(userId)));
+
+        userDAO.updateStatus(userId, status, updatedBy);
+
+        log.info("User '{}' status updated to '{}'", user.username(), status);
+
+        return getUser(userId).orElseThrow();
     }
 
     /**

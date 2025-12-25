@@ -9,7 +9,7 @@ CREATE TABLE users (
     password_hash VARCHAR(255) NOT NULL COMMENT 'Password hash (BCrypt)',
     full_name VARCHAR(255) COMMENT 'User full name',
     avatar_url VARCHAR(500) COMMENT 'Avatar URL',
-    status VARCHAR(20) NOT NULL DEFAULT 'active' COMMENT 'User status: active, suspended, deleted',
+    status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE' COMMENT 'User status: ACTIVE, SUSPENDED, DELETED',
     is_system_admin BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'Whether user is system administrator',
     email_verified BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'Whether email is verified',
     last_login_at TIMESTAMP(6) COMMENT 'Last login timestamp',
@@ -49,10 +49,10 @@ INSERT INTO users (
     '00000000-0000-0000-0000-000000000001',
     'admin',
     'admin@opik.local',
-    '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYb8Fo0e5A6',
+    '$2a$12$AQt0JVOdQcUXI8LZY1XnRePSnwV.frRl27i3eYD1Z9oVmkMtPiPPC',
     'System Administrator',
     TRUE,
-    'active',
+    'ACTIVE',
     TRUE
 );
 

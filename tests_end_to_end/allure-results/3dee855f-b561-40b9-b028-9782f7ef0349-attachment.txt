@@ -1,4 +1,0 @@
-INFO     tests_end_to_end.tests.Authentication.conftest:conftest.py:50 Creating registered test user: testuser_34bmp5a2
-INFO     tests.Authentication.auth_helpers:auth_helpers.py:49 Registering user: testuser_34bmp5a2
-INFO     tests_end_to_end.tests.Authentication.conftest:conftest.py:73 Cleaning up test user: testuser_34bmp5a2
-INFO     tests.Authentication.auth_helpers:auth_helpers.py:504 Cleaning up test user: testuser_34bmp5a2

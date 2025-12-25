@@ -1,4 +1,0 @@
-15:43:23 [INFO] Creating registered test user: testuser_a7gow27u
-15:43:23 [INFO] Registering user: testuser_a7gow27u
-15:43:23 [INFO] Cleaning up test user: testuser_a7gow27u
-15:43:23 [INFO] Cleaning up test user: testuser_a7gow27u

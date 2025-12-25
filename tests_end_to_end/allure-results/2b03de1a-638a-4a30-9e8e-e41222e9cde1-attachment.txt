@@ -1,4 +1,0 @@
-15:43:21 [INFO] Creating registered test user: testuser_xf3zpgsm
-15:43:21 [INFO] Registering user: testuser_xf3zpgsm
-15:43:21 [INFO] Cleaning up test user: testuser_xf3zpgsm
-15:43:21 [INFO] Cleaning up test user: testuser_xf3zpgsm

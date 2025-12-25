@@ -64,6 +64,7 @@ public class SpanService {
     private final @NonNull AttachmentService attachmentService;
     private final @NonNull AttachmentStripperService attachmentStripperService;
     private final @NonNull AttachmentReinjectorService attachmentReinjectorService;
+    private final @NonNull WorkspaceQuotaService quotaService;
 
     @WithSpan
     public Mono<Span.SpanPage> find(int page, int size, @NonNull SpanSearchCriteria searchCriteria) {
@@ -177,7 +178,12 @@ public class SpanService {
                         log.info("Inserting span with id '{}' , projectId '{}' , traceId '{}' , parentSpanId '{}'",
                                 processedSpan.id(), processedSpan.projectId(), processedSpan.traceId(),
                                 processedSpan.parentSpanId());
-                        return spanDAO.insert(processedSpan).thenReturn(processedSpan.id());
+                        return spanDAO.insert(processedSpan)
+                                .doOnSuccess(v -> {
+                                    // Invalidate quota cache after creating span
+                                    quotaService.invalidateQuotaCache(workspaceId);
+                                })
+                                .thenReturn(processedSpan.id());
                     });
         });
     }
@@ -342,7 +348,15 @@ public class SpanService {
         return attachmentService.deleteAutoStrippedAttachments(SPAN, spanIds)
                 .then(resolveProjects)
                 .flatMap(this::stripAttachmentsFromSpanBatch)
-                .flatMap(spanDAO::batchInsert);
+                .flatMap(spanDAO::batchInsert)
+                .contextWrite(ctx -> {
+                    // Invalidate quota cache after batch insert
+                    String workspaceId = ctx.getOrDefault(RequestContext.WORKSPACE_ID, null);
+                    if (workspaceId != null) {
+                        quotaService.invalidateQuotaCache(workspaceId);
+                    }
+                    return ctx;
+                });
     }
 
     private Mono<List<Span>> stripAttachmentsFromSpanBatch(List<Span> spans) {
@@ -435,6 +449,16 @@ public class SpanService {
                         spanIds -> commentService.deleteByEntityIds(CommentDAO.EntityType.SPAN, spanIds)
                                 .then(Mono.defer(() -> attachmentService.deleteByEntityIds(SPAN, spanIds))))
                 .then(Mono.defer(() -> spanDAO.deleteByTraceIds(traceIds, projectId)))
+                .doOnSuccess(v -> {
+                    // Invalidate quota cache after deleting spans
+                    Mono.deferContextual(ctx -> {
+                        String workspaceId = ctx.getOrDefault(RequestContext.WORKSPACE_ID, null);
+                        if (workspaceId != null) {
+                            quotaService.invalidateQuotaCache(workspaceId);
+                        }
+                        return Mono.empty();
+                    }).subscribe();
+                })
                 .then();
     }
 

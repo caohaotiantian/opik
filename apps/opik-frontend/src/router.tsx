@@ -42,6 +42,46 @@ import CompareTrialsPage from "@/components/pages/CompareTrialsPage/CompareTrial
 import AddEditAlertPage from "@/components/pages/ConfigurationPage/AlertsTab/AddEditAlertPage/AddEditAlertPage";
 import AlertNestedRoute from "@/components/pages/ConfigurationPage/AlertsTab/AddEditAlertPage/AlertNestedRoute";
 
+// Auth pages (lazy loaded)
+const LoginPage = lazy(
+  () => import("@/components/pages/LoginPage/LoginPage"),
+);
+const RegisterPage = lazy(
+  () => import("@/components/pages/RegisterPage/RegisterPage"),
+);
+const ForgotPasswordPage = lazy(
+  () => import("@/components/pages/ForgotPasswordPage/ForgotPasswordPage"),
+);
+const ResetPasswordPage = lazy(
+  () => import("@/components/pages/ResetPasswordPage/ResetPasswordPage"),
+);
+
+// Workspace management pages (lazy loaded)
+const ApiKeysPage = lazy(
+  () => import("@/components/pages/ApiKeysPage/ApiKeysPage"),
+);
+const MembersPage = lazy(
+  () => import("@/components/pages/MembersPage/MembersPage"),
+);
+
+// User settings page (lazy loaded)
+const ProfileSettingsPage = lazy(
+  () => import("@/components/pages/ProfileSettingsPage/ProfileSettingsPage"),
+);
+
+// Admin pages (lazy loaded)
+const UsersManagementPage = lazy(
+  () => import("@/components/pages/admin/UsersManagementPage/UsersManagementPage"),
+);
+const AuditLogsPage = lazy(
+  () => import("@/components/pages/admin/AuditLogsPage/AuditLogsPage"),
+);
+
+// Layouts
+import PublicLayout from "@/components/layout/PublicLayout/PublicLayout";
+import AdminLayout from "@/components/layout/AdminLayout/AdminLayout";
+import AuthGuard from "@/components/layout/AuthGuard/AuthGuard";
+
 declare module "@tanstack/react-router" {
   interface StaticDataRouteOption {
     hideUpgradeButton?: boolean;
@@ -71,27 +111,109 @@ const rootRoute = createRootRoute({
   ),
 });
 
+// ----------- Public routes (no auth required)
+const publicLayoutRoute = createRoute({
+  id: "publicLayout",
+  getParentRoute: () => rootRoute,
+  component: PublicLayout,
+});
+
+const loginRoute = createRoute({
+  path: "/login",
+  getParentRoute: () => publicLayoutRoute,
+  component: LoginPage,
+  staticData: {
+    title: "Login",
+  },
+});
+
+const registerRoute = createRoute({
+  path: "/register",
+  getParentRoute: () => publicLayoutRoute,
+  component: RegisterPage,
+  staticData: {
+    title: "Register",
+  },
+});
+
+const forgotPasswordRoute = createRoute({
+  path: "/forgot-password",
+  getParentRoute: () => publicLayoutRoute,
+  component: ForgotPasswordPage,
+  staticData: {
+    title: "Forgot Password",
+  },
+});
+
+const resetPasswordRoute = createRoute({
+  path: "/reset-password/$token",
+  getParentRoute: () => publicLayoutRoute,
+  component: ResetPasswordPage,
+  staticData: {
+    title: "Reset Password",
+  },
+});
+
+// ----------- Admin routes
+const adminLayoutRoute = createRoute({
+  id: "adminLayout",
+  getParentRoute: () => rootRoute,
+  component: AdminLayout,
+});
+
+const adminRoute = createRoute({
+  path: "/admin",
+  getParentRoute: () => adminLayoutRoute,
+  component: () => <Navigate to="/admin/users" />,
+});
+
+const adminUsersRoute = createRoute({
+  path: "/admin/users",
+  getParentRoute: () => adminLayoutRoute,
+  component: UsersManagementPage,
+  staticData: {
+    title: "User Management",
+  },
+});
+
+const adminAuditLogsRoute = createRoute({
+  path: "/admin/audit-logs",
+  getParentRoute: () => adminLayoutRoute,
+  component: AuditLogsPage,
+  staticData: {
+    title: "Audit Logs",
+  },
+});
+
+// ----------- Auth Guard route (protects all authenticated routes)
+const authGuardRoute = createRoute({
+  id: "authGuard",
+  getParentRoute: () => rootRoute,
+  component: AuthGuard,
+});
+
+// ----------- Workspace Guard routes (inherit from authGuardRoute)
 const workspaceGuardRoute = createRoute({
   id: "workspaceGuard",
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => authGuardRoute,
   component: WorkspaceGuard,
 });
 
 const workspaceGuardPartialLayoutRoute = createRoute({
   id: "workspaceGuardPartialLayout",
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => authGuardRoute,
   component: () => <WorkspaceGuard Layout={PartialPageLayout} />,
 });
 
 const workspaceGuardSMELayoutRoute = createRoute({
   id: "workspaceGuardSMELayout",
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => authGuardRoute,
   component: () => <WorkspaceGuard Layout={SMEPageLayout} />,
 });
 
 const workspaceGuardEmptyLayoutRoute = createRoute({
   id: "workspaceGuardEmptyLayout",
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => authGuardRoute,
   component: () => <WorkspaceGuard Layout={EmptyPageLayout} />,
 });
 
@@ -437,52 +559,108 @@ const automationLogsRoute = createRoute({
   component: AutomationLogsPage,
 });
 
+// ----------- Workspace Settings (API Keys, Members)
+const apiKeysRoute = createRoute({
+  path: "/api-keys",
+  getParentRoute: () => workspaceRoute,
+  staticData: {
+    title: "API Keys",
+  },
+  component: ApiKeysPage,
+});
+
+const membersRoute = createRoute({
+  path: "/members",
+  getParentRoute: () => workspaceRoute,
+  staticData: {
+    title: "Members",
+  },
+  component: MembersPage,
+});
+
+// User settings route
+const settingsRoute = createRoute({
+  path: "/settings",
+  getParentRoute: () => workspaceRoute,
+});
+
+const profileSettingsRoute = createRoute({
+  path: "/profile",
+  getParentRoute: () => settingsRoute,
+  staticData: {
+    title: "Profile Settings",
+  },
+  component: ProfileSettingsPage,
+});
+
 const routeTree = rootRoute.addChildren([
-  workspaceGuardEmptyLayoutRoute.addChildren([automationLogsRoute]),
-  workspaceGuardPartialLayoutRoute.addChildren([
-    quickstartRoute,
-    getStartedRoute,
+  // Public routes (no auth required)
+  publicLayoutRoute.addChildren([
+    loginRoute,
+    registerRoute,
+    forgotPasswordRoute,
+    resetPasswordRoute,
   ]),
-  workspaceGuardSMELayoutRoute.addChildren([homeSMERoute]),
-  workspaceGuardRoute.addChildren([
-    baseRoute,
-    homeRoute,
-    homeRouteNew,
-    workspaceRoute.addChildren([
-      projectsRoute.addChildren([
-        projectsListRoute,
-        projectRoute.addChildren([tracesRoute]),
-      ]),
-      experimentsRoute.addChildren([
-        experimentsListRoute,
-        compareExperimentsRoute,
-      ]),
-      optimizationsRoute.addChildren([
-        optimizationsListRoute,
-        compareOptimizationsRoute,
-        optimizationBaseRoute.addChildren([
-          optimizationRoute,
-          compareTrialsRoute,
+  // Admin routes (AdminLayout handles its own auth check)
+  adminLayoutRoute.addChildren([
+    adminRoute,
+    adminUsersRoute,
+    adminAuditLogsRoute,
+  ]),
+  // Protected routes (require authentication)
+  authGuardRoute.addChildren([
+    // Workspace routes
+    workspaceGuardEmptyLayoutRoute.addChildren([automationLogsRoute]),
+    workspaceGuardPartialLayoutRoute.addChildren([
+      quickstartRoute,
+      getStartedRoute,
+    ]),
+    workspaceGuardSMELayoutRoute.addChildren([homeSMERoute]),
+    workspaceGuardRoute.addChildren([
+      baseRoute,
+      homeRoute,
+      homeRouteNew,
+      workspaceRoute.addChildren([
+        projectsRoute.addChildren([
+          projectsListRoute,
+          projectRoute.addChildren([tracesRoute]),
         ]),
-      ]),
-      datasetsRoute.addChildren([
-        datasetsListRoute,
-        datasetRoute.addChildren([datasetItemsRoute]),
-      ]),
-      promptsRoute.addChildren([promptsListRoute, promptRoute]),
-      redirectRoute.addChildren([
-        homeRedirectRoute,
-        redirectProjectsRoute,
-        redirectDatasetsRoute,
-      ]),
-      playgroundRoute,
-      configurationRoute.addChildren([
-        alertsRoute.addChildren([alertNewRoute, alertEditRoute]),
-      ]),
-      onlineEvaluationRoute,
-      annotationQueuesRoute.addChildren([
-        annotationQueuesListRoute,
-        annotationQueueDetailsRoute,
+        experimentsRoute.addChildren([
+          experimentsListRoute,
+          compareExperimentsRoute,
+        ]),
+        optimizationsRoute.addChildren([
+          optimizationsListRoute,
+          compareOptimizationsRoute,
+          optimizationBaseRoute.addChildren([
+            optimizationRoute,
+            compareTrialsRoute,
+          ]),
+        ]),
+        datasetsRoute.addChildren([
+          datasetsListRoute,
+          datasetRoute.addChildren([datasetItemsRoute]),
+        ]),
+        promptsRoute.addChildren([promptsListRoute, promptRoute]),
+        redirectRoute.addChildren([
+          homeRedirectRoute,
+          redirectProjectsRoute,
+          redirectDatasetsRoute,
+        ]),
+        playgroundRoute,
+        configurationRoute.addChildren([
+          alertsRoute.addChildren([alertNewRoute, alertEditRoute]),
+        ]),
+        onlineEvaluationRoute,
+        annotationQueuesRoute.addChildren([
+          annotationQueuesListRoute,
+          annotationQueueDetailsRoute,
+        ]),
+        // Workspace management routes
+        apiKeysRoute,
+        membersRoute,
+        // User settings routes
+        settingsRoute.addChildren([profileSettingsRoute]),
       ]),
     ]),
   ]),

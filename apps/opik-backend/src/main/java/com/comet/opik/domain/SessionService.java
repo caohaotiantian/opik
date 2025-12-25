@@ -44,14 +44,6 @@ public class SessionService {
     public com.comet.opik.api.Session createSession(String userId, String ipAddress, String userAgent) {
         log.info("Creating session for user: '{}'", userId);
 
-        // Check and clean old sessions if limit exceeded
-        int maxConcurrent = sessionConfig.getMaxConcurrentSessions();
-        int activeCount = sessionDAO.countActiveByUser(userId);
-        if (activeCount >= maxConcurrent) {
-            log.info("User '{}' has '{}' active sessions, cleaning old ones", userId, activeCount);
-            sessionDAO.deleteOldUserSessions(userId, maxConcurrent - 1);
-        }
-
         // Generate secure session token
         String sessionToken = generateSecureToken();
         String tokenHash = hashToken(sessionToken);
@@ -79,9 +71,19 @@ public class SessionService {
                 .lastUpdatedBy("system")
                 .build();
 
-        // Save to database (within write transaction)
+        // Check, clean old sessions and save new session (all within write transaction)
+        int maxConcurrent = sessionConfig.getMaxConcurrentSessions();
         transactionTemplate.inTransaction(WRITE, handle -> {
             var dao = handle.attach(SessionDAO.class);
+
+            // Check and clean old sessions if limit exceeded
+            int activeCount = dao.countActiveByUser(userId);
+            if (activeCount >= maxConcurrent) {
+                log.info("User '{}' has '{}' active sessions, cleaning old ones", userId, activeCount);
+                dao.deleteOldUserSessions(userId, maxConcurrent - 1);
+            }
+
+            // Insert new session
             dao.insert(session);
             return null;
         });
@@ -164,6 +166,58 @@ public class SessionService {
     }
 
     /**
+     * Validate a session token without fingerprint check
+     * Used for /v1/session/* endpoints that don't have full request context
+     *
+     * @param sessionToken the session token
+     * @return the session if valid, empty otherwise
+     */
+    public Optional<com.comet.opik.api.Session> validateSessionOnly(String sessionToken) {
+        log.debug("Validating session token (without fingerprint)");
+
+        // Try to get from cache first
+        var cached = getFromCache(sessionToken);
+        if (cached != null) {
+            if (cached.expiresAt().isAfter(Instant.now())) {
+                // Double-check database to handle logout-all scenario
+                String tokenHash = hashToken(sessionToken);
+                var dbSession = sessionDAO.findByTokenHash(tokenHash);
+                if (dbSession.isEmpty()) {
+                    log.debug("Session found in cache but not in database - invalidated");
+                    removeFromCache(sessionToken);
+                    return Optional.empty();
+                }
+                log.debug("Session validated from cache (no fingerprint)");
+                return Optional.of(cached);
+            } else {
+                log.debug("Cached session expired");
+                removeFromCache(sessionToken);
+                return Optional.empty();
+            }
+        }
+
+        // Get from database
+        String tokenHash = hashToken(sessionToken);
+        var session = sessionDAO.findByTokenHash(tokenHash);
+
+        if (session.isEmpty()) {
+            log.debug("Session not found in database");
+            return Optional.empty();
+        }
+
+        // Check expiration
+        if (session.get().expiresAt().isBefore(Instant.now())) {
+            log.debug("Session expired - will be cleaned up by background task");
+            return Optional.empty();
+        }
+
+        // Cache and return
+        cacheSession(sessionToken, session.get());
+        log.debug("Session validated from database (no fingerprint)");
+        return session;
+    }
+
+    /**
      * Update last activity time (async)
      *
      * @param sessionId the session ID
@@ -171,7 +225,11 @@ public class SessionService {
     public void updateLastActivityAsync(String sessionId) {
         CompletableFuture.runAsync(() -> {
             try {
-                sessionDAO.updateLastActivity(sessionId, Instant.now());
+                transactionTemplate.inTransaction(WRITE, handle -> {
+                    var dao = handle.attach(SessionDAO.class);
+                    dao.updateLastActivity(sessionId, Instant.now());
+                    return null;
+                });
             } catch (Exception e) {
                 log.error("Failed to update session last activity: '{}'", sessionId, e);
             }
@@ -187,7 +245,11 @@ public class SessionService {
         log.info("Invalidating session");
 
         String tokenHash = hashToken(sessionToken);
-        sessionDAO.deleteByTokenHash(tokenHash);
+        transactionTemplate.inTransaction(WRITE, handle -> {
+            var dao = handle.attach(SessionDAO.class);
+            dao.deleteByTokenHash(tokenHash);
+            return null;
+        });
         removeFromCache(sessionToken);
 
         log.info("Session invalidated successfully");
@@ -202,7 +264,10 @@ public class SessionService {
     public int invalidateAllSessions(String userId) {
         log.info("Invalidating all sessions for user: '{}'", userId);
 
-        int deleted = sessionDAO.deleteAllByUser(userId);
+        int deleted = transactionTemplate.inTransaction(WRITE, handle -> {
+            var dao = handle.attach(SessionDAO.class);
+            return dao.deleteAllByUser(userId);
+        });
 
         // Note: Cannot easily clear all cached sessions without tracking them
         // They will expire naturally or be invalidated on next use
@@ -219,7 +284,11 @@ public class SessionService {
     public int cleanupExpiredSessions() {
         log.debug("Cleaning up expired sessions");
 
-        int deleted = sessionDAO.deleteExpired(Instant.now());
+        // 必须在写事务中执行删除操作
+        int deleted = transactionTemplate.inTransaction(WRITE, handle -> {
+            var dao = handle.attach(SessionDAO.class);
+            return dao.deleteExpired(Instant.now());
+        });
 
         if (deleted > 0) {
             log.info("Cleaned up '{}' expired sessions", deleted);

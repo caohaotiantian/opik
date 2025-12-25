@@ -28,6 +28,10 @@ import java.lang.annotation.Target;
  * // Project-level permission check
  * @RequiresPermission(value = "TRACE_CREATE", checkProjectLevel = true)
  * public Trace createTrace(...) { ... }
+ *
+ * // System Admin only endpoint (no specific permissions required)
+ * @RequiresPermission(systemAdminOnly = true)
+ * public User createUser(...) { ... }
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE})
@@ -37,10 +41,11 @@ public @interface RequiresPermission {
      * Required permissions (Permission enum names as strings)
      *
      * Use Permission enum names like "PROJECT_CREATE", "WORKSPACE_VIEW", etc.
+     * Can be empty when systemAdminOnly = true.
      *
      * @return array of permission names
      */
-    String[] value();
+    String[] value() default {};
 
     /**
      * Whether all permissions are required (AND logic)
@@ -72,4 +77,14 @@ public @interface RequiresPermission {
      * @return custom error message or empty string for default
      */
     String message() default "";
+
+    /**
+     * Whether this permission requires system admin role
+     *
+     * When true, only users with systemAdmin=true will pass the permission check.
+     * This is typically used for system-level administration endpoints.
+     *
+     * @return true if system admin role is required, false otherwise
+     */
+    boolean systemAdminOnly() default false;
 }

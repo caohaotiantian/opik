@@ -3,10 +3,12 @@ package com.comet.opik.api.resources.v1.priv;
 import com.codahale.metrics.annotation.Timed;
 import com.comet.opik.api.ApiKey;
 import com.comet.opik.api.ApiKeyCreateRequest;
+import com.comet.opik.api.ApiKeyPage;
 import com.comet.opik.api.error.ErrorMessage;
 import com.comet.opik.domain.ApiKeyService;
 import com.comet.opik.infrastructure.auth.RequestContext;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -16,11 +18,13 @@ import jakarta.inject.Provider;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import lombok.NonNull;
@@ -28,7 +32,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
-import java.util.List;
 
 @Path("/v1/api-keys")
 @Produces(MediaType.APPLICATION_JSON)
@@ -43,18 +46,28 @@ public class ApiKeyResource {
     private final @NonNull Provider<RequestContext> requestContext;
 
     @GET
-    @Operation(operationId = "listApiKeys", summary = "List API keys", description = "Get list of API keys for the current user", responses = {
-            @ApiResponse(responseCode = "200", description = "API key list", content = @Content(schema = @Schema(implementation = ApiKey.class)))
+    @Operation(operationId = "listApiKeys", summary = "List API keys", description = "Get list of API keys for the current user with pagination, sorting and filtering", responses = {
+            @ApiResponse(responseCode = "200", description = "API key list", content = @Content(schema = @Schema(implementation = ApiKeyPage.class)))
     })
-    public Response listApiKeys() {
+    public Response listApiKeys(
+            @Parameter(description = "Page number (1-based)") @QueryParam("page") @DefaultValue("1") int page,
+            @Parameter(description = "Page size") @QueryParam("size") @DefaultValue("10") int size,
+            @Parameter(description = "Search by name") @QueryParam("search") String search,
+            @Parameter(description = "Filter by status (ACTIVE, REVOKED)") @QueryParam("status") String status,
+            @Parameter(description = "Sort by field (name, created_at, last_used_at, status)") @QueryParam("sort_by") @DefaultValue("created_at") String sortBy,
+            @Parameter(description = "Sort direction (asc, desc)") @QueryParam("sort_dir") @DefaultValue("desc") String sortDir) {
         String userId = requestContext.get().getUserId();
         String workspaceId = requestContext.get().getWorkspaceId();
-        log.info("Listing API keys for user '{}' in workspace '{}'", userId, workspaceId);
+        log.info(
+                "Listing API keys for user '{}' in workspace '{}', page={}, size={}, search='{}', status='{}', sortBy='{}', sortDir='{}'",
+                userId, workspaceId, page, size, search, status, sortBy, sortDir);
 
-        List<ApiKey> apiKeys = apiKeyService.listApiKeys(userId, workspaceId);
-        log.info("Found '{}' API keys for user '{}'", apiKeys.size(), userId);
+        ApiKeyPage apiKeyPage = apiKeyService.listApiKeysPaged(userId, workspaceId, page, size, search, status, sortBy,
+                sortDir);
+        log.info("Found '{}' API keys (total: {}) for user '{}'", apiKeyPage.content().size(), apiKeyPage.total(),
+                userId);
 
-        return Response.ok().entity(apiKeys).build();
+        return Response.ok().entity(apiKeyPage).build();
     }
 
     @POST

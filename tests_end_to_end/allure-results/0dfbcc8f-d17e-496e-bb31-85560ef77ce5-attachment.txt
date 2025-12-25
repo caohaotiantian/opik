@@ -1,1 +1,0 @@
-✅ 配置正常: base_url=http://localhost:5173, api_url=http://localhost:5173/api

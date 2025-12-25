@@ -1326,6 +1326,15 @@ class SpanDAO {
             ;
             """;
 
+    private static final String COUNT_SPANS_BY_WORKSPACE_ID = """
+            SELECT COUNT(DISTINCT id) as count
+            FROM spans
+            WHERE workspace_id = :workspace_id
+            ORDER BY (workspace_id, project_id, id) DESC, last_updated_at DESC
+            LIMIT 1 BY id
+            ;
+            """;
+
     private static final String SPAN_DAILY_BI_INFORMATION = """
             SELECT
                     workspace_id,
@@ -2189,6 +2198,30 @@ class SpanDAO {
                         .workspace(row.get("workspace_id", String.class))
                         .spanCount(row.get("span_count", Integer.class))
                         .build()));
+    }
+
+    /**
+     * Count total spans by workspace ID for quota management
+     *
+     * @param workspaceId the workspace ID
+     * @return Mono of span count
+     */
+    @WithSpan
+    public Mono<Integer> countByWorkspaceId(@NonNull String workspaceId) {
+        log.debug("Counting spans for workspace: '{}'", workspaceId);
+
+        return Mono.from(connectionFactory.create())
+                .flatMapMany(connection -> {
+                    var statement = connection.createStatement(COUNT_SPANS_BY_WORKSPACE_ID);
+                    statement.bind("workspace_id", workspaceId);
+                    return statement.execute();
+                })
+                .flatMap(result -> result.map((row, rowMetadata) -> {
+                    Long count = row.get("count", Long.class);
+                    return count != null ? count.intValue() : 0;
+                }))
+                .next()
+                .defaultIfEmpty(0);
     }
 
     @WithSpan

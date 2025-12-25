@@ -1,2 +1,0 @@
-15:43:22 [INFO] Testing get user profile without authentication
-15:43:22 [INFO] Getting user profile

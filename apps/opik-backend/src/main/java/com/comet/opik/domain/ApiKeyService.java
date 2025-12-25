@@ -1,6 +1,7 @@
 package com.comet.opik.domain;
 
 import com.comet.opik.api.ApiKey;
+import com.comet.opik.api.ApiKeyPage;
 import com.comet.opik.api.ApiKeyStatus;
 import com.comet.opik.infrastructure.audit.Auditable;
 import com.comet.opik.infrastructure.audit.Operation;
@@ -11,6 +12,7 @@ import jakarta.ws.rs.NotFoundException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import ru.vyarus.guicey.jdbi3.tx.TransactionTemplate;
 
 import java.nio.charset.StandardCharsets;
@@ -20,6 +22,7 @@ import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -195,10 +198,73 @@ public class ApiKeyService {
      * @param workspaceId the workspace ID
      * @return list of API keys
      */
-    public java.util.List<ApiKey> listApiKeys(String userId, String workspaceId) {
+    public List<ApiKey> listApiKeys(String userId, String workspaceId) {
         log.info("Listing API keys for user: '{}' in workspace: '{}'", userId, workspaceId);
         return transactionTemplate.inTransaction(READ_ONLY, handle -> {
             return handle.attach(ApiKeyDAO.class).findByUserAndWorkspace(userId, workspaceId);
+        });
+    }
+
+    /**
+     * List API keys with pagination, sorting and filtering
+     *
+     * @param userId the user ID
+     * @param workspaceId the workspace ID
+     * @param page the page number (1-based)
+     * @param size the page size
+     * @param search search by name
+     * @param status filter by status
+     * @param sortBy sort by field
+     * @param sortDir sort direction
+     * @return paginated list of API keys
+     */
+    public ApiKeyPage listApiKeysPaged(String userId, String workspaceId, int page, int size,
+            String search, String status, String sortBy, String sortDir) {
+        log.info("Listing API keys (paged) for user: '{}' in workspace: '{}'", userId, workspaceId);
+
+        // Validate and normalize parameters
+        int validPage = Math.max(1, page);
+        int validSize = Math.min(Math.max(1, size), 100); // Max 100 items per page
+        int offset = (validPage - 1) * validSize;
+
+        // Validate sort field to prevent SQL injection
+        String validSortBy = switch (sortBy != null ? sortBy.toLowerCase() : "created_at") {
+            case "name" -> "name";
+            case "status" -> "status";
+            case "last_used_at" -> "last_used_at";
+            default -> "created_at";
+        };
+
+        String validSortDir = "asc".equalsIgnoreCase(sortDir) ? "ASC" : "DESC";
+
+        // Parse status filter
+        ApiKeyStatus statusFilter = null;
+        if (StringUtils.isNotBlank(status)) {
+            try {
+                statusFilter = ApiKeyStatus.valueOf(status.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                log.warn("Invalid status filter: '{}'", status);
+            }
+        }
+
+        final ApiKeyStatus finalStatusFilter = statusFilter;
+        final String finalSearch = StringUtils.isNotBlank(search) ? "%" + search.trim() + "%" : null;
+
+        return transactionTemplate.inTransaction(READ_ONLY, handle -> {
+            var dao = handle.attach(ApiKeyDAO.class);
+
+            List<ApiKey> content = dao.findByUserAndWorkspacePaged(
+                    userId, workspaceId, finalSearch, finalStatusFilter,
+                    validSortBy, validSortDir, validSize, offset);
+
+            long total = dao.countByUserAndWorkspace(userId, workspaceId, finalSearch, finalStatusFilter);
+
+            return ApiKeyPage.builder()
+                    .content(content)
+                    .page(validPage)
+                    .size(validSize)
+                    .total(total)
+                    .build();
         });
     }
 

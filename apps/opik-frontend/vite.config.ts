@@ -39,6 +39,14 @@ export default defineConfig(({ mode }) => {
     server: {
       host: "0.0.0.0",
       port: 5174,
+      proxy: {
+        // 代理 API 请求到后端
+        "/api": {
+          target: env.VITE_PROXY_TARGET || "http://localhost:8080",
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api/, ""),
+        },
+      },
     },
   } satisfies UserConfig;
 });

@@ -452,8 +452,8 @@ auditLog:
   # 是否启用审计日志 (默认: true)
   enabled: ${AUDIT_LOG_ENABLED:-true}
   
-  # 日志保留天数 (默认: 90)
-  retentionDays: ${AUDIT_LOG_RETENTION_DAYS:-90}
+  # 日志保留天数 (默认: 365天,即12个月)
+  retentionDays: ${AUDIT_LOG_RETENTION_DAYS:-365}
   
   # 批量写入大小
   batchSize: ${AUDIT_LOG_BATCH_SIZE:-100}
@@ -488,7 +488,7 @@ export WORKSPACE_DEFAULT_QUOTA=10
 
 # 审计日志相关
 export AUDIT_LOG_ENABLED=true
-export AUDIT_LOG_RETENTION_DAYS=90
+export AUDIT_LOG_RETENTION_DAYS=365  # 12个月
 export AUDIT_LOG_READ_OPERATIONS=true
 
 # 国际化相关

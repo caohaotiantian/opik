@@ -1,4 +1,0 @@
-16:56:11 [INFO] Creating registered test user: testuser_1xfuhlhz
-16:56:11 [INFO] Registering user: testuser_1xfuhlhz
-16:56:11 [INFO] Cleaning up test user: testuser_1xfuhlhz
-16:56:11 [INFO] Cleaning up test user: testuser_1xfuhlhz

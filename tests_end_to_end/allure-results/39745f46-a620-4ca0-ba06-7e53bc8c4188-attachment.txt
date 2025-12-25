@@ -1,2 +1,0 @@
-INFO     tests_end_to_end.tests.Authentication.test_api_key_auth:test_api_key_auth.py:180 Testing API auth with invalid key
-INFO     tests.Authentication.auth_helpers:auth_helpers.py:293 Validating API key

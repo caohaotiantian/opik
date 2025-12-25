@@ -9,6 +9,7 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 @RegisterRowMapper(UserRowMapper.class)
@@ -106,4 +107,30 @@ public interface UserDAO {
     void updateLastLogin(
             @Bind("id") String id,
             @Bind("lastLoginAt") Instant lastLoginAt);
+
+    @SqlQuery("""
+            SELECT * FROM users
+            WHERE (:search IS NULL OR username LIKE CONCAT('%', :search, '%') OR email LIKE CONCAT('%', :search, '%'))
+            AND (:status IS NULL OR status = :status)
+            AND (:systemAdmin IS NULL OR is_system_admin = :systemAdmin)
+            ORDER BY created_at DESC
+            LIMIT :limit OFFSET :offset
+            """)
+    List<User> findAll(
+            @Bind("search") String search,
+            @Bind("status") String status,
+            @Bind("systemAdmin") Boolean systemAdmin,
+            @Bind("offset") int offset,
+            @Bind("limit") int limit);
+
+    @SqlQuery("""
+            SELECT COUNT(*) FROM users
+            WHERE (:search IS NULL OR username LIKE CONCAT('%', :search, '%') OR email LIKE CONCAT('%', :search, '%'))
+            AND (:status IS NULL OR status = :status)
+            AND (:systemAdmin IS NULL OR is_system_admin = :systemAdmin)
+            """)
+    int countAll(
+            @Bind("search") String search,
+            @Bind("status") String status,
+            @Bind("systemAdmin") Boolean systemAdmin);
 }

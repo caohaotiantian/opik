@@ -56,17 +56,30 @@ public class PermissionInterceptor implements MethodInterceptor {
         boolean requireAll = annotation.requireAll();
         boolean checkProjectLevel = annotation.checkProjectLevel();
         String customMessage = annotation.message();
+        boolean systemAdminOnly = annotation.systemAdminOnly();
 
-        log.debug("Permission check triggered for method: '{}', user: '{}', permissions: {}, requireAll: {}",
-                method.getName(), context.getUserName(), Arrays.toString(requiredPermissions), requireAll);
+        log.debug(
+                "Permission check triggered for method: '{}', user: '{}', permissions: {}, requireAll: {}, systemAdminOnly: {}",
+                method.getName(), context.getUserName(), Arrays.toString(requiredPermissions), requireAll,
+                systemAdminOnly);
 
-        // 1. System Admin check - automatic pass
+        // 1. System Admin only check
+        if (systemAdminOnly) {
+            if (!context.isSystemAdmin()) {
+                log.warn("System Admin required but user '{}' is not a System Admin", context.getUserName());
+                throw new ForbiddenException("System Administrator access required");
+            }
+            log.debug("User '{}' is System Admin, permission check passed", context.getUserName());
+            return invocation.proceed();
+        }
+
+        // 2. System Admin check - automatic pass for non-systemAdminOnly permissions
         if (context.isSystemAdmin()) {
             log.debug("User '{}' is System Admin, permission check passed", context.getUserName());
             return invocation.proceed();
         }
 
-        // 2. Validate context
+        // 3. Validate context
         String userId = context.getUserId();
         String workspaceId = context.getWorkspaceId();
 
@@ -75,7 +88,7 @@ public class PermissionInterceptor implements MethodInterceptor {
             throw new ForbiddenException("Authentication context is missing");
         }
 
-        // 3. Perform permission check
+        // 4. Perform permission check
         boolean hasPermission;
 
         if (checkProjectLevel) {
@@ -102,7 +115,7 @@ public class PermissionInterceptor implements MethodInterceptor {
                     requireAll);
         }
 
-        // 4. Handle permission check result
+        // 5. Handle permission check result
         if (!hasPermission) {
             // Permission denied
             String errorMessage;
@@ -118,7 +131,7 @@ public class PermissionInterceptor implements MethodInterceptor {
             throw new ForbiddenException(errorMessage);
         }
 
-        // 5. Permission check passed, proceed with method execution
+        // 6. Permission check passed, proceed with method execution
         log.debug("Permission check passed for user: '{}', method: '{}'",
                 context.getUserName(), method.getName());
 

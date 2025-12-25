@@ -1,2 +1,0 @@
-15:43:22 [INFO] Testing user registration for: testuser_now1gafz
-15:43:22 [INFO] Registering user: testuser_now1gafz

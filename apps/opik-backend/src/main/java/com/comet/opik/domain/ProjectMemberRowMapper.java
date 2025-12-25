@@ -17,7 +17,7 @@ public class ProjectMemberRowMapper implements RowMapper<ProjectMember> {
                 .projectId(rs.getString("project_id"))
                 .userId(rs.getString("user_id"))
                 .roleId(rs.getString("role_id"))
-                .status(MemberStatus.valueOf(rs.getString("status")))
+                .status(MemberStatus.fromValue(rs.getString("status")))
                 .version(rs.getInt("version"))
                 .createdAt(rs.getTimestamp("created_at").toInstant())
                 .createdBy(rs.getString("created_by"))

@@ -209,8 +209,8 @@ auditLog:
   # 是否启用审计日志
   enabled: ${AUDIT_LOG_ENABLED:-true}
   
-  # 日志保留天数
-  retentionDays: ${AUDIT_LOG_RETENTION_DAYS:-90}
+  # 日志保留天数 (默认: 365天,即12个月)
+  retentionDays: ${AUDIT_LOG_RETENTION_DAYS:-365}
   
   # 批量写入大小
   batchSize: ${AUDIT_LOG_BATCH_SIZE:-100}
@@ -541,7 +541,7 @@ workspace:
 # 审计日志配置
 auditLog:
   enabled: true
-  retentionDays: 365  # 合规要求
+  retentionDays: 365  # 12个月审计日志保留期
   batchSize: 100
   flushIntervalMs: 5000
   logReadOperations: true

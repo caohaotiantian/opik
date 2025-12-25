@@ -67,6 +67,15 @@ class AuthServiceImpl implements AuthService {
                 log.info("Workspace header received: '{}'", workspaceHeader);
 
                 if (workspaceHeader != null && !workspaceHeader.isEmpty()) {
+                    // Check if it's the default workspace (backward compatibility for open source)
+                    if (ProjectService.DEFAULT_WORKSPACE_NAME.equalsIgnoreCase(workspaceHeader)) {
+                        log.info("Using default workspace for backward compatibility");
+                        requestContext.get().setWorkspaceId(ProjectService.DEFAULT_WORKSPACE_ID);
+                        requestContext.get().setWorkspaceName(ProjectService.DEFAULT_WORKSPACE_NAME);
+                        requestContext.get().setUserName(session.userId());
+                        return;
+                    }
+
                     // Try to get workspace by ID first, then by name
                     log.info("Looking up workspace by ID: '{}'", workspaceHeader);
                     var workspaceOpt = workspaceService.getWorkspace(workspaceHeader);

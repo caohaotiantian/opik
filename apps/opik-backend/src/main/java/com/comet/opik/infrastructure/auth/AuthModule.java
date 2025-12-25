@@ -1,7 +1,14 @@
 package com.comet.opik.infrastructure.auth;
 
+import com.comet.opik.domain.ApiKeyService;
+import com.comet.opik.domain.SessionService;
+import com.comet.opik.domain.UserService;
+import com.comet.opik.domain.WorkspaceMemberService;
+import com.comet.opik.domain.WorkspaceQuotaService;
+import com.comet.opik.domain.WorkspaceService;
 import com.comet.opik.infrastructure.AuthenticationConfig;
 import com.comet.opik.infrastructure.OpikConfiguration;
+import com.comet.opik.infrastructure.authorization.PermissionService;
 import com.google.common.base.Preconditions;
 import com.google.inject.Provides;
 import jakarta.inject.Provider;
@@ -24,20 +31,54 @@ public class AuthModule extends DropwizardAwareModule<OpikConfiguration> {
             @Config("authentication") AuthenticationConfig config,
             @NonNull Provider<RequestContext> requestContext,
             @NonNull RedissonReactiveClient redissonClient,
-            @NonNull com.comet.opik.domain.SessionService sessionService,
-            @NonNull com.comet.opik.domain.WorkspaceService workspaceService,
-            @NonNull com.comet.opik.domain.ApiKeyService apiKeyService,
-            @NonNull com.comet.opik.domain.UserService userService) {
+            @NonNull SessionService sessionService,
+            @NonNull WorkspaceService workspaceService,
+            @NonNull WorkspaceMemberService workspaceMemberService,
+            @NonNull ApiKeyService apiKeyService,
+            @NonNull UserService userService,
+            @NonNull PermissionService permissionService,
+            @NonNull WorkspaceQuotaService quotaService) {
 
+        // When authentication is disabled, use LocalAuthService with default workspace mode (backward compatibility)
         if (!config.isEnabled()) {
-            return new AuthServiceImpl(requestContext, sessionService, workspaceService, apiKeyService, userService);
+            return new LocalAuthService(
+                    requestContext,
+                    sessionService,
+                    apiKeyService,
+                    userService,
+                    workspaceService,
+                    workspaceMemberService,
+                    permissionService,
+                    quotaService,
+                    false); // authEnabled = false (backward compatibility mode)
         }
 
+        // Check authentication type (defaults to LOCAL)
+        var authType = config.getType();
+        if (authType == null) {
+            authType = AuthenticationConfig.AuthType.LOCAL;
+        }
+
+        // Use LocalAuthService for LOCAL authentication type
+        if (authType == AuthenticationConfig.AuthType.LOCAL) {
+            return new LocalAuthService(
+                    requestContext,
+                    sessionService,
+                    apiKeyService,
+                    userService,
+                    workspaceService,
+                    workspaceMemberService,
+                    permissionService,
+                    quotaService,
+                    true); // authEnabled = true (require authentication)
+        }
+
+        // REMOTE authentication type requires reactService configuration
         Objects.requireNonNull(config.getReactService(),
-                "The property authentication.reactService.url is required when authentication is enabled");
+                "The property authentication.reactService.url is required when authentication type is REMOTE");
 
         Preconditions.checkArgument(StringUtils.isNotBlank(config.getReactService().url()),
-                "The property authentication.reactService.url must not be blank when authentication is enabled");
+                "The property authentication.reactService.url must not be blank when authentication type is REMOTE");
 
         var cacheService = config.getApiKeyResolutionCacheTTLInSec() > 0
                 ? new AuthCredentialsCacheService(redissonClient, config.getApiKeyResolutionCacheTTLInSec())

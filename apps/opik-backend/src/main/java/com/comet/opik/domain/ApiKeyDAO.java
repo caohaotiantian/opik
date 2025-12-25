@@ -7,6 +7,7 @@ import org.jdbi.v3.sqlobject.config.RegisterArgumentFactory;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindMethods;
+import org.jdbi.v3.sqlobject.customizer.Define;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
@@ -76,4 +77,36 @@ public interface ApiKeyDAO {
     void updateLastUsed(
             @Bind("id") String id,
             @Bind("lastUsedAt") Instant lastUsedAt);
+
+    @SqlQuery("""
+            SELECT * FROM user_api_keys
+            WHERE user_id = :userId
+              AND workspace_id = :workspaceId
+              AND (:search IS NULL OR name LIKE :search)
+              AND (:status IS NULL OR status = :status)
+            ORDER BY <sortBy> <sortDir>
+            LIMIT :limit OFFSET :offset
+            """)
+    List<ApiKey> findByUserAndWorkspacePaged(
+            @Bind("userId") String userId,
+            @Bind("workspaceId") String workspaceId,
+            @Bind("search") String search,
+            @Bind("status") ApiKeyStatus status,
+            @Define("sortBy") String sortBy,
+            @Define("sortDir") String sortDir,
+            @Bind("limit") int limit,
+            @Bind("offset") int offset);
+
+    @SqlQuery("""
+            SELECT COUNT(*) FROM user_api_keys
+            WHERE user_id = :userId
+              AND workspace_id = :workspaceId
+              AND (:search IS NULL OR name LIKE :search)
+              AND (:status IS NULL OR status = :status)
+            """)
+    long countByUserAndWorkspace(
+            @Bind("userId") String userId,
+            @Bind("workspaceId") String workspaceId,
+            @Bind("search") String search,
+            @Bind("status") ApiKeyStatus status);
 }

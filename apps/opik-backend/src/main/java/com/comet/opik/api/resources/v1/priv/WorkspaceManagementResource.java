@@ -5,12 +5,16 @@ import com.comet.opik.api.Workspace;
 import com.comet.opik.api.WorkspaceCreateRequest;
 import com.comet.opik.api.WorkspaceMember;
 import com.comet.opik.api.WorkspaceMemberAddRequest;
+import com.comet.opik.api.WorkspaceMemberResponse;
 import com.comet.opik.api.WorkspaceMemberUpdateRequest;
 import com.comet.opik.api.WorkspaceUpdateRequest;
 import com.comet.opik.api.error.ErrorMessage;
+import com.comet.opik.domain.RoleService;
+import com.comet.opik.domain.UserService;
 import com.comet.opik.domain.WorkspaceMemberService;
 import com.comet.opik.domain.WorkspaceService;
 import com.comet.opik.infrastructure.auth.RequestContext;
+import com.comet.opik.infrastructure.authorization.RequiresPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -49,6 +53,8 @@ public class WorkspaceManagementResource {
 
     private final @NonNull WorkspaceService workspaceService;
     private final @NonNull WorkspaceMemberService memberService;
+    private final @NonNull UserService userService;
+    private final @NonNull RoleService roleService;
     private final @NonNull Provider<RequestContext> requestContext;
 
     @GET
@@ -69,6 +75,7 @@ public class WorkspaceManagementResource {
     }
 
     @POST
+    @RequiresPermission("WORKSPACE_CREATE")
     @Operation(operationId = "createWorkspace", summary = "Create workspace", description = "Create a new workspace", responses = {
             @ApiResponse(responseCode = "201", description = "Workspace created", content = @Content(schema = @Schema(implementation = Workspace.class))),
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(schema = @Schema(implementation = ErrorMessage.class))),
@@ -97,6 +104,7 @@ public class WorkspaceManagementResource {
 
     @GET
     @Path("/{id}")
+    @RequiresPermission("WORKSPACE_VIEW")
     @Operation(operationId = "getWorkspace", summary = "Get workspace", description = "Get workspace details by ID", responses = {
             @ApiResponse(responseCode = "200", description = "Workspace details", content = @Content(schema = @Schema(implementation = Workspace.class))),
             @ApiResponse(responseCode = "404", description = "Workspace not found", content = @Content(schema = @Schema(implementation = ErrorMessage.class)))
@@ -114,6 +122,7 @@ public class WorkspaceManagementResource {
 
     @PUT
     @Path("/{id}")
+    @RequiresPermission("WORKSPACE_SETTINGS")
     @Operation(operationId = "updateWorkspace", summary = "Update workspace", description = "Update workspace details", responses = {
             @ApiResponse(responseCode = "200", description = "Workspace updated", content = @Content(schema = @Schema(implementation = Workspace.class))),
             @ApiResponse(responseCode = "404", description = "Workspace not found", content = @Content(schema = @Schema(implementation = ErrorMessage.class))),
@@ -144,6 +153,7 @@ public class WorkspaceManagementResource {
 
     @DELETE
     @Path("/{id}")
+    @RequiresPermission("WORKSPACE_ADMIN")
     @Operation(operationId = "deleteWorkspace", summary = "Delete workspace", description = "Delete workspace (soft delete)", responses = {
             @ApiResponse(responseCode = "204", description = "Workspace deleted"),
             @ApiResponse(responseCode = "404", description = "Workspace not found", content = @Content(schema = @Schema(implementation = ErrorMessage.class)))
@@ -162,8 +172,9 @@ public class WorkspaceManagementResource {
 
     @GET
     @Path("/{id}/members")
-    @Operation(operationId = "listMembers", summary = "List workspace members", description = "Get list of workspace members", responses = {
-            @ApiResponse(responseCode = "200", description = "Member list", content = @Content(schema = @Schema(implementation = WorkspaceMember.class))),
+    @RequiresPermission("WORKSPACE_MEMBER_VIEW")
+    @Operation(operationId = "listMembers", summary = "List workspace members", description = "Get list of workspace members with user details", responses = {
+            @ApiResponse(responseCode = "200", description = "Member list", content = @Content(schema = @Schema(implementation = WorkspaceMemberResponse.class))),
             @ApiResponse(responseCode = "404", description = "Workspace not found", content = @Content(schema = @Schema(implementation = ErrorMessage.class)))
     })
     public Response listMembers(@PathParam("id") String workspaceId) {
@@ -171,13 +182,23 @@ public class WorkspaceManagementResource {
 
         List<WorkspaceMember> members = memberService.getWorkspaceMembers(workspaceId);
 
-        log.info("Found '{}' members for workspace '{}'", members.size(), workspaceId);
+        // Convert to response with user details
+        List<WorkspaceMemberResponse> memberResponses = members.stream()
+                .map(member -> {
+                    var user = userService.getUser(member.userId()).orElse(null);
+                    var role = roleService.getRole(member.roleId()).orElse(null);
+                    return WorkspaceMemberResponse.from(member, user, role);
+                })
+                .toList();
 
-        return Response.ok().entity(members).build();
+        log.info("Found '{}' members for workspace '{}'", memberResponses.size(), workspaceId);
+
+        return Response.ok().entity(memberResponses).build();
     }
 
     @POST
     @Path("/{id}/members")
+    @RequiresPermission("WORKSPACE_MEMBER_MANAGE")
     @Operation(operationId = "addMember", summary = "Add workspace member", description = "Add a user as workspace member", responses = {
             @ApiResponse(responseCode = "201", description = "Member added"),
             @ApiResponse(responseCode = "409", description = "User already a member", content = @Content(schema = @Schema(implementation = io.dropwizard.jersey.errors.ErrorMessage.class)))
@@ -199,6 +220,7 @@ public class WorkspaceManagementResource {
 
     @PUT
     @Path("/{id}/members/{userId}")
+    @RequiresPermission("WORKSPACE_MEMBER_MANAGE")
     @Operation(operationId = "updateMember", summary = "Update member role", description = "Update workspace member's role", responses = {
             @ApiResponse(responseCode = "204", description = "Member role updated"),
             @ApiResponse(responseCode = "404", description = "Member not found", content = @Content(schema = @Schema(implementation = ErrorMessage.class)))
@@ -221,6 +243,7 @@ public class WorkspaceManagementResource {
 
     @DELETE
     @Path("/{id}/members/{userId}")
+    @RequiresPermission("WORKSPACE_MEMBER_MANAGE")
     @Operation(operationId = "removeMember", summary = "Remove member", description = "Remove user from workspace", responses = {
             @ApiResponse(responseCode = "204", description = "Member removed"),
             @ApiResponse(responseCode = "404", description = "Member not found", content = @Content(schema = @Schema(implementation = ErrorMessage.class)))

@@ -607,7 +607,8 @@ public class UserServiceImpl implements UserService {
         // 创建重置令牌
         String token = tokenService.createResetToken(user.getId());
         
-        // TODO: 发送重置邮件 (当前版本暂不实现)
+        // 注意: 当前版本不集成邮件服务
+        // 重置令牌需要通过其他方式(如管理员操作、短信等)传递给用户
         log.info("Password reset token generated for user: '{}', token: '{}'", 
             user.getUsername(), token);
     }

@@ -1,3 +1,0 @@
-15:43:22 [INFO] Testing weak password rejection
-15:43:22 [INFO] Testing weak password: 123
-15:43:22 [INFO] Registering user: testuser_je8l79n2_0

@@ -1,3 +1,0 @@
-16:56:11 [INFO] Testing invalid email format
-16:56:11 [INFO] Testing invalid email: not-an-email
-16:56:11 [INFO] Registering user: testuser_emb8ebu6_0

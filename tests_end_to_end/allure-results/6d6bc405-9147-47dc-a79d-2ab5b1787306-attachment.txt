@@ -1,2 +1,0 @@
-16:56:11 [INFO] Testing user registration for: testuser_duplue1s
-16:56:11 [INFO] Registering user: testuser_duplue1s

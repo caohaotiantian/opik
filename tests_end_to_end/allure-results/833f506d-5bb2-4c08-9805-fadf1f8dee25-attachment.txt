@@ -1,2 +1,0 @@
-15:43:21 [INFO] Testing audit log for user registration: testuser_ffz20b56
-15:43:21 [INFO] Registering user: testuser_ffz20b56

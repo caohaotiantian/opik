@@ -19,7 +19,7 @@ public class UserRowMapper implements RowMapper<User> {
                 .passwordHash(rs.getString("password_hash"))
                 .fullName(rs.getString("full_name"))
                 .avatarUrl(rs.getString("avatar_url"))
-                .status(UserStatus.valueOf(rs.getString("status")))
+                .status(UserStatus.fromValue(rs.getString("status")))
                 .systemAdmin(rs.getBoolean("is_system_admin"))
                 .emailVerified(rs.getBoolean("email_verified"))
                 .lastLoginAt(rs.getTimestamp("last_login_at") != null

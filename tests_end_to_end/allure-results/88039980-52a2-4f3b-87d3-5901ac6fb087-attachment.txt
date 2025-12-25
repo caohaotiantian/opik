@@ -1,4 +1,0 @@
-15:43:22 [INFO] Creating registered test user: testuser_341s3wow
-15:43:22 [INFO] Registering user: testuser_341s3wow
-15:43:22 [INFO] Cleaning up test user: testuser_341s3wow
-15:43:22 [INFO] Cleaning up test user: testuser_341s3wow

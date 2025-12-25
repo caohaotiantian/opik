@@ -1,3 +1,0 @@
-INFO     tests_end_to_end.tests.Authentication.test_authentication_flow:test_authentication_flow.py:161 Testing weak password rejection
-INFO     tests_end_to_end.tests.Authentication.test_authentication_flow:test_authentication_flow.py:171 Testing weak password: 123
-INFO     tests.Authentication.auth_helpers:auth_helpers.py:49 Registering user: testuser_je8l79n2_0

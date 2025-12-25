@@ -8,7 +8,9 @@ import com.comet.opik.domain.ProjectService;
 import com.comet.opik.domain.SessionService;
 import com.comet.opik.domain.UserService;
 import com.comet.opik.domain.WorkspaceMemberService;
+import com.comet.opik.domain.WorkspaceQuotaService;
 import com.comet.opik.domain.WorkspaceService;
+import com.comet.opik.infrastructure.authorization.PermissionService;
 import jakarta.inject.Provider;
 import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.core.Cookie;
@@ -90,6 +92,10 @@ public class LocalAuthService implements AuthService {
     private final @NonNull UserService userService;
     private final @NonNull WorkspaceService workspaceService;
     private final @NonNull WorkspaceMemberService memberService;
+    private final @NonNull PermissionService permissionService;
+    private final @NonNull WorkspaceQuotaService quotaService;
+    // Whether authentication is enabled (true = require auth, false = backward compatibility mode)
+    private final boolean authEnabled;
 
     @Override
     public void authenticate(HttpHeaders headers, Cookie sessionToken, ContextInfoHolder contextInfo) {
@@ -105,9 +111,9 @@ public class LocalAuthService implements AuthService {
             throw new ClientErrorException(MISSING_WORKSPACE, Response.Status.FORBIDDEN);
         }
 
-        // Handle default workspace (backward compatibility)
-        if (isDefaultWorkspace(currentWorkspaceName)) {
-            log.debug("Using default workspace");
+        // Handle default workspace (backward compatibility mode - only when auth is disabled)
+        if (!authEnabled && isDefaultWorkspace(currentWorkspaceName)) {
+            log.debug("Using default workspace (auth disabled mode)");
             requestContext.get().setUserName(ProjectService.DEFAULT_USER);
             requestContext.get().setWorkspaceId(ProjectService.DEFAULT_WORKSPACE_ID);
             requestContext.get().setWorkspaceName(ProjectService.DEFAULT_WORKSPACE_NAME);
@@ -139,8 +145,39 @@ public class LocalAuthService implements AuthService {
             throw new ClientErrorException(NOT_LOGGED_USER, Response.Status.FORBIDDEN);
         }
 
-        // Just verify session exists, details will be loaded in authenticate()
-        log.debug("Session cookie present, will be validated in authenticate()");
+        log.debug("Authenticating session for /v1/session/* endpoints");
+
+        // Validate session (without fingerprint for session-only endpoints)
+        var session = sessionService.validateSessionOnly(sessionToken.getValue());
+
+        if (session.isEmpty()) {
+            log.warn("Invalid or expired session");
+            throw new ClientErrorException(INVALID_SESSION, Response.Status.UNAUTHORIZED);
+        }
+
+        // Load user
+        var user = userService.getUser(session.get().userId())
+                .orElseThrow(() -> {
+                    log.error("User not found for session: '{}'", session.get().userId());
+                    return new ClientErrorException(USER_NOT_FOUND, Response.Status.UNAUTHORIZED);
+                });
+
+        // Check user status
+        if (user.status() != UserStatus.ACTIVE) {
+            log.warn("User account is not active: '{}' - status: '{}'", user.id(), user.status());
+            throw new ClientErrorException("User account is suspended or deleted", Response.Status.FORBIDDEN);
+        }
+
+        // Set basic user info in context (no workspace context for session-only endpoints)
+        requestContext.get().setUserName(user.username());
+        requestContext.get().setUserId(user.id());
+        requestContext.get().setSystemAdmin(user.systemAdmin());
+        requestContext.get().setApiKey(sessionToken.getValue());
+
+        // Update last activity async
+        sessionService.updateLastActivityAsync(session.get().id());
+
+        log.debug("Session authentication successful for user: '{}'", user.username());
     }
 
     /**
@@ -260,9 +297,17 @@ public class LocalAuthService implements AuthService {
             throw new ClientErrorException(NOT_ALLOWED_TO_ACCESS_WORKSPACE, Response.Status.FORBIDDEN);
         }
 
-        // Load permissions (limited by API key scopes)
-        // Convert scopes to permissions (will be fully implemented in RBAC phase)
-        var permissions = new HashSet<String>();
+        // Load user permissions from database
+        var permissions = loadUserPermissions(user.id(), workspace.id());
+
+        // If API key has scopes defined, filter permissions to only those in scopes
+        if (apiKeyInfo.get().scopes() != null && !apiKeyInfo.get().scopes().isEmpty()
+                && !apiKeyInfo.get().scopes().contains("*")) {
+            // Restrict permissions to API key scopes
+            permissions = permissions.stream()
+                    .filter(p -> apiKeyInfo.get().scopes().contains(p))
+                    .collect(java.util.stream.Collectors.toSet());
+        }
 
         // Set credentials in context
         setCredentialsInContext(user.username(), user.id(), workspace.id(), workspaceName,
@@ -312,18 +357,28 @@ public class LocalAuthService implements AuthService {
         requestContext.get().setSystemAdmin(isSystemAdmin);
         requestContext.get().setPermissions(permissions);
 
-        // Set default quotas (TODO: load from database)
-        requestContext.get().setQuotas(java.util.List.of());
+        // Load workspace quotas
+        var quotas = quotaService.loadWorkspaceQuotas(workspaceId);
+        requestContext.get().setQuotas(quotas);
+
+        log.debug("Loaded {} quotas for workspace: '{}'", quotas.size(), workspaceId);
     }
 
     /**
-     * Load user permissions from database
-     * TODO: Implement actual permission loading logic
+     * Load user permissions from database using PermissionService
+     *
+     * @param userId the user ID
+     * @param workspaceId the workspace ID
+     * @return set of permission names
      */
     private Set<String> loadUserPermissions(String userId, String workspaceId) {
-        // TODO: Implement permission loading from roles
-        // For now, return empty set - will be implemented in RBAC phase
-        return new HashSet<>();
+        try {
+            return permissionService.getUserWorkspacePermissions(userId, workspaceId);
+        } catch (Exception e) {
+            log.error("Failed to load permissions for user '{}' in workspace '{}': {}",
+                    userId, workspaceId, e.getMessage());
+            return new HashSet<>();
+        }
     }
 
     /**

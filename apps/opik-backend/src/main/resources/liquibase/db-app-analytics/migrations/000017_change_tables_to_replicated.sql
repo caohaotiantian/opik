@@ -261,6 +261,9 @@ RENAME TABLE ${ANALYTICS_DB_DATABASE_NAME}.attachments1 TO ${ANALYTICS_DB_DATABA
 --rollback RENAME TABLE ${ANALYTICS_DB_DATABASE_NAME}.attachments TO ${ANALYTICS_DB_DATABASE_NAME}.attachments1;
 
 --changeset liyaka:change-tables-to-replicated-19 id:migrate-databasechangelog
+--comment: Create DATABASECHANGELOG1 table for cluster mode migration (skipped in single-instance mode if default.DATABASECHANGELOG does not exist)
+--preconditions onFail:MARK_RAN
+--precondition-sql-check expectedResult:1 SELECT count() > 0 FROM system.tables WHERE database = 'default' AND name = 'DATABASECHANGELOG'
 CREATE TABLE IF NOT EXISTS default.DATABASECHANGELOG1
 (
     `ID` String,
@@ -281,9 +284,12 @@ CREATE TABLE IF NOT EXISTS default.DATABASECHANGELOG1
 ENGINE = ReplicatedMergeTree('/clickhouse/tables/{shard}/default/DATABASECHANGELOG', '{replica}')
 ORDER BY ID
 SETTINGS index_granularity = 8192
---rollback DROP TABLE default.DATABASECHANGELOG1;
+--rollback DROP TABLE IF EXISTS default.DATABASECHANGELOG1;
 
 --changeset liyaka:change-tables-to-replicated-20 id:migrate-databasechangelog
+--comment: Migrate DATABASECHANGELOG data for cluster mode (skipped in single-instance mode if default.DATABASECHANGELOG does not exist)
+--preconditions onFail:MARK_RAN
+--precondition-sql-check expectedResult:1 SELECT count() > 0 FROM system.tables WHERE database = 'default' AND name = 'DATABASECHANGELOG'
 ALTER TABLE default.DATABASECHANGELOG1 ATTACH PARTITION tuple() FROM default.DATABASECHANGELOG;
 ALTER TABLE default.DATABASECHANGELOG DETACH PARTITION tuple() SETTINGS max_partition_size_to_drop = 0;
 DROP TABLE default.DATABASECHANGELOG SYNC SETTINGS max_table_size_to_drop = 0;
@@ -291,6 +297,9 @@ RENAME TABLE default.DATABASECHANGELOG1 TO default.DATABASECHANGELOG;
 --rollback RENAME TABLE default.DATABASECHANGELOG TO default.DATABASECHANGELOG1;
 
 --changeset liyaka:change-tables-to-replicated-21 id:migrate-databasechangeloglock
+--comment: Create DATABASECHANGELOGLOCK1 table for cluster mode migration (skipped in single-instance mode if default.DATABASECHANGELOGLOCK does not exist)
+--preconditions onFail:MARK_RAN
+--precondition-sql-check expectedResult:1 SELECT count() > 0 FROM system.tables WHERE database = 'default' AND name = 'DATABASECHANGELOGLOCK'
 CREATE TABLE IF NOT EXISTS default.DATABASECHANGELOGLOCK1
 (
     `ID` Int64,
@@ -301,9 +310,12 @@ CREATE TABLE IF NOT EXISTS default.DATABASECHANGELOGLOCK1
 ENGINE = ReplicatedMergeTree('/clickhouse/tables/{shard}/default/DATABASECHANGELOGLOCK', '{replica}')
 ORDER BY ID
 SETTINGS index_granularity = 8192
---rollback DROP TABLE default.DATABASECHANGELOGLOCK1;
+--rollback DROP TABLE IF EXISTS default.DATABASECHANGELOGLOCK1;
 
 --changeset liyaka:change-tables-to-replicated-22 id:migrate-databasechangeloglock
+--comment: Migrate DATABASECHANGELOGLOCK data for cluster mode (skipped in single-instance mode if default.DATABASECHANGELOGLOCK does not exist)
+--preconditions onFail:MARK_RAN
+--precondition-sql-check expectedResult:1 SELECT count() > 0 FROM system.tables WHERE database = 'default' AND name = 'DATABASECHANGELOGLOCK'
 ALTER TABLE default.DATABASECHANGELOGLOCK1 ATTACH PARTITION tuple() FROM default.DATABASECHANGELOGLOCK;
 ALTER TABLE default.DATABASECHANGELOGLOCK DETACH PARTITION tuple() SETTINGS max_partition_size_to_drop = 0;
 DROP TABLE default.DATABASECHANGELOGLOCK SYNC SETTINGS max_table_size_to_drop = 0;

@@ -158,14 +158,22 @@ openTelemetry:
 
 # Authentication configuration. This is not enabled by default for open source installations.
 authentication:
-  # Default: false
+  # Default: true
   # Description: Whether or not to enable authentication
-  enabled: ${AUTH_ENABLED:-false}
+  enabled: ${AUTH_ENABLED:-true}
+  # Default: local
+  # Description: Authentication type - 'local' for database authentication, 'remote' for external React service
+  type: ${AUTH_TYPE:-local}
   # Default: 5
   # Description: API key resolution cache TTL (seconds). Setting this value to 0 means no caching.
   apiKeyResolutionCacheTTLInSec: ${AUTH_API_KEY_RESOLUTION_CACHE_TTL_IN_SEC:-5}
+  # API Key configuration
+  apiKey:
+    # Default: 50
+    # Description: Maximum number of API keys allowed per user
+    maxPerUser: ${AUTH_API_KEY_MAX_PER_USER:-50}
   # Default: http://react-svc:8080
-  # Description: Configures base url for React service, used for user management and authentication
+  # Description: Configures base url for React service, used for user management and authentication (only needed when type=remote)
   reactService:
     url: ${REACT_SERVICE_URL:-http://react-svc:8080}
 
