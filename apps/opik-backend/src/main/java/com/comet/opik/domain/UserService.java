@@ -270,6 +270,25 @@ public class UserService {
     }
 
     /**
+     * Set system admin flag for a user
+     *
+     * @param userId the user ID
+     * @param systemAdmin true to grant system admin, false to revoke
+     * @param updatedBy the user who made the update
+     */
+    @Auditable(action = "Update System Admin", resourceType = "user", operation = Operation.UPDATE)
+    public void setSystemAdmin(String userId, boolean systemAdmin, String updatedBy) {
+        log.info("Setting system admin flag for user '{}' to '{}'", userId, systemAdmin);
+
+        var user = getUser(userId)
+                .orElseThrow(() -> new NotFoundException("User not found: '%s'".formatted(userId)));
+
+        userDAO.updateSystemAdmin(userId, systemAdmin, updatedBy);
+
+        log.info("User '{}' system admin flag updated to '{}'", user.username(), systemAdmin);
+    }
+
+    /**
      * Delete user (soft delete by setting status to DELETED)
      *
      * @param userId the user ID

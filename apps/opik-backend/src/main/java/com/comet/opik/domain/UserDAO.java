@@ -100,6 +100,19 @@ public interface UserDAO {
 
     @SqlUpdate("""
             UPDATE users
+            SET is_system_admin = :systemAdmin,
+                version = version + 1,
+                last_updated_at = CURRENT_TIMESTAMP(6),
+                last_updated_by = :updatedBy
+            WHERE id = :id
+            """)
+    void updateSystemAdmin(
+            @Bind("id") String id,
+            @Bind("systemAdmin") boolean systemAdmin,
+            @Bind("updatedBy") String updatedBy);
+
+    @SqlUpdate("""
+            UPDATE users
             SET last_login_at = :lastLoginAt,
                 last_updated_at = CURRENT_TIMESTAMP(6)
             WHERE id = :id
