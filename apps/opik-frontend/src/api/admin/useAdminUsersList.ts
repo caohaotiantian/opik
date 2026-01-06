@@ -1,6 +1,11 @@
 import { useQuery, UseQueryOptions } from "@tanstack/react-query";
 import axiosInstance from "@/api/api";
-import { AdminUser, AdminUserListResponse, AdminUserQueryParams, UserStatus } from "./types";
+import {
+  AdminUser,
+  AdminUserListResponse,
+  AdminUserQueryParams,
+  UserStatus,
+} from "./types";
 
 const ADMIN_USERS_REST_ENDPOINT = "/v1/private/admin/users";
 
@@ -72,4 +77,3 @@ export default function useAdminUsersList(
     ...options,
   });
 }
-

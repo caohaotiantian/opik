@@ -111,4 +111,3 @@ export interface ExportAuditLogsRequest {
   format: "csv" | "json";
   filters?: Omit<AuditLogQueryParams, "page" | "size">;
 }
-

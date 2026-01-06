@@ -2,7 +2,7 @@ import { useMutation, UseMutationOptions, useQueryClient } from "@tanstack/react
 import axiosInstance from "@/api/api";
 import { API_KEYS_KEY } from "./useApiKeysList";
 
-const API_KEYS_REST_ENDPOINT = "/v1/api-keys";
+const API_KEYS_REST_ENDPOINT = "/v1/private/api-keys";
 
 const deleteApiKey = async (id: string): Promise<void> => {
   await axiosInstance.delete(`${API_KEYS_REST_ENDPOINT}/${id}`);

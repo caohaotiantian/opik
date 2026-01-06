@@ -103,8 +103,9 @@ const ApiKeysPage = () => {
       status: statusFilter || undefined,
       sortBy,
       sortDir,
+      workspaceId: workspaceId || undefined, // 传递工作空间 ID
     }),
-    [page, size, search, statusFilter, sortBy, sortDir],
+    [page, size, search, statusFilter, sortBy, sortDir, workspaceId],
   );
 
   const { data, isLoading, isError } = useApiKeysList(queryParams);
@@ -388,7 +389,7 @@ const ApiKeysPage = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <code className="text-sm">{apiKey.keyPrefix || apiKey.id.substring(0, 8)}...</code>
+                        <code className="text-sm">{apiKey.id.substring(0, 8)}...</code>
                       </TableCell>
                       <TableCell>{getStatusBadge(apiKey.status)}</TableCell>
                       <TableCell>

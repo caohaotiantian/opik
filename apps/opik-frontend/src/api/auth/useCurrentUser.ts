@@ -37,10 +37,9 @@ interface BackendCurrentUserResponse {
   username?: string;
   email?: string;
   full_name?: string;
-  default_workspace_id?: string;
   default_workspace_name?: string;
   system_admin?: boolean;
-  // 完整响应格式
+  // 完整响应格式（也用于简单格式）
   workspaces?: BackendWorkspaceInfo[];
   default_workspace_id?: string;
 }

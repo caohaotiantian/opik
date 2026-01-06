@@ -30,8 +30,21 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 
+// 密码强度类型
+type PasswordStrengthLevel = "weak" | "medium" | "strong";
+
 // 密码强度检查
-const checkPasswordStrength = (password: string) => {
+const checkPasswordStrength = (password: string): {
+  checks: {
+    minLength: boolean;
+    hasLowercase: boolean;
+    hasUppercase: boolean;
+    hasNumber: boolean;
+    hasSpecial: boolean;
+  };
+  score: number;
+  strength: PasswordStrengthLevel;
+} => {
   const checks = {
     minLength: password.length >= 8,
     hasLowercase: /[a-z]/.test(password),
@@ -42,10 +55,13 @@ const checkPasswordStrength = (password: string) => {
 
   const score = Object.values(checks).filter(Boolean).length;
 
+  const strength: PasswordStrengthLevel =
+    score <= 2 ? "weak" : score <= 3 ? "medium" : "strong";
+
   return {
     checks,
     score,
-    strength: score <= 2 ? "weak" : score <= 3 ? "medium" : "strong",
+    strength,
   };
 };
 

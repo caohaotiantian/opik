@@ -1,4 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  UseMutationOptions,
+  useQueryClient,
+} from "@tanstack/react-query";
 import axiosInstance from "@/api/api";
 import { AdminUser, UpdateUserStatusRequest } from "./types";
 import { ADMIN_USERS_KEY } from "./useAdminUsersList";
@@ -35,4 +39,3 @@ export default function useUpdateUserStatus(
     ...options,
   });
 }
-
