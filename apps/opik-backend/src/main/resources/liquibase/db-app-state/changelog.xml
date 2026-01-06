@@ -7,7 +7,9 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
         http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
+    <!-- Default database name for MySQL state database -->
+    <property name="STATE_DB_DATABASE_NAME" value="opik" global="true"/>
 
-<includeAll relativeToChangelogFile="true" path="migrations/" endsWithFilter=".sql"  />
+    <includeAll relativeToChangelogFile="true" path="migrations/" endsWithFilter=".sql"/>
 
 </databaseChangeLog>

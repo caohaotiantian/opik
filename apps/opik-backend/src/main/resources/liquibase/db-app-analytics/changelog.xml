@@ -5,6 +5,9 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
+    <!-- Default database name for ClickHouse analytics database -->
+    <property name="ANALYTICS_DB_DATABASE_NAME" value="opik" global="true"/>
+
     <includeAll relativeToChangelogFile="true" path="migrations/" endsWithFilter=".sql"/>
 
 </databaseChangeLog>
