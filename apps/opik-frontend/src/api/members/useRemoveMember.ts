@@ -4,16 +4,21 @@ import { MEMBERS_KEY } from "./useMembersList";
 
 interface RemoveMemberParams {
   workspaceId: string;
+  workspaceName?: string;
   memberId: string;
 }
 
 const removeMember = async ({
   workspaceId,
+  workspaceName,
   memberId,
 }: RemoveMemberParams): Promise<void> => {
   // memberId 实际上是 userId
   await axiosInstance.delete(
     `${WORKSPACES_MANAGEMENT_REST_ENDPOINT}${workspaceId}/members/${memberId}`,
+    {
+      params: workspaceName ? { workspace_name: workspaceName } : undefined,
+    },
   );
 };
 

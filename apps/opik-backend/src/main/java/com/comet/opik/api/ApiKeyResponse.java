@@ -21,6 +21,8 @@ public record ApiKeyResponse(
 
         @Schema(description = "Description") String description,
 
+    @Schema(description = "API key prefix") String keyPrefix,
+
         @Schema(description = "Status") ApiKeyStatus status,
 
         @Schema(description = "Expiry date") Instant expiresAt,

@@ -62,7 +62,7 @@ const UsersManagementPage = () => {
   const { data, isLoading } = useAdminUsersList({
     search: searchQuery || undefined,
     status: statusFilter === "all" ? undefined : statusFilter,
-    page,
+    page: page + 1,
     size: 20,
   });
 

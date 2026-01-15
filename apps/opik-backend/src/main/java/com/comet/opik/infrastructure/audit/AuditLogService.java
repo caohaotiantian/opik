@@ -374,9 +374,9 @@ public class AuditLogService {
             String sortDirection = request.sortDirection() != null ? request.sortDirection() : "DESC";
             sql.append(" ORDER BY ").append(sortBy).append(" ").append(sortDirection);
 
-            int page = request.page() != null ? request.page() : 1;
+            int page = request.page() != null ? request.page() : 0;
             int size = request.size() != null ? request.size() : 20;
-            int offset = (page - 1) * size;
+            int offset = page * size;
 
             sql.append(" LIMIT :limitSize OFFSET :offsetVal");
             params.put("limitSize", size);

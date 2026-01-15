@@ -55,6 +55,7 @@ import usePromptsList from "@/api/prompts/usePromptsList";
 import useAnnotationQueuesList from "@/api/annotation-queues/useAnnotationQueuesList";
 // import { useOpenQuickStartDialog } from "@/components/pages-shared/onboarding/QuickstartDialog/QuickstartDialog"; // Removed - no longer needed
 // import GitHubStarListItem from "@/components/layout/SideBar/GitHubStarListItem/GitHubStarListItem"; // Removed - no longer needed
+import WorkspaceSelector from "@/components/layout/WorkspaceSelector/WorkspaceSelector";
 import SidebarMenuItem, {
   MENU_ITEM_TYPE,
   MenuItem,
@@ -540,6 +541,12 @@ const SideBar: React.FunctionComponent<SideBarProps> = ({
         <div className="relative flex h-[calc(100%-var(--header-height))]">
           {renderExpandCollapseButton()}
           <div className="flex min-h-0 grow flex-col overflow-auto px-3 py-4">
+            {/* 工作空间选择器 - 仅在认证模式下显示 */}
+            {authEnabled && (
+              <div className="mb-4">
+                <WorkspaceSelector expanded={expanded} />
+              </div>
+            )}
             <ul className="flex flex-col gap-1 pb-2">
               {renderGroups(MENU_ITEMS)}
             </ul>

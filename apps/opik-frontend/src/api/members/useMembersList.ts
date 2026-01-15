@@ -6,6 +6,7 @@ export const MEMBERS_KEY = "workspace-members";
 
 interface UseMembersListParams {
   workspaceId: string;
+  workspaceName?: string;
   page?: number;
   size?: number;
 }
@@ -42,11 +43,16 @@ const transformMember = (member: BackendWorkspaceMember): WorkspaceMember => ({
 const getMembersList = async (
   params: UseMembersListParams,
 ): Promise<MemberListResponse> => {
-  const { workspaceId, ...queryParams } = params;
+  const { workspaceId, workspaceName, ...queryParams } = params;
   // 后端返回的是数组而非分页对象
   const { data } = await axiosInstance.get<BackendWorkspaceMember[]>(
     `${WORKSPACES_MANAGEMENT_REST_ENDPOINT}${workspaceId}/members`,
-    { params: queryParams },
+    {
+      params: {
+        ...queryParams,
+        ...(workspaceName ? { workspace_name: workspaceName } : {}),
+      },
+    },
   );
   // 转换数据格式并转换为分页格式以兼容前端
   return {

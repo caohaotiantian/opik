@@ -5,12 +5,14 @@ import { MEMBERS_KEY } from "./useMembersList";
 
 interface UpdateMemberRoleParams {
   workspaceId: string;
+  workspaceName?: string;
   memberId: string;
   request: UpdateMemberRoleRequest;
 }
 
 const updateMemberRole = async ({
   workspaceId,
+  workspaceName,
   memberId,
   request,
 }: UpdateMemberRoleParams): Promise<void> => {
@@ -19,6 +21,9 @@ const updateMemberRole = async ({
     `${WORKSPACES_MANAGEMENT_REST_ENDPOINT}${workspaceId}/members/${memberId}`,
     {
       role_id: request.roleId,
+    },
+    {
+      params: workspaceName ? { workspace_name: workspaceName } : undefined,
     },
   );
 };

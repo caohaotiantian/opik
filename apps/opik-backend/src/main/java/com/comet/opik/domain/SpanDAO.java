@@ -1330,8 +1330,6 @@ class SpanDAO {
             SELECT COUNT(DISTINCT id) as count
             FROM spans
             WHERE workspace_id = :workspace_id
-            ORDER BY (workspace_id, project_id, id) DESC, last_updated_at DESC
-            LIMIT 1 BY id
             ;
             """;
 

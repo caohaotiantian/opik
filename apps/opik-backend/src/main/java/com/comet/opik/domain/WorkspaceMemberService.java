@@ -6,6 +6,7 @@ import com.comet.opik.api.WorkspaceMember;
 import com.comet.opik.api.error.ConflictException;
 import com.comet.opik.infrastructure.audit.Auditable;
 import com.comet.opik.infrastructure.audit.Operation;
+import com.comet.opik.infrastructure.authorization.PermissionCacheService;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.BadRequestException;
@@ -26,6 +27,7 @@ public class WorkspaceMemberService {
     private final @NonNull WorkspaceMemberDAO memberDAO;
     private final @NonNull RoleService roleService;
     private final @NonNull IdGenerator idGenerator;
+    private final @NonNull PermissionCacheService permissionCacheService;
 
     /**
      * Add a member to a workspace
@@ -72,6 +74,8 @@ public class WorkspaceMemberService {
 
         memberDAO.insert(member);
 
+        // Invalidate permission cache for the new member
+        permissionCacheService.invalidateWorkspacePermissions(userId, workspaceId);
         log.info("User '{}' added to workspace '{}' successfully", userId, workspaceId);
 
         return member;
@@ -135,6 +139,8 @@ public class WorkspaceMemberService {
 
         memberDAO.updateRole(workspaceId, userId, roleId, updatedBy);
 
+        // Invalidate permission cache since role has changed
+        permissionCacheService.invalidateWorkspacePermissions(userId, workspaceId);
         log.info("Role updated successfully for user '{}' in workspace '{}'", userId, workspaceId);
     }
 
@@ -156,6 +162,8 @@ public class WorkspaceMemberService {
 
         memberDAO.updateStatus(workspaceId, userId, status, updatedBy);
 
+        // Invalidate permission cache since status has changed (inactive users may lose permissions)
+        permissionCacheService.invalidateWorkspacePermissions(userId, workspaceId);
         log.info("Status updated successfully for user '{}' in workspace '{}'", userId, workspaceId);
     }
 
@@ -176,6 +184,8 @@ public class WorkspaceMemberService {
 
         memberDAO.delete(workspaceId, userId);
 
+        // Invalidate permission cache for the removed member
+        permissionCacheService.invalidateWorkspacePermissions(userId, workspaceId);
         log.info("User '{}' removed from workspace '{}' successfully", userId, workspaceId);
     }
 }

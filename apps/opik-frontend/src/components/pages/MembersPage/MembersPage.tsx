@@ -11,7 +11,8 @@ import {
   useRolesList,
 } from "@/api/members";
 import type { WorkspaceMember } from "@/api/members";
-import { useCurrentWorkspaceId } from "@/store/AuthStore";
+import { useCurrentWorkspace, useCurrentWorkspaceId } from "@/store/AuthStore";
+import { useActiveWorkspaceName } from "@/store/AppStore";
 import { useUsersList } from "@/api/users";
 
 import { Button } from "@/components/ui/button";
@@ -70,6 +71,9 @@ const MembersPage = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const workspaceId = useCurrentWorkspaceId();
+  const workspace = useCurrentWorkspace();
+  const activeWorkspaceName = useActiveWorkspaceName();
+  const workspaceName = activeWorkspaceName || workspace?.name;
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
@@ -82,6 +86,7 @@ const MembersPage = () => {
 
   const { data: membersData, isLoading: membersLoading } = useMembersList({
     workspaceId: workspaceId || "",
+    workspaceName,
   });
 
   const { data: rolesData } = useRolesList({ scope: "workspace" });
@@ -113,6 +118,7 @@ const MembersPage = () => {
     try {
       await addMutation.mutateAsync({
         workspaceId,
+        workspaceName,
         request: {
           userId: selectedUserId,
           roleId: selectedRoleId,
@@ -145,6 +151,7 @@ const MembersPage = () => {
     try {
       await updateRoleMutation.mutateAsync({
         workspaceId,
+        workspaceName,
         memberId: member.userId, // 后端使用 userId 而不是 member.id
         request: { roleId: newRoleId },
       });
@@ -167,6 +174,7 @@ const MembersPage = () => {
     try {
       await removeMutation.mutateAsync({
         workspaceId,
+        workspaceName,
         memberId: selectedMember.userId, // 后端使用 userId 而不是 member.id
       });
 

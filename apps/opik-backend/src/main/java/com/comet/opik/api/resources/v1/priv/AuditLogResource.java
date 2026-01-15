@@ -44,7 +44,7 @@ public class AuditLogResource {
     private final @NonNull AuditLogService auditLogService;
 
     @GET
-    @RequiresPermission("SYSTEM_AUDIT_READ")
+    @RequiresPermission("SYSTEM_AUDIT_VIEW")
     @Operation(operationId = "queryAuditLogs", summary = "Query audit logs", description = "Query audit logs with filters and pagination (System Admin only)", responses = {
             @ApiResponse(responseCode = "200", description = "Audit log page", content = @Content(schema = @Schema(implementation = AuditLogPage.class))),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorMessage.class))),
@@ -78,7 +78,7 @@ public class AuditLogResource {
                 .status(status)
                 .startTime(startTime)
                 .endTime(endTime)
-                .page(page != null ? page : 1)
+                .page(page != null ? page : 0)
                 .size(size != null ? size : 20)
                 .sortBy(sortBy)
                 .sortDirection(sortDirection)
@@ -94,7 +94,7 @@ public class AuditLogResource {
 
     @GET
     @Path("/{id}")
-    @RequiresPermission("SYSTEM_AUDIT_READ")
+    @RequiresPermission("SYSTEM_AUDIT_VIEW")
     @Operation(operationId = "getAuditLog", summary = "Get audit log by ID", description = "Get detailed information of a specific audit log (System Admin only)", responses = {
             @ApiResponse(responseCode = "200", description = "Audit log details", content = @Content(schema = @Schema(implementation = AuditLog.class))),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorMessage.class))),
@@ -124,7 +124,7 @@ public class AuditLogResource {
 
     @GET
     @Path("/stats")
-    @RequiresPermission("SYSTEM_AUDIT_READ")
+    @RequiresPermission("SYSTEM_AUDIT_VIEW")
     @Operation(operationId = "getAuditLogStats", summary = "Get audit log statistics", description = "Get statistics of audit logs (System Admin only)", responses = {
             @ApiResponse(responseCode = "200", description = "Audit log statistics"),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(schema = @Schema(implementation = ErrorMessage.class))),
@@ -167,7 +167,7 @@ public class AuditLogResource {
 
     @GET
     @Path("/export")
-    @RequiresPermission("SYSTEM_AUDIT_READ")
+    @RequiresPermission("SYSTEM_AUDIT_VIEW")
     @Produces({MediaType.APPLICATION_JSON, "text/csv"})
     @Operation(operationId = "exportAuditLogs", summary = "Export audit logs", description = "Export audit logs to CSV or JSON format (System Admin only)", responses = {
             @ApiResponse(responseCode = "200", description = "Exported audit logs"),

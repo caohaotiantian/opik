@@ -13,6 +13,7 @@ export interface BackendApiKeyResponse {
   api_key: string | null; // 明文 key，仅在创建时返回，列表查询时为 null
   workspace_id: string;
   description?: string;
+  key_prefix?: string;
   status: ApiKeyStatus;
   expires_at?: string;
   created_at: string;
@@ -42,6 +43,7 @@ export interface ApiKeyResponse {
   workspaceId: string;
   name: string;
   description?: string;
+  keyPrefix?: string;
   apiKey?: string; // 明文 key，仅在创建时返回
   status: ApiKeyStatus;
   expiresAt?: string;
@@ -102,6 +104,7 @@ export const transformApiKey = (
   workspaceId: backendKey.workspace_id,
   name: backendKey.name,
   description: backendKey.description,
+  keyPrefix: backendKey.key_prefix,
   apiKey: backendKey.api_key || undefined, // api_key 可能为 null
   status: backendKey.status,
   expiresAt: backendKey.expires_at,

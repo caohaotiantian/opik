@@ -99,6 +99,9 @@ public class AdminResource {
         // Permission check is handled by @RequiresPermission annotation
 
         int pageNum = page != null ? page : 1;
+        if (pageNum < 1) {
+            pageNum = 1;
+        }
         int pageSize = size != null ? Math.min(size, 100) : 20;
 
         List<User> users = userService.getAllUsers(search, status, systemAdmin, pageNum, pageSize);

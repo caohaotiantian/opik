@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import get from "lodash/get";
 import {
   Plus,
   Key,
@@ -145,7 +146,8 @@ const ApiKeysPage = () => {
 
   // 处理状态筛选
   const handleStatusFilter = (value: string) => {
-    setStatusFilter(value as ApiKeyStatus | "");
+    // "all" 表示全部状态，转换为空字符串用于查询
+    setStatusFilter(value === "all" ? "" : (value as ApiKeyStatus));
     setPage(1); // 重置到第一页
   };
 
@@ -164,10 +166,17 @@ const ApiKeysPage = () => {
         description: t("apiKeys.createdDescription", "请立即复制保存，此密钥仅显示一次"),
       });
     } catch (error) {
+      const errorMessage = get(error, ["response", "data", "message"]);
+      const description = errorMessage
+        ? t("apiKeys.createFailedWithReason", "创建 API Key 失败：{{reason}}", {
+            reason: errorMessage,
+          })
+        : t("apiKeys.createFailed", "创建 API Key 失败");
+
       toast({
         variant: "destructive",
         title: t("common.error", "错误"),
-        description: t("apiKeys.createFailed", "创建 API Key 失败"),
+        description,
       });
     }
   };
@@ -306,12 +315,12 @@ const ApiKeysPage = () => {
           placeholder={t("apiKeys.searchPlaceholder", "搜索 API Key 名称...")}
           className="w-64"
         />
-        <Select value={statusFilter} onValueChange={handleStatusFilter}>
+        <Select value={statusFilter || "all"} onValueChange={handleStatusFilter}>
           <SelectTrigger className="w-40">
             <SelectValue placeholder={t("apiKeys.allStatus", "全部状态")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">{t("apiKeys.allStatus", "全部状态")}</SelectItem>
+            <SelectItem value="all">{t("apiKeys.allStatus", "全部状态")}</SelectItem>
             <SelectItem value="ACTIVE">{t("apiKeys.status.active", "活跃")}</SelectItem>
             <SelectItem value="REVOKED">{t("apiKeys.status.revoked", "已撤销")}</SelectItem>
           </SelectContent>
@@ -389,7 +398,11 @@ const ApiKeysPage = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <code className="text-sm">{apiKey.id.substring(0, 8)}...</code>
+                        <code className="text-sm">
+                          {apiKey.keyPrefix
+                            ? `${apiKey.keyPrefix}...`
+                            : `${apiKey.id.substring(0, 8)}...`}
+                        </code>
                       </TableCell>
                       <TableCell>{getStatusBadge(apiKey.status)}</TableCell>
                       <TableCell>

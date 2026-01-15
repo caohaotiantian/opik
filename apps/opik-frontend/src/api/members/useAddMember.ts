@@ -5,11 +5,13 @@ import { MEMBERS_KEY } from "./useMembersList";
 
 interface AddMemberParams {
   workspaceId: string;
+  workspaceName?: string;
   request: AddMemberRequest;
 }
 
 const addMember = async ({
   workspaceId,
+  workspaceName,
   request,
 }: AddMemberParams): Promise<void> => {
   // 后端期望 user_id 和 role_id (snake_case)
@@ -18,6 +20,9 @@ const addMember = async ({
     {
       user_id: request.userId,
       role_id: request.roleId,
+    },
+    {
+      params: workspaceName ? { workspace_name: workspaceName } : undefined,
     },
   );
 };

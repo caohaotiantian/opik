@@ -7,6 +7,7 @@ import com.comet.opik.api.ApiKeyResponse;
 import com.comet.opik.api.error.ErrorMessage;
 import com.comet.opik.domain.ApiKeyService;
 import com.comet.opik.infrastructure.auth.RequestContext;
+import com.comet.opik.infrastructure.authorization.RequiresPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -51,6 +52,7 @@ public class ApiKeyManagementResource {
     private final @NonNull Provider<RequestContext> requestContext;
 
     @GET
+    @RequiresPermission("API_KEY_VIEW")
     @Operation(operationId = "listApiKeys", summary = "List API keys", description = "List all API keys for a workspace (without plaintext keys)", responses = {
             @ApiResponse(responseCode = "200", description = "List of API keys", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ApiKeyResponse.class)))),
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(schema = @Schema(implementation = ErrorMessage.class)))
@@ -69,6 +71,7 @@ public class ApiKeyManagementResource {
                         .apiKey(null)
                         .workspaceId(apiKey.workspaceId())
                         .description(apiKey.description())
+                        .keyPrefix(apiKey.keyPrefix())
                         .status(apiKey.status())
                         .expiresAt(apiKey.expiresAt())
                         .createdAt(apiKey.createdAt())
@@ -82,6 +85,7 @@ public class ApiKeyManagementResource {
     }
 
     @POST
+    @RequiresPermission("API_KEY_CREATE")
     @Operation(operationId = "createApiKey", summary = "Create API key", description = "Create a new API key (returns plaintext key only once)", responses = {
             @ApiResponse(responseCode = "201", description = "API Key created", content = @Content(schema = @Schema(implementation = ApiKeyResponse.class))),
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(schema = @Schema(implementation = ErrorMessage.class)))
@@ -114,6 +118,7 @@ public class ApiKeyManagementResource {
                 .apiKey(result.plainApiKey())
                 .workspaceId(result.apiKey().workspaceId())
                 .description(result.apiKey().description())
+                .keyPrefix(result.apiKey().keyPrefix())
                 .status(result.apiKey().status())
                 .expiresAt(result.apiKey().expiresAt())
                 .createdAt(result.apiKey().createdAt())
@@ -129,6 +134,7 @@ public class ApiKeyManagementResource {
 
     @DELETE
     @Path("/{id}")
+    @RequiresPermission("API_KEY_REVOKE")
     @Operation(operationId = "revokeApiKey", summary = "Revoke API key", description = "Revoke/delete an API key", responses = {
             @ApiResponse(responseCode = "204", description = "API Key revoked"),
             @ApiResponse(responseCode = "404", description = "API Key not found", content = @Content(schema = @Schema(implementation = ErrorMessage.class)))

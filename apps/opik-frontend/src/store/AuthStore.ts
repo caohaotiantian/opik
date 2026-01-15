@@ -1,11 +1,21 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { User, WorkspaceInfo } from "@/api/auth/types";
+import axiosInstance from "@/api/api";
 
 /**
  * 认证状态管理
  * 管理用户登录状态、当前用户信息、工作空间列表等
  */
+
+// 同步设置工作空间 Header，确保所有 API 请求都携带正确的工作空间信息
+const setWorkspaceHeader = (workspaceName: string) => {
+  if (workspaceName) {
+    axiosInstance.defaults.headers.common["Comet-Workspace"] = workspaceName;
+  } else {
+    delete axiosInstance.defaults.headers.common["Comet-Workspace"];
+  }
+};
 
 interface AuthState {
   // 是否已认证
@@ -68,39 +78,76 @@ const useAuthStore = create<AuthStore>()(
       setWorkspaces: (workspaces) => set({ workspaces }),
 
       setCurrentWorkspaceId: (workspaceId) =>
-        set({ currentWorkspaceId: workspaceId }),
+        set((state) => {
+          // 找到对应的工作空间并设置 Header
+          const workspace = state.workspaces.find((w) => w.id === workspaceId);
+          if (workspace) {
+            setWorkspaceHeader(workspace.name);
+          }
+          return { currentWorkspaceId: workspaceId };
+        }),
 
       setDefaultWorkspaceId: (workspaceId) =>
         set({ defaultWorkspaceId: workspaceId }),
 
       setAuthEnabled: (enabled) => set({ authEnabled: enabled }),
 
-      loginSuccess: (user, workspaces, defaultWorkspaceId) =>
-        set({
+      loginSuccess: (user, workspaces, defaultWorkspaceId) => {
+        // 立即设置工作空间 Header，确保后续 API 请求能正确携带工作空间信息
+        const defaultWorkspace = workspaces.find((w) => w.id === defaultWorkspaceId);
+        if (defaultWorkspace) {
+          setWorkspaceHeader(defaultWorkspace.name);
+        } else if (workspaces.length > 0) {
+          setWorkspaceHeader(workspaces[0].name);
+        }
+        
+        return set({
           isAuthenticated: true,
           currentUser: user,
           workspaces,
           defaultWorkspaceId,
           currentWorkspaceId: defaultWorkspaceId,
-        }),
+        });
+      },
 
-      logout: () =>
-        set({
+      logout: () => {
+        // 清除工作空间 Header
+        setWorkspaceHeader("");
+        return set({
           isAuthenticated: false,
           currentUser: null,
           workspaces: [],
           currentWorkspaceId: null,
-        }),
+        });
+      },
 
-      reset: () => set(initialState),
+      reset: () => {
+        // 清除工作空间 Header
+        setWorkspaceHeader("");
+        return set(initialState);
+      },
     }),
     {
       name: "opik-auth-storage",
       partialize: (state) => ({
-        // 只持久化部分状态
+        // 持久化认证相关状态，确保页面刷新后能正确恢复
         currentWorkspaceId: state.currentWorkspaceId,
         defaultWorkspaceId: state.defaultWorkspaceId,
+        workspaces: state.workspaces,
+        isAuthenticated: state.isAuthenticated,
+        currentUser: state.currentUser,
       }),
+      // 在恢复状态后立即设置 workspace header
+      onRehydrateStorage: () => (state) => {
+        if (state && state.workspaces && state.currentWorkspaceId) {
+          const workspace = state.workspaces.find(
+            (w) => w.id === state.currentWorkspaceId
+          );
+          if (workspace) {
+            setWorkspaceHeader(workspace.name);
+          }
+        }
+      },
     },
   ),
 );

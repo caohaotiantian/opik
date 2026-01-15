@@ -13,14 +13,14 @@ public enum Permission {
     // ==================== SYSTEM PERMISSIONS ====================
 
     /**
+     * System admin marker
+     */
+    SYSTEM_ADMIN,
+
+    /**
      * Create, update, delete users
      */
     SYSTEM_USER_MANAGE,
-
-    /**
-     * View all users
-     */
-    SYSTEM_USER_READ,
 
     /**
      * Create, update, delete workspaces
@@ -28,41 +28,31 @@ public enum Permission {
     SYSTEM_WORKSPACE_MANAGE,
 
     /**
-     * View all workspaces
+     * Manage system settings
      */
-    SYSTEM_WORKSPACE_READ,
-
-    /**
-     * Manage system configuration
-     */
-    SYSTEM_CONFIG_MANAGE,
-
-    /**
-     * View system configuration
-     */
-    SYSTEM_CONFIG_READ,
+    SYSTEM_SETTINGS,
 
     /**
      * View audit logs
      */
-    SYSTEM_AUDIT_READ,
+    SYSTEM_AUDIT_VIEW,
 
     // ==================== WORKSPACE PERMISSIONS ====================
 
     /**
-     * Delete workspace
+     * Workspace admin marker
      */
-    WORKSPACE_DELETE,
-
-    /**
-     * Update workspace settings
-     */
-    WORKSPACE_UPDATE,
+    WORKSPACE_ADMIN,
 
     /**
      * View workspace details
      */
-    WORKSPACE_READ,
+    WORKSPACE_VIEW,
+
+    /**
+     * Update workspace settings
+     */
+    WORKSPACE_SETTINGS,
 
     /**
      * Add/remove members
@@ -70,46 +60,21 @@ public enum Permission {
     WORKSPACE_MEMBER_MANAGE,
 
     /**
-     * Update member roles
-     */
-    WORKSPACE_MEMBER_UPDATE,
-
-    /**
      * View workspace members
      */
-    WORKSPACE_MEMBER_READ,
-
-    /**
-     * Create projects
-     */
-    WORKSPACE_PROJECT_CREATE,
-
-    /**
-     * View all projects in workspace
-     */
-    WORKSPACE_PROJECT_READ,
-
-    /**
-     * Generate API keys
-     */
-    WORKSPACE_API_KEY_CREATE,
-
-    /**
-     * Revoke API keys
-     */
-    WORKSPACE_API_KEY_REVOKE,
-
-    /**
-     * View API keys
-     */
-    WORKSPACE_API_KEY_READ,
+    WORKSPACE_MEMBER_VIEW,
 
     // ==================== PROJECT PERMISSIONS ====================
 
     /**
-     * Delete project
+     * Create projects
      */
-    PROJECT_DELETE,
+    PROJECT_CREATE,
+
+    /**
+     * View project details
+     */
+    PROJECT_VIEW,
 
     /**
      * Update project settings
@@ -117,124 +82,124 @@ public enum Permission {
     PROJECT_UPDATE,
 
     /**
-     * View project details
+     * Delete project
      */
-    PROJECT_READ,
-
-    /**
-     * Add/remove project members
-     */
-    PROJECT_MEMBER_MANAGE,
-
-    /**
-     * Update project member roles
-     */
-    PROJECT_MEMBER_UPDATE,
-
-    /**
-     * View project members
-     */
-    PROJECT_MEMBER_READ,
+    PROJECT_DELETE,
 
     /**
      * Create traces
      */
-    PROJECT_TRACE_CREATE,
-
-    /**
-     * Update traces
-     */
-    PROJECT_TRACE_UPDATE,
-
-    /**
-     * Delete traces
-     */
-    PROJECT_TRACE_DELETE,
+    TRACE_CREATE,
 
     /**
      * View traces
      */
-    PROJECT_TRACE_READ,
+    TRACE_VIEW,
 
     /**
-     * Create spans
+     * Update traces
      */
-    PROJECT_SPAN_CREATE,
+    TRACE_UPDATE,
 
     /**
-     * Update spans
+     * Delete traces
      */
-    PROJECT_SPAN_UPDATE,
-
-    /**
-     * Delete spans
-     */
-    PROJECT_SPAN_DELETE,
-
-    /**
-     * View spans
-     */
-    PROJECT_SPAN_READ,
+    TRACE_DELETE,
 
     /**
      * Create datasets
      */
-    PROJECT_DATASET_CREATE,
-
-    /**
-     * Update datasets
-     */
-    PROJECT_DATASET_UPDATE,
-
-    /**
-     * Delete datasets
-     */
-    PROJECT_DATASET_DELETE,
+    DATASET_CREATE,
 
     /**
      * View datasets
      */
-    PROJECT_DATASET_READ,
+    DATASET_VIEW,
+
+    /**
+     * Update datasets
+     */
+    DATASET_UPDATE,
+
+    /**
+     * Delete datasets
+     */
+    DATASET_DELETE,
+
+    /**
+     * Create prompts
+     */
+    PROMPT_CREATE,
+
+    /**
+     * View prompts
+     */
+    PROMPT_VIEW,
+
+    /**
+     * Update prompts
+     */
+    PROMPT_UPDATE,
+
+    /**
+     * Delete prompts
+     */
+    PROMPT_DELETE,
 
     /**
      * Create experiments
      */
-    PROJECT_EXPERIMENT_CREATE,
-
-    /**
-     * Update experiments
-     */
-    PROJECT_EXPERIMENT_UPDATE,
-
-    /**
-     * Delete experiments
-     */
-    PROJECT_EXPERIMENT_DELETE,
+    EXPERIMENT_CREATE,
 
     /**
      * View experiments
      */
-    PROJECT_EXPERIMENT_READ,
+    EXPERIMENT_VIEW,
 
     /**
-     * Add feedback scores
+     * Update experiments
      */
-    PROJECT_FEEDBACK_CREATE,
+    EXPERIMENT_UPDATE,
 
     /**
-     * Update feedback scores
+     * Delete experiments
      */
-    PROJECT_FEEDBACK_UPDATE,
+    EXPERIMENT_DELETE,
 
     /**
-     * Delete feedback scores
+     * Generate API keys
      */
-    PROJECT_FEEDBACK_DELETE,
+    API_KEY_CREATE,
 
     /**
-     * View feedback scores
+     * View API keys
      */
-    PROJECT_FEEDBACK_READ;
+    API_KEY_VIEW,
+
+    /**
+     * Revoke API keys
+     */
+    API_KEY_REVOKE,
+
+    /**
+     * Create feedback definitions
+     */
+    FEEDBACK_DEFINITION_CREATE,
+
+    /**
+     * View feedback definitions
+     */
+    FEEDBACK_DEFINITION_VIEW,
+
+    /**
+     * Update feedback definitions
+     */
+    FEEDBACK_DEFINITION_UPDATE,
+
+    /**
+     * Delete feedback definitions
+     */
+    FEEDBACK_DEFINITION_DELETE;
 
     /**
      * Check if this is a system permission

@@ -56,3 +56,4 @@ public record WorkspaceMemberResponse(
                 .build();
     }
 }
+
