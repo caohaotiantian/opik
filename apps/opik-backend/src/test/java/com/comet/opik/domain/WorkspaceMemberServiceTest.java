@@ -5,6 +5,7 @@ import com.comet.opik.api.Role;
 import com.comet.opik.api.RoleScope;
 import com.comet.opik.api.WorkspaceMember;
 import com.comet.opik.api.error.ConflictException;
+import com.comet.opik.infrastructure.authorization.PermissionCacheService;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,11 +51,14 @@ class WorkspaceMemberServiceTest {
     @Mock
     private IdGenerator idGenerator;
 
+    @Mock
+    private PermissionCacheService permissionCacheService;
+
     private WorkspaceMemberService memberService;
 
     @BeforeEach
     void setUp() {
-        memberService = new WorkspaceMemberService(memberDAO, roleService, idGenerator);
+        memberService = new WorkspaceMemberService(memberDAO, roleService, idGenerator, permissionCacheService);
     }
 
     @Nested

@@ -21,7 +21,7 @@ public record ApiKeyResponse(
 
         @Schema(description = "Description") String description,
 
-    @Schema(description = "API key prefix") String keyPrefix,
+        @Schema(description = "API key prefix") String keyPrefix,
 
         @Schema(description = "Status") ApiKeyStatus status,
 
