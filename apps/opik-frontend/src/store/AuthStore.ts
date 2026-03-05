@@ -46,7 +46,11 @@ interface AuthActions {
   // 设置认证模式
   setAuthEnabled: (enabled: boolean) => void;
   // 登录成功后设置状态
-  loginSuccess: (user: User, workspaces: WorkspaceInfo[], defaultWorkspaceId: string) => void;
+  loginSuccess: (
+    user: User,
+    workspaces: WorkspaceInfo[],
+    defaultWorkspaceId: string,
+  ) => void;
   // 登出
   logout: () => void;
   // 重置状态
@@ -61,8 +65,7 @@ const initialState: AuthState = {
   workspaces: [],
   currentWorkspaceId: null,
   defaultWorkspaceId: null,
-  // 默认启用认证模式，只有当后端明确返回认证未启用时才禁用
-  authEnabled: true,
+  authEnabled: false,
 };
 
 const useAuthStore = create<AuthStore>()(
@@ -94,13 +97,15 @@ const useAuthStore = create<AuthStore>()(
 
       loginSuccess: (user, workspaces, defaultWorkspaceId) => {
         // 立即设置工作空间 Header，确保后续 API 请求能正确携带工作空间信息
-        const defaultWorkspace = workspaces.find((w) => w.id === defaultWorkspaceId);
+        const defaultWorkspace = workspaces.find(
+          (w) => w.id === defaultWorkspaceId,
+        );
         if (defaultWorkspace) {
           setWorkspaceHeader(defaultWorkspace.name);
         } else if (workspaces.length > 0) {
           setWorkspaceHeader(workspaces[0].name);
         }
-        
+
         return set({
           isAuthenticated: true,
           currentUser: user,
@@ -141,7 +146,7 @@ const useAuthStore = create<AuthStore>()(
       onRehydrateStorage: () => (state) => {
         if (state && state.workspaces && state.currentWorkspaceId) {
           const workspace = state.workspaces.find(
-            (w) => w.id === state.currentWorkspaceId
+            (w) => w.id === state.currentWorkspaceId,
           );
           if (workspace) {
             setWorkspaceHeader(workspace.name);
@@ -156,11 +161,9 @@ const useAuthStore = create<AuthStore>()(
 export const useIsAuthenticated = () =>
   useAuthStore((state) => state.isAuthenticated);
 
-export const useCurrentUser = () =>
-  useAuthStore((state) => state.currentUser);
+export const useCurrentUser = () => useAuthStore((state) => state.currentUser);
 
-export const useWorkspaces = () =>
-  useAuthStore((state) => state.workspaces);
+export const useWorkspaces = () => useAuthStore((state) => state.workspaces);
 
 export const useCurrentWorkspaceId = () =>
   useAuthStore((state) => state.currentWorkspaceId);
@@ -168,8 +171,7 @@ export const useCurrentWorkspaceId = () =>
 export const useDefaultWorkspaceId = () =>
   useAuthStore((state) => state.defaultWorkspaceId);
 
-export const useAuthEnabled = () =>
-  useAuthStore((state) => state.authEnabled);
+export const useAuthEnabled = () => useAuthStore((state) => state.authEnabled);
 
 export const useIsSystemAdmin = () =>
   useAuthStore((state) => state.currentUser?.systemAdmin ?? false);
@@ -190,4 +192,3 @@ export const useCurrentWorkspaceRole = () =>
   });
 
 export default useAuthStore;
-
